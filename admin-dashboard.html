@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>EV Analytics | Admin Dashboard</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --sidebar-width: 260px;
+      --primary-color: #6366f1;
+      --sidebar-bg: #0f172a;
+      --content-bg: #f8fafc;
+    }
+
+    body {
+      background: var(--content-bg);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      display: flex;
+      color: #1e293b;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: var(--sidebar-width);
+      height: 100vh;
+      background: var(--sidebar-bg);
+      color: #cbd5e1;
+      position: fixed;
+      left: 0;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      z-index: 1000;
+      box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-brand {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      flex-grow: 1;
+    }
+
+    .nav-link-custom {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0.75rem 1rem;
+      color: #94a3b8;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-link-custom:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+
+    .nav-link-custom.active {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .logout-btn-nav {
+      margin-top: auto;
+      background: rgba(239, 68, 68, 0.1);
+      color: #f87171 !important;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .logout-btn-nav:hover {
+      background: #ef4444 !important;
+      color: white !important;
+    }
+
+    /* Main Content Area */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      flex-grow: 1;
+      padding: 2rem;
+      min-height: 100vh;
+      width: calc(100% - var(--sidebar-width));
+    }
+
+    .filter-box,
+    .kpi-card,
+    .chart-card {
+      background: white;
+      border: none;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      color: #1e293b;
+      transition: transform 0.2s ease;
+    }
+
+    .filter-box:hover,
+    .kpi-card:hover,
+    .chart-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .kpi-card h6 {
+      font-size: 13px;
+      color: #64748b;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .kpi-card h2 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--primary-color);
+      margin: 0.5rem 0;
+    }
+
+    .chart-title {
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 1.25rem;
+      border-bottom: 1px solid #f1f5f9;
+      color: #1e293b;
+    }
+
+    .nav-tabs {
+      border-bottom: 1px solid #e2e8f0;
+      gap: 1rem;
+    }
+
+    .nav-tabs .nav-link {
+      color: #64748b;
+      border: none;
+      padding: 0.75rem 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .nav-tabs .nav-link:hover {
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+
+    .nav-tabs .nav-link.active {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    canvas {
+      max-height: 280px;
+    }
+
+    .table {
+      color: #1e293b;
+    }
+
+    .table-dark {
+      background-color: white;
+      color: #1e293b;
+    }
+
+    .table-hover tbody tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .modal-content {
+      background: white;
+      color: #1e293b;
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal-header {
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .modal-footer {
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .form-select,
+    .form-control {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #1e293b;
+      border-radius: 10px;
+    }
+
+    .form-select:focus,
+    .form-control:focus {
+      background-color: white;
+      border-color: var(--primary-color);
+      color: #1e293b;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    .analysis-card {
+      max-width: 800px;
+      margin: 2rem auto;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span>⚡ Volt Analytics</span>
+    </div>
+    <div class="nav-links">
+      <a href="admin-dashboard.html" class="nav-link-custom active">
+        <span>📊</span> Admin Dashboard
+      </a>
+      <a href="index.html" class="nav-link-custom">
+        <span>🏠</span> Home
+      </a>
+      <a href="calculator.html" class="nav-link-custom">
+        <span>🧮</span> Calculator
+      </a>
+      <button class="nav-link-custom logout-btn-nav mt-auto" onclick="logout()">
+        <span>🚪</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <div class="row align-items-center mb-4">
+      <div class="col">
+        <h2 class="fw-bold mb-0">Admin Dashboard</h2>
+        <p class="text-muted">Comprehensive EV market insights and user analytics.</p>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <ul class="nav nav-tabs mb-4">
+      <li class="nav-item">
+        <a class="nav-link active fw-bold" href="#" id="tab-ev" onclick="switchTab('ev')">EV Insights</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link fw-bold" href="#" id="tab-users" onclick="switchTab('users')">User Analytics</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link fw-bold" href="#" id="tab-ads" onclick="switchTab('ads')">Ad Manager</a>
+      </li>
+    </ul>
+
+    <!-- =======================
+         EV INSIGHTS SECTION
+         ======================= -->
+    <div id="ev-insights">
+
+      <!-- FILTERS -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-3">
+          <div class="filter-box p-2">
+            <label class="form-label">Brand</label>
+            <select id="brandFilter" class="form-select form-select-sm">
+              <option value="All">All</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="filter-box p-2">
+            <label class="form-label">Industry (Category)</label>
+            <select id="categoryFilter" class="form-select form-select-sm">
+              <option value="All">All</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI CARDS -->
+      <div class="row g-3 mb-3">
+        <div class="col-md">
+          <div class="kpi-card p-3 text-center">
+            <h6>Total Records</h6>
+            <h2 id="users">0</h2>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="kpi-card p-3 text-center">
+            <h6>Total Distance (km)</h6>
+            <h2 id="distance">0</h2>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="kpi-card p-3 text-center">
+            <h6>Total Savings (₹)</h6>
+            <h2 id="savings">0</h2>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="kpi-card p-3 text-center">
+            <h6>CO₂ Saved (kg)</h6>
+            <h2 id="co2">0</h2>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="kpi-card p-3 text-center">
+            <h6>Avg Battery Health (%)</h6>
+            <h2 id="battery">0</h2>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="kpi-card p-3 text-center" style="border-left: 4px solid #10b981;">
+            <h6>Total Sales (Store)</h6>
+            <h2 id="store-sales">0</h2>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="kpi-card p-3 text-center" style="border-left: 4px solid #f59e0b;">
+            <h6>Store Revenue (₹)</h6>
+            <h2 id="store-revenue">0</h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHART ROW 1 -->
+      <div class="row g-3 mb-3">
+
+        <div class="col-lg-6">
+          <div class="chart-card h-100">
+            <div class="chart-title">Distance Usage by Purchase Year</div>
+            <div class="p-3">
+              <canvas id="distanceChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3">
+          <div class="chart-card h-100">
+            <div class="chart-title">Vehicle Category Distribution</div>
+            <div class="p-3">
+              <canvas id="categoryChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3">
+          <div class="chart-card h-100">
+            <div class="chart-title">State-wise Units Sold</div>
+            <div class="p-3">
+              <canvas id="stateChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CHART ROW 2 -->
+      <div class="row g-3 mb-3">
+
+        <div class="col-lg-6">
+          <div class="chart-card h-100">
+            <div class="chart-title">Units Sold per Year by State</div>
+            <div class="p-3">
+              <canvas id="stateYearChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="chart-card h-100">
+            <div class="chart-title">Sum of Vehicle Price by Purchase Year</div>
+            <div class="p-3">
+              <canvas id="priceYearChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- REVENUE ANALYSIS ROW -->
+      <div class="row g-3 mt-1 mb-3">
+        <div class="col-12">
+          <h5 class="text-secondary pb-2 border-bottom">Revenue & Market Analysis</h5>
+        </div>
+        <div class="col-lg-6">
+          <div class="chart-card h-100">
+            <div class="chart-title">Revenue by Brand (High Sales Performance)</div>
+            <div class="p-3">
+              <canvas id="revenueByBrandChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="chart-card h-100">
+            <div class="chart-title">Customer Interest (Units Sold by Brand)</div>
+            <div class="p-3">
+              <canvas id="salesByBrandChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <script type="module" src="admin-dashboard.js"></script>
+
+
+
+
+    <!-- =======================
+       USER ANALYTICS SECTION
+       ======================= -->
+    <div id="user-analytics" style="display: none;">
+
+      <!-- USER KPIs -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-3">
+          <div class="kpi-card p-3 text-center">
+            <h6>Total Users</h6>
+            <h2 id="totalUsers">0</h2>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="kpi-card p-3 text-center">
+            <h6>Active Users (Now)</h6>
+            <h2 id="activeUsers" class="text-success">0</h2>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="kpi-card p-3 text-center">
+            <h6>Total Logins</h6>
+            <h2 id="totalLogins">0</h2>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="kpi-card p-3 text-center">
+            <h6>Avg Session Time</h6>
+            <h2 id="avgSessionDuration">0m</h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- USER CHARTS -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-8">
+          <div class="chart-card h-100">
+            <div class="chart-title d-flex justify-content-between align-items-center">
+              <span>User Activity Trends</span>
+              <div class="d-flex gap-2">
+                <input type="date" id="startDate" class="form-control form-control-sm" style="width: 140px;">
+                <input type="date" id="endDate" class="form-control form-control-sm" style="width: 140px;">
+                <select id="userActivityRange" class="form-select form-select-sm" style="width: 120px;">
+                  <option value="7">Last 7 Days</option>
+                  <option value="30">Last 30 Days</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </div>
+            </div>
+            <div class="p-3">
+              <canvas id="userActivityChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="chart-card h-100">
+            <div class="chart-title">User Distribution</div>
+            <div class="p-3">
+              <canvas id="userDistributionChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- USER TABLE -->
+      <div class="row g-3 mb-4">
+        <div class="col-12">
+          <div class="card chart-card">
+            <div class="chart-title">User Database</div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th class="ps-4">Name / Email</th>
+                      <th class="text-center">Total Logins</th>
+                      <th class="text-center">Total Time Spent</th>
+                      <th class="text-center">Last Login</th>
+                      <th class="text-center">Status</th>
+                      <th class="text-end pe-4">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="userTableBody">
+                    <!-- JS Generates Rows -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- End of User Analytics Wrapper -->
+
+    <!-- =======================
+         AD MANAGER SECTION
+         ======================= -->
+    <div id="ad-manager" style="display: none;">
+
+      <!-- CURRENT ACTIVE AD -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card-custom bg-white p-4 rounded-4 shadow-sm border-start border-5 border-primary">
+            <h5 class="fw-bold text-muted text-uppercase small">Current Global Promotion</h5>
+            <div class="d-flex align-items-center justify-content-between mt-3">
+              <div>
+                <h2 class="fw-bold mb-1" id="activeAdBrand">No Active Promo</h2>
+                <p class="text-muted mb-0" id="activeAdDetails">-</p>
+              </div>
+              <button class="btn btn-outline-danger btn-sm" onclick="removeActiveAd()">Stop Promotion</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PENDING REQUESTS -->
+      <h5 class="fw-bold mb-3">Pending Ad Requests</h5>
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th class="ps-4">Brand</th>
+                  <th>Plan</th>
+                  <th>Amount</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th class="text-end pe-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adRequestsTable">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ADMIN INSIGHTS SECTION (GLOBAL FOOTER) -->
+    <div class="row justify-content-center my-5">
+      <div class="col-12">
+        <div class="card chart-card analysis-card text-center border-0"
+          style="background: rgba(99, 102, 241, 0.03); border: 1px dashed rgba(99, 102, 241, 0.2) !important;">
+          <div class="chart-title text-primary">⚡ Market Insights & Trends</div>
+          <div class="card-body text-start">
+            <div class="row">
+              <div class="col-md-6">
+                <ul class="list-unstyled mb-0">
+                  <li class="mb-2">🚀 <strong>Urban Growth:</strong> EV sales are increasing rapidly in urban regions
+                    with widespread charging access.</li>
+                  <li class="mb-2">🚙 <strong>Model Dominance:</strong> SUVs and Sedans dominate due to superior comfort
+                    and long driving range.</li>
+                  <li class="mb-2">🔋 <strong>Battery Impact:</strong> Higher battery capacity directly correlates with
+                    user satisfaction.</li>
+                  <li class="mb-2">💰 <strong>Incentives:</strong> Government subsidies remain a key driver for market
+                    affordability.</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <ul class="list-unstyled mb-0">
+                  <li class="mb-2">🔌 <strong>Home Charging:</strong> Availability of home charging infrastructure
+                    significantly boosts ownership rates.</li>
+                  <li class="mb-2">🏢 <strong>Fleet Adoption:</strong> Corporate fleets contribute heavily to the total
+                    EV sales volume.</li>
+                  <li class="mb-2">🌍 <strong>Sustainability:</strong> EV adoption is key to reducing carbon emissions
+                    in the transportation sector.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- USER DETAIL MODAL -->
+  <div class="modal fade" id="userModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold">User Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="d-flex align-items-center mb-4">
+            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3"
+              style="width: 60px; height: 60px; font-size: 24px;">👤</div>
+            <div>
+              <h5 class="mb-0" id="modalUserName">Name</h5>
+              <small class="text-muted" id="modalUserEmail">email@example.com</small>
+            </div>
+          </div>
+
+          <h6 class="fw-bold border-bottom pb-2 mb-3">Session History</h6>
+          <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+            <table class="table table-sm table-bordered">
+              <thead class="table-light">
+                <tr>
+                  <th>Login Time</th>
+                  <th>Logout Time</th>
+                  <th>Duration</th>
+                </tr>
+              </thead>
+              <tbody id="modalSessionRows">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AD REVIEW MODAL -->
+  <div class="modal fade" id="adReviewModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content bg-dark border-secondary text-white">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title">Review & Publish Ad</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="reviewAdId">
+          <input type="hidden" id="reviewAdBrand">
+          <input type="hidden" id="reviewAdPlan">
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label text-muted">Brand Name</label>
+              <input type="text" class="form-control bg-secondary text-white border-0" id="reviewBrandDisplay" readonly>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted">Original Plan</label>
+              <input type="text" class="form-control bg-secondary text-white border-0" id="reviewPlanDisplay" readonly>
+            </div>
+
+            <div class="col-12">
+              <hr class="border-secondary">
+              <h6 class="text-info mb-3">✏️ Edit Content Before Publishing</h6>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Ad Title</label>
+              <input type="text" class="form-control bg-dark text-white border-secondary" id="reviewTitle">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Ad Description</label>
+              <textarea class="form-control bg-dark text-white border-secondary" id="reviewDesc" rows="2"></textarea>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Target Link</label>
+              <input type="text" class="form-control bg-dark text-white border-secondary" id="reviewLink">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Image URL</label>
+              <div class="input-group">
+                <input type="text" class="form-control bg-dark text-white border-secondary" id="reviewImage"
+                  onchange="document.getElementById('imgPreview').src = this.value">
+                <button class="btn btn-outline-secondary" type="button"
+                  onclick="window.open(document.getElementById('reviewImage').value, '_blank')">View</button>
+              </div>
+              <div class="mt-2 text-center p-2 border border-secondary rounded">
+                <small class="d-block text-muted mb-1">Image Preview</small>
+                <img id="imgPreview" src="" alt="Preview" style="max-height: 150px; max-width: 100%;">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-secondary">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-success" onclick="publishAd()">🚀 Publish Live</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS (Required for Modal) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+</body>
+
+</html>

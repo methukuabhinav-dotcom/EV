@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>EV Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>EV Dashboard</h1>
+
+<div class="stats">
+  <div class="box" id="total"></div>
+  <div class="box" id="avgRange"></div>
+  <div class="box" id="avgPrice"></div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Vehicle ID</th>
+      <th>Brand</th>
+      <th>Category</th>
+      <th>Range (km)</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
+
+<script>
+fetch("ev-data.json")
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("total").innerText =
+      "Total Vehicles: " + data.length;
+
+    const avgRange = (data.reduce((a,b)=>a+b.Driving_Range_km,0)/data.length).toFixed(1);
+    const avgPrice = (data.reduce((a,b)=>a+b.Vehicle_Price,0)/data.length).toFixed(0);
+
+    document.getElementById("avgRange").innerText =
+      "Avg Range: " + avgRange + " km";
+
+    document.getElementById("avgPrice").innerText =
+      "Avg Price: ₹" + avgPrice;
+
+    const rows = data.slice(0,20).map(ev => `
+      <tr>
+        <td>${ev.Vehicle_ID}</td>
+        <td>${ev.Brand}</td>
+        <td>${ev.Vehicle_Category}</td>
+        <td>${ev.Driving_Range_km}</td>
+        <td>₹${ev.Vehicle_Price}</td>
+      </tr>
+    `).join("");
+
+    document.getElementById("tableBody").innerHTML = rows;
+  });
+</script>
+
+</body>
+</html>

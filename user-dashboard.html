@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>EV Analytics Dashboard</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --sidebar-width: 260px;
+      --primary-color: #6366f1;
+      --sidebar-bg: #0f172a;
+      --content-bg: #f8fafc;
+    }
+
+    body {
+      background: var(--content-bg);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      margin: 0;
+      display: flex;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: var(--sidebar-width);
+      height: 100vh;
+      background: var(--sidebar-bg);
+      color: #cbd5e1;
+      position: fixed;
+      left: 0;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      z-index: 1000;
+      box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-brand {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      flex-grow: 1;
+    }
+
+    .nav-link-custom {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0.75rem 1rem;
+      color: #94a3b8;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+
+    .nav-link-custom:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+    }
+
+    .nav-link-custom.active {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .logout-btn-nav {
+      margin-top: auto;
+      background: rgba(239, 68, 68, 0.1);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .logout-btn-nav:hover {
+      background: #ef4444;
+      color: white;
+    }
+
+    /* Main Content Area */
+    .main-content {
+      margin-left: var(--sidebar-width);
+      flex-grow: 1;
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    .card {
+      border: none;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      background: transparent;
+      border-bottom: 1px solid #f1f5f9;
+      font-weight: 600;
+      padding: 1.25rem;
+    }
+
+    canvas {
+      max-height: 280px;
+    }
+
+    .user-analysis {
+      max-width: 800px;
+      margin: 2rem auto;
+    }
+
+    .user-analysis .card-body {
+      font-size: 1.1rem;
+      line-height: 1.7;
+    }
+
+    .brand-filter-container {
+      background: white;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <span>⚡ Volt Analytics</span>
+    </div>
+    <div class="nav-links">
+      <a href="user-dashboard.html" class="nav-link-custom active">
+        <span>📊</span> Dashboard
+      </a>
+      <a href="index.html" class="nav-link-custom">
+        <span>🏠</span> Home
+      </a>
+      <a href="calculator.html" class="nav-link-custom">
+        <span>🧮</span> Calculator
+      </a>
+      <button class="nav-link-custom logout-btn-nav mt-auto" onclick="logout()">
+        <span>🚪</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <div class="row align-items-center mb-4">
+      <div class="col">
+        <h2 class="fw-bold mb-0">User Dashboard</h2>
+        <p class="text-muted">Welcome back to your personalized EV insights.</p>
+      </div>
+      <div class="col-auto">
+        <div class="brand-filter-container">
+          <select id="brandFilter" class="form-select border-0 fw-bold" style="color: var(--primary-color);">
+            <option value="All">All Brands</option>
+            <option value="Tesla">Tesla</option>
+            <option value="Tata">Tata Motors</option>
+            <option value="Hyundai">Hyundai</option>
+            <option value="MG">MG Motors</option>
+            <option value="Mahindra">Mahindra</option>
+            <option value="Ather">Ather Energy</option>
+            <option value="BYD">BYD</option>
+            <option value="Ola">Ola Electric</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- USER PROFILE & TRACKING -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card p-3 d-flex flex-row justify-content-between align-items-center bg-white">
+          <div class="d-flex align-items-center gap-3">
+            <div
+              style="width:56px; height:56px; background:#e0e7ff; border-radius:14px; display:flex; align-items:center; justify-content:center; color:#6366f1; font-size:24px;">
+              👤
+            </div>
+            <div>
+              <h5 class="mb-0 fw-bold" id="profileEmail">User</h5>
+              <span class="badge bg-slate-100 text-slate-600 border" id="profileRole"
+                style="background: #f1f5f9; color: #475569; font-size: 0.75rem;">STANDARD</span>
+            </div>
+          </div>
+
+          <div class="text-end">
+            <small class="text-muted d-block text-uppercase fw-bold"
+              style="font-size: 0.7rem; letter-spacing: 0.05em;">Session Time</small>
+            <h3 class="mb-0 fw-bold text-primary" id="timeSpent">0m 0s</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBSCRIPTION & PAYMENT DETAILS -->
+    <div class="row mb-4" id="subscription-section" style="display: none;">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+            <span>Subscription & Payment Details</span>
+            <span class="badge bg-success" id="sub-status-badge">Active</span>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3">
+                <small class="text-muted">Current Plan</small>
+                <h5 class="fw-bold" id="sub-plan">Free Plan</h5>
+              </div>
+              <div class="col-md-3">
+                <small class="text-muted">Price</small>
+                <h5 class="fw-bold text-primary" id="sub-price">₹0</h5>
+              </div>
+              <div class="col-md-3">
+                <small class="text-muted">Payment Method</small>
+                <h5 class="fw-bold" id="sub-method">-</h5>
+              </div>
+              <div class="col-md-3">
+                <small class="text-muted">Transaction ID</small>
+                <h5 class="fw-bold text-secondary" id="sub-txid">-</h5>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GET STARTED MODULE ENTRY -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card p-4 text-white" style="background: linear-gradient(135deg, #6a5cff, #22d3ee);">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2 class="fw-bold">Ready to find your perfect EV?</h2>
+              <p class="mb-0 fs-5">Compare models, check subsidies, and book your vehicle today.</p>
+            </div>
+            <a href="vehicle-selection.html" class="btn btn-light btn-lg fw-bold text-primary px-5">Get Started</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPI -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="card text-center p-3">
+          <h4 id="kpi-satisfaction">5.52</h4>
+          <small>Avg Satisfaction</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center p-3">
+          <h4 id="kpi-channel">Corporate</h4>
+          <small>Purchase Channel</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center p-3">
+          <h4 id="kpi-battery">85 kWh</h4>
+          <small>Max Battery</small>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card text-center p-3">
+          <h4 id="kpi-co2">145M</h4>
+          <small>CO₂ Saved</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 1 -->
+    <div class="row g-4 mb-4">
+
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-header">Charging Time by Vehicle Category</div>
+          <div class="card-body">
+            <canvas id="chargingChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-header">Battery Capacity Distribution</div>
+          <div class="card-body">
+            <canvas id="batteryChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BRAND BAR -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header">Vehicle Count by Brand</div>
+          <div class="card-body">
+            <canvas id="brandChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DONUT -->
+    <div class="row mb-4">
+      <div class="col-md-7">
+        <div class="card shadow-sm">
+          <div class="card-header">Net Price After Subsidy</div>
+          <div class="card-body">
+            <canvas id="priceChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-5">
+        <div class="card shadow-sm">
+          <div class="card-header">Category Table</div>
+          <div class="card-body">
+            <table class="table table-bordered">
+              <tr>
+                <th>Sedan</th>
+                <td>16bn</td>
+              </tr>
+              <tr>
+                <th>SUV</th>
+                <td>11bn</td>
+              </tr>
+              <tr>
+                <th>Bike</th>
+                <td>11bn</td>
+              </tr>
+              <tr>
+                <th>Hatchback</th>
+                <td>11bn</td>
+              </tr>
+              <tr>
+                <th>Scooter</th>
+                <td>11bn</td>
+              </tr>
+              <tr>
+                <th>Fleet Van</th>
+                <td>11bn</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USER ANALYSIS SECTION -->
+    <div class="row justify-content-center my-4">
+      <div class="col-12">
+        <div class="card shadow-sm user-analysis text-center">
+          <div class="card-header fw-bold">
+            User Insights
+          </div>
+          <div class="card-body text-start">
+            <ul>
+              <li>• Users prefer EVs with high driving range and moderate price</li>
+              <li>• Corporate and fleet purchases dominate EV adoption</li>
+              <li>• Battery capacity strongly influences satisfaction</li>
+              <li>• Subsidies improve affordability for users</li>
+              <li>• Charging convenience impacts buying decisions</li>
+              <li>• EV usage helps reduce environmental impact</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- LOGOUT FUNCTION -->
+  <script>
+    function logout() {
+      if (window.handleLogout) {
+        window.handleLogout();
+      } else {
+        sessionStorage.clear();
+        window.location.href = "login.html";
+      }
+    }
+  </script>
+
+  <!-- External JS for Profile & Tracking -->
+  <script type="module" src="user-dashboard.js"></script>
+
+  <!-- CHART SCRIPTS -->
+  <script>
+
+  </script>
+
+  <!-- USER ANALYSIS SECTION -->
+
+
+</body>
+
+</html>

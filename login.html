@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Login | EV Analytics</title>
+  <link rel="stylesheet" href="login.css">
+</head>
+
+<body>
+
+  <a href="index.html" class="back-home">Back to Home</a>
+
+  <div class="page">
+    <div class="bg"></div>
+
+    <div class="login-card">
+      <h2>Welcome Back</h2>
+      <!-- <div class="admin-hint"
+        style="background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9em; border: 1px dashed rgba(255, 255, 255, 0.3);">
+        <p style="margin: 0; color: #aaa;"><strong>Admin credentials:</strong></p>
+        <p style="margin: 5px 0 0 0; color: #fff;">Email: admin@volt.com | Pass: admin123</p>
+      </div> -->
+
+      <label>Email Address</label>
+      <input type="email" id="email" value="admin@volt.com" placeholder="admin@volt.com">
+      <div id="email-error" class="error-msg"></div>
+
+      <label>Password</label>
+      <div class="password-wrapper">
+        <input type="password" id="password" value="admin123" placeholder="••••••••">
+        <span class="toggle-password" onclick="togglePassword('password')">
+          <svg class="eye-icon eye-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </span>
+      </div>
+      <div id="password-error" class="error-msg"></div>
+
+      <div id="form-message" class="main-msg"></div>
+
+      <button id="login-btn" type="button" onclick="handleLogin()">
+        <span class="btn-text">Sign In</span>
+        <span class="spinner" style="display: none;"></span>
+      </button>
+
+      <p class="link">
+        Don’t have an account?
+        <a href="signup.html">Sign up</a>
+      </p>
+    </div>
+  </div>
+
+  <script type="module" src="auth.js"></script>
+</body>
+
+</html>

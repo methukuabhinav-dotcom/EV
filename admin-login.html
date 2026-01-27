@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Login</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #020617;
+    }
+
+    .login-box {
+      width: 360px;
+      padding: 35px;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      color: white;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    .login-box h2 {
+      font-size: 26px;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    label {
+      font-size: 14px;
+      color: #c7d2fe;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 18px;
+      border-radius: 8px;
+      border: none;
+      background: #020617;
+      color: white;
+      outline: none;
+    }
+
+    .password-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .password-wrapper input {
+      width: 100%;
+      padding-right: 45px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      transition: color 0.2s ease;
+      user-select: none;
+    }
+
+    .toggle-password:hover {
+      color: #e5e7eb;
+    }
+
+    .eye-icon {
+      pointer-events: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(90deg, #3b82f6, #ec4899);
+      color: white;
+      transition: transform 0.2s ease;
+    }
+
+    button:hover {
+      transform: scale(1.03);
+    }
+
+    #error {
+      color: #ef4444;
+      font-size: 14px;
+      margin-top: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-box">
+    <h2>Admin Login</h2>
+
+    <label>Username</label>
+    <input type="text" id="username" placeholder="Username" required>
+
+    <label>Password</label>
+    <div class="password-wrapper">
+      <input type="password" id="password" placeholder="Password" required>
+      <span class="toggle-password" onclick="togglePassword()">
+        <svg class="eye-icon eye-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+        <svg class="eye-icon eye-on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" style="display: none;">
+          <path
+            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+          </path>
+          <line x1="1" y1="1" x2="23" y2="23"></line>
+        </svg>
+      </span>
+    </div>
+
+    <button onclick="adminLogin()">Login</button>
+
+    <p id="error"></p>
+  </div>
+
+  <script src="admin-login.js"></script>
+</body>
+
+</html>

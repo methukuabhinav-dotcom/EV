@@ -1,0 +1,189 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  height: 100vh;
+  background: #020617;
+}
+
+/* Back to Home */
+.back-home {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  color: #e5e7eb;
+  text-decoration: none;
+  font-size: 14px;
+  z-index: 10;
+}
+
+.back-home:hover {
+  text-decoration: underline;
+}
+
+/* Page Layout */
+.page {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Background */
+.bg {
+  position: absolute;
+  inset: 0;
+  background: url("https://images.unsplash.com/photo-1617704548623-340376564e68") center / cover no-repeat;
+  filter: brightness(0.35);
+}
+
+/* Login Card */
+.login-card {
+  position: relative;
+  width: 360px;
+  padding: 35px;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  color: white;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+
+.login-card h2 {
+  font-size: 26px;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+label {
+  font-size: 14px;
+  color: #c7d2fe;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0 18px;
+  border-radius: 8px;
+  border: none;
+  background: #020617;
+  color: white;
+  outline: none;
+}
+
+/* Password Wrapper */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 45px;
+  /* Space for the icon */
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  transition: color 0.2s ease;
+  user-select: none;
+}
+
+.toggle-password:hover {
+  color: #e5e7eb;
+}
+
+.eye-icon {
+  pointer-events: none;
+}
+
+
+/* Button */
+button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  background: linear-gradient(90deg, #3b82f6, #ec4899);
+  color: white;
+  transition: transform 0.2s ease;
+}
+
+button:hover {
+  transform: scale(1.03);
+}
+
+/* Link */
+.link {
+  margin-top: 18px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.link a {
+  color: #38bdf8;
+  text-decoration: none;
+}
+
+/* Authentication Enhancements */
+.error-msg {
+  color: #fb7185;
+  font-size: 12px;
+  margin-top: -12px;
+  margin-bottom: 12px;
+  min-height: 15px;
+}
+
+.main-msg {
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 15px;
+  min-height: 20px;
+}
+
+.main-msg.error {
+  color: #fb7185;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none !important;
+}

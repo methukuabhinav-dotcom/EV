@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>EV Analytics | Business Dashboard</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Razorpay -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --sidebar-bg: #0f172a;
+            --content-bg: #f8fafc;
+        }
+
+        body {
+            background: var(--content-bg);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            display: flex;
+            color: #1e293b;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            height: 100vh;
+            background: var(--sidebar-bg);
+            color: #cbd5e1;
+            position: fixed;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex-grow: 1;
+        }
+
+        .nav-link-custom {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.75rem 1rem;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .nav-link-custom:hover,
+        .nav-link-custom.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 260px;
+            flex-grow: 1;
+            padding: 2rem;
+            min-height: 100vh;
+            width: calc(100% - 260px);
+        }
+
+        .card-custom {
+            background: white;
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card h6 {
+            color: #64748b;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        .stat-card h2 {
+            color: var(--primary-color);
+            font-weight: 800;
+            margin: 0.5rem 0;
+        }
+
+        .plan-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .plan-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .plan-card.active {
+            border-color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <span>⚡ Business Portal</span>
+        </div>
+        <div class="nav-links">
+            <button class="nav-link-custom active" onclick="showSection('analytics')">
+                <span>📊</span> Analytics
+            </button>
+            <button class="nav-link-custom" onclick="showSection('advertising')">
+                <span>📢</span> Advertising
+            </button>
+            <button class="nav-link-custom" onclick="showSection('plans')">
+                <span>💳</span> Plans
+            </button>
+            <button class="nav-link-custom" onclick="showSection('profile')">
+                <span>👤</span> Profile
+            </button>
+            <a href="index.html" class="nav-link-custom mt-auto">
+                <span>🚪</span> Back to Home
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- HEADER -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-0">Business Dashboard</h2>
+                <p class="text-muted">Manage your brand presence and view analytics.</p>
+            </div>
+            <div class="bg-white px-3 py-2 rounded-pill shadow-sm">
+                <span class="fw-bold text-primary" id="brandNameDisplay">Select Brand...</span>
+            </div>
+        </div>
+
+        <!-- ANALYTICS SECTION -->
+        <div id="section-analytics">
+            <!-- STATS ROW -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="card-custom stat-card text-center">
+                        <h6>Total User Views</h6>
+                        <h2 id="stats-views">0</h2>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card-custom stat-card text-center">
+                        <h6>Engagement Rate</h6>
+                        <h2 id="stats-engagement">0%</h2>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card-custom stat-card text-center">
+                        <h6>Potential Leads</h6>
+                        <h2 id="stats-leads">0</h2>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card-custom stat-card text-center">
+                        <h6>Ad Status</h6>
+                        <h2 id="stats-ad-status" class="text-secondary" style="font-size: 1.5rem;">Inactive</h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHARTS ROW -->
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <div class="card-custom h-100">
+                        <h5 class="fw-bold mb-3">Make / Model Interest</h5>
+                        <canvas id="brandInterestChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-custom h-100">
+                        <h5 class="fw-bold mb-3">User Demographics</h5>
+                        <canvas id="demographicsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADVERTISING SECTION -->
+        <div id="section-advertising">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card-custom bg-primary text-white">
+                        <h4>🚀 Boost Your Brand Visibility</h4>
+                        <p class="mb-0">Promote your brand to thousands of EV enthusiasts. Your brand will be featured
+                            in popups and top billing.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MANAGE ACTIVE AD SECTION (Hidden by default) -->
+            <div id="manage-ad-section">
+                <div class="card-custom border-primary">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-primary mb-0">✨ Your Active Promotion</h5>
+                        <span class="badge bg-success p-2" id="manageStatusBadge">ACTIVE</span>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <img id="manageImage" src="" class="img-fluid rounded" alt="Ad Preview"
+                                style="max-height: 200px; object-fit: cover;">
+                        </div>
+                        <div class="col-md-8">
+                            <h4 id="manageTitle" class="fw-bold"></h4>
+                            <p id="manageDesc" class="text-muted"></p>
+                            <a id="manageLink" href="#" target="_blank"
+                                class="text-primary fw-bold text-decoration-none">View Target Link ↗</a>
+
+                            <hr>
+
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-outline-primary" onclick="enableEditMode()">✏️ Edit
+                                    Content</button>
+                                <button class="btn btn-outline-danger" onclick="cancelAd()">🛑 Stop Promotion</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EDIT FORM (Hidden inside Manage Section) -->
+                    <div id="edit-ad-form" class="mt-4 p-3 bg-light rounded" style="display: none;">
+                        <h6 class="fw-bold">Update Ad Content</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">New Title</label>
+                                <input type="text" class="form-control" id="editTitle">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">New Link</label>
+                                <input type="text" class="form-control" id="editLink">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">New Description</label>
+                                <textarea class="form-control" id="editDesc" rows="2"></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">New Image URL</label>
+                                <input type="text" class="form-control" id="editImage">
+                            </div>
+                            <div class="col-12 text-end">
+                                <button class="btn btn-secondary" onclick="disableEditMode()">Cancel</button>
+                                <button class="btn btn-success" onclick="updateAdContent()">💾 Save Changes
+                                    (Re-submit)</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CREATE AD SECTION (Wrapped to toggle) -->
+            <div id="create-ad-section">
+                <!-- AD CONTENT FORM -->
+                <div class="card-custom mb-4">
+                    <h5 class="fw-bold mb-3">1. Customize Your Ad</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Ad Title</label>
+                            <input type="text" class="form-control" id="adTitle"
+                                placeholder="e.g. Experience the Future">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Call to Action Link</label>
+                            <input type="text" class="form-control" id="adLink"
+                                placeholder="https://yourwebsite.com/offer">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Ad Message / Description</label>
+                            <textarea class="form-control" id="adDesc" rows="2"
+                                placeholder="Briefly describe your offer..."></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Ad Image URL</label>
+                            <input type="text" class="form-control" id="adImage"
+                                placeholder="https://example.com/banner.jpg">
+                            <div class="form-text">Provide a direct link to your promotional image (Recommended:
+                                800x400px).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="publish-actions" class="text-center mb-5" style="display: none;">
+                    <div class="alert alert-success d-inline-block mb-3">
+                        <i class="bi bi-check-circle-fill"></i> You have an active plan! You can publish ads directly.
+                    </div>
+                    <br>
+                    <button id="publish-btn" class="btn btn-success btn-lg px-5 rounded-pill"
+                        onclick="submitAdForApproval()">
+                        🚀 Publish Ad for Approval
+                    </button>
+                </div>
+
+                <div id="no-plan-warning" class="text-center py-5" style="display: none;">
+                    <div class="card-custom bg-light border-warning">
+                        <h5 class="text-warning">⚠️ No Active Plan Found</h5>
+                        <p>You need an active subscription to publish advertisements.</p>
+                        <button class="btn btn-primary" onclick="showSection('plans')">View Available Plans</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- PLANS SECTION -->
+        <div id="section-plans" style="display: none;">
+            <div class="card-custom mb-4 bg-light">
+                <h4 class="fw-bold text-primary mb-3">💎 Upgrade Your Subscription</h4>
+                <p class="mb-0">Choose the best plan for your brand visibility and growth. Subscriptions stack if
+                    you already have an active plan.</p>
+            </div>
+
+            <div id="plan-selection-container">
+                <div class="row g-4 mb-4">
+                    <!-- Monthly Plan -->
+                    <div class="col-md-4">
+                        <div class="card-custom plan-card text-center" onclick="selectPlan('monthly', 4999)">
+                            <h3 class="fw-bold">Monthly</h3>
+                            <h1 class="text-primary display-4 fw-bold">₹4,999</h1>
+                            <p class="text-muted">per month</p>
+                            <ul class="list-unstyled text-start mx-auto" style="max-width: 200px;">
+                                <li class="mb-2">✓ Business Analytics</li>
+                                <li class="mb-2">✓ Homepage Popup Ad</li>
+                                <li class="mb-2">✓ Priority Support</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Quarterly Plan -->
+                    <div class="col-md-4">
+                        <div class="card-custom plan-card text-center highlight position-relative"
+                            onclick="selectPlan('quarterly', 12999)">
+                            <span
+                                class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-warning text-dark">BEST
+                                VALUE</span>
+                            <h3 class="fw-bold">Quarterly</h3>
+                            <h1 class="text-primary display-4 fw-bold">₹12,999</h1>
+                            <p class="text-muted">for 3 months</p>
+                            <ul class="list-unstyled text-start mx-auto" style="max-width: 200px;">
+                                <li class="mb-2">✓ All Monthly Features</li>
+                                <li class="mb-2">✓ Email Campaign Feature</li>
+                                <li class="mb-2">✓ <strong>Save ₹2,000</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Yearly Plan -->
+                    <div class="col-md-4">
+                        <div class="card-custom plan-card text-center" onclick="selectPlan('yearly', 44999)">
+                            <h3 class="fw-bold">Yearly</h3>
+                            <h1 class="text-primary display-4 fw-bold">₹44,999</h1>
+                            <p class="text-muted">per year</p>
+                            <ul class="list-unstyled text-start mx-auto" style="max-width: 200px;">
+                                <li class="mb-2">✓ Full Brand Takeover</li>
+                                <li class="mb-2">✓ Dedicated Account Mgr</li>
+                                <li class="mb-2">✓ <strong>Save ₹15,000</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="plan-payment-actions" class="text-center" style="display: none;">
+                <p class="mb-2">Selected Plan: <strong id="selected-plan-details">None</strong></p>
+                <button id="plan-pay-btn" class="btn btn-primary btn-lg px-5 rounded-pill" onclick="initiatePayment()">
+                    Pay Now & Update Subscription
+                </button>
+            </div>
+
+            <!-- AD HISTORY TABLE (Now in Plans/Subscription section) -->
+            <div id="ad-history-card" class="card-custom mt-5">
+                <h5 class="fw-bold mb-3">📜 Subscription & Payment History</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Plan</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Expiry</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adHistoryBody">
+                            <!-- Rows loaded by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFILE SECTION -->
+        <div id="section-profile" style="display: none;">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card-custom text-center">
+                        <div class="mb-3">
+                            <img id="profile-avatar"
+                                src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff&size=128"
+                                class="rounded-circle shadow-sm" alt="Profile">
+                        </div>
+                        <h4 id="profile-name" class="fw-bold mb-1">Loading...</h4>
+                        <p id="profile-role" class="badge bg-primary px-3">Business</p>
+                        <hr>
+                        <div class="text-start">
+                            <p class="mb-2"><strong>📧 Email:</strong> <span id="profile-email">-</span></p>
+                            <p class="mb-2"><strong>🏢 Brand:</strong> <span id="profile-brand">-</span></p>
+                            <p class="mb-2"><strong>📅 Joined:</strong> <span id="profile-joined">-</span></p>
+                            <p class="mb-0"><strong>🔑 Logins:</strong> <span id="profile-logins">0</span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <!-- Active Plans Card -->
+                    <div class="card-custom mb-4">
+                        <h5 class="fw-bold mb-3">⭐ My Active Plans</h5>
+                        <div id="active-plans-container" class="row g-3">
+                            <!-- Placeholder if no plan -->
+                            <div class="col-12 text-center py-4 text-muted" id="no-active-plans">
+                                No active subscription plans found.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- My Advertisements Card -->
+                    <div class="card-custom">
+                        <h5 class="fw-bold mb-3">🚀 My Advertisements</h5>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Ad Title</th>
+                                        <th>Plan</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="profileAdHistoryBody">
+                                    <!-- Rows loaded by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Login Modal (Simulated for this demo) -->
+    <div class="modal fade" id="brandLoginModal" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Business Login</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Please select your Brand Name to access your dashboard.</p>
+                    <select id="brandSelect" class="form-select">
+                        <option value="" selected disabled>Select a Brand...</option>
+                        <!-- Options populated by JS -->
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="setBrandSession()">Access Dashboard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="business-dashboard.js"></script>
+
+    <script>
+
+        // Plan Selection
+        let selectedPlan = null;
+        let selectedAmount = 0;
+
+        function selectPlan(plan, amount) {
+            selectedPlan = plan;
+            selectedAmount = amount;
+
+            document.querySelectorAll('.plan-card').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+
+            const detailsEl = document.getElementById('selected-plan-details');
+            const actionsEl = document.getElementById('plan-payment-actions');
+
+            if (detailsEl) detailsEl.innerText = plan.toUpperCase() + ` (₹${amount})`;
+            if (actionsEl) {
+                actionsEl.style.display = 'block';
+                // Scroll to button
+                actionsEl.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>EV Analytics | Home</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <nav class="navbar">
+    <div class="logo">⚡ <span>EV ANALYTICS</span></div>
+    <ul class="nav-links">
+      <li><a class="active" href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li id="nav-dashboard-link" class="hidden"><a href="user-dashboard.html">Dashboard</a></li>
+    </ul>
+    <div id="nav-auth-container">
+      <a href="login.html"><button class="btn">Login</button></a>
+    </div>
+  </nav>
+
+  <script type="module" src="nav.js"></script>
+
+  <section class="section">
+    <h1>Powering the <span style="color:#6a5cff">Future</span> of EVs</h1>
+    <p style="margin-top:30px; color:white; max-width:750px;">
+      Smart analytics platform for electric vehicle charging,
+      performance monitoring, and sustainable mobility.
+    </p>
+
+    <div style="display:flex;gap:200px;margin-top:70px;">
+      <div class="card">
+        <h2>⚡ EV Benefits</h2>
+        <p>Lower costs & higher efficiency</p>
+      </div>
+      <div class="card">
+        <h2>📊 Industry Relevance</h2>
+        <p>Market trends & growth data</p>
+      </div>
+      <div class="card">
+        <h2>🌱 Sustainability</h2>
+        <p>Zero emissions & clean energy</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY EV ANALYTICS -->
+
+  <section class="why-section">
+    <h1>Why Choose EV Analytics?</h1>
+    <p class="why-subtitle">
+      Your comprehensive platform for the electric vehicle revolution.
+    </p>
+
+    <div class="why-cards">
+      <div class="why-card">
+        <div class="why-icon">⚡</div>
+        <h3>EV Benefits</h3>
+        <p>
+          Experience reduced operating costs, minimal maintenance, and superior performance compared to traditional
+          vehicles.
+        </p>
+      </div>
+
+      <div class="why-card active">
+        <div class="why-icon">📈</div>
+        <h3>Industry Relevance</h3>
+        <p>
+          Stay ahead of the curve with real-time insights into market adoption, sales trends, and competitor analysis.
+        </p>
+      </div>
+
+      <div class="why-card">
+        <div class="why-icon">🌱</div>
+        <h3>Sustainability Impact</h3>
+        <p>
+          Visualize your contribution to a greener planet with our CO₂ savings tracker and environmental impact reports.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA SECTION -->
+  <section class="cta-section">
+    <div class="cta-box">
+      <h2>Ready to Switch to Electric?</h2>
+      <p>
+        Join the revolution. Analyze the data, understand the savings,
+        and make an informed decision today.
+      </p>
+      <a href="vehicle-selection.html" class="cta-btn">Get Started Free</a>
+    </div>
+  </section>
+
+  <!-- FOOTER (WITHOUT STATION FINDER) -->
+  <footer class="footer">
+    <div class="footer-row">
+
+      <!-- Left -->
+      <div class="footer-left">
+        <h3>⚡ <span>EV</span> ANALYTICS</h3>
+        <p>
+          Empowering the EV ecosystem with data-driven insights and smart
+          mobility solutions.
+        </p>
+      </div>
+
+      <!-- Platform -->
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <a href="index.html">Home</a>
+        <a href="#">Insights</a>
+        <a href="#">Stations</a>
+      </div>
+
+      <!-- Company -->
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
+        <a href="#">Careers</a>
+      </div>
+
+      <!-- Social -->
+      <div class="footer-col">
+        <h4>Social</h4>
+        <a href="#">Twitter</a>
+        <a href="#">LinkedIn</a>
+        <a href="#">Instagram</a>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      © 2025 EV Analytics. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- GLOBAL PROMO POPUP -->
+  <div id="promoModal" class="promo-modal"
+    style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+    <div class="promo-content"
+      style="background:#1e293b; padding:40px; border-radius:20px; text-align:center; max-width:500px; border: 2px solid #6366f1; position:relative; animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+      <button onclick="document.getElementById('promoModal').style.display='none'"
+        style="position:absolute; top:15px; right:20px; background:none; border:none; color:white; font-size:24px; cursor:pointer;">&times;</button>
+
+      <span
+        style="background:#6366f1; color:white; padding:4px 12px; border-radius:20px; font-size:12px; text-transform:uppercase; font-weight:bold; letter-spacing:1px;">Featured
+        Partner</span>
+
+      <h2 id="promoBrand" style="margin:20px 0 10px; font-size:36px; color:white;">Brand Name</h2>
+      <p style="color:#cbd5e1; font-size:16px; margin-bottom:30px;">Discover the innovation driving the future. Explore
+        the latest models now.</p>
+
+      <a href="vehicle-selection.html" class="cta-btn"
+        style="display:inline-block; width:100%; box-sizing:border-box;">View Collection</a>
+    </div>
+  </div>
+
+  <style>
+    @keyframes popIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+  </style>
+
+  <script type="module">
+    import { db } from "./firebase-config.js";
+    import { doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+    window.onload = async function () {
+      try {
+        const snap = await getDoc(doc(db, "site_settings", "global_ad"));
+        if (snap.exists()) {
+          const ad = snap.data();
+          const now = new Date();
+          // Check expiry
+          if (ad.expiresAt && ad.expiresAt.toDate() > now) {
+            document.getElementById("promoBrand").innerText = ad.brand;
+
+            // Show popup with 2s delay
+            setTimeout(() => {
+              document.getElementById("promoModal").style.display = 'flex';
+            }, 1000);
+          }
+        }
+      } catch (e) { console.log("Promo check failed", e); }
+    }
+  </script>
+</body>
+
+</html>

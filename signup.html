@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up | EV Analytics</title>
+  <link rel="stylesheet" href="signup.css">
+</head>
+
+<body>
+
+  <a href="index.html" class="back-home">Back to Home</a>
+
+  <div class="page">
+    <div class="bg"></div>
+
+    <div class="card">
+      <h2>Create Account</h2>
+
+      <label>Full Name</label>
+      <input type="text" id="name" placeholder="John Doe">
+      <div id="name-error" class="error-msg"></div>
+
+      <label>Email Address</label>
+      <input type="email" id="email" placeholder="john@example.com">
+      <div id="email-error" class="error-msg"></div>
+
+      <label>Password</label>
+      <div class="password-wrapper">
+        <input type="password" id="password" placeholder="Create a password">
+        <span class="toggle-password" onclick="togglePassword('password')">
+          <svg class="eye-icon eye-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </span>
+      </div>
+      <div id="password-error" class="error-msg"></div>
+
+      <label>Confirm Password</label>
+      <div class="password-wrapper">
+        <input type="password" id="confirm-password" placeholder="Confirm your password">
+        <span class="toggle-password" onclick="togglePassword('confirm-password')">
+          <svg class="eye-icon eye-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </span>
+      </div>
+      <div id="confirm-password-error" class="error-msg"></div>
+
+      <div id="form-message" class="main-msg"></div>
+
+      <button id="signup-btn" onclick="handleSignup()">
+        <span class="btn-text">Create Account</span>
+        <span class="spinner" style="display: none;"></span>
+      </button>
+
+      <p class="link">
+        Already have an account?
+        <a href="login.html">Sign In</a>
+      </p>
+    </div>
+  </div>
+
+  <script type="module" src="auth.js"></script>
+</body>
+
+</html>

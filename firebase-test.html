@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Firebase Connection Test</title>
+    <style>
+        body {
+            background: #0b0f19;
+            color: white;
+            font-family: sans-serif;
+            padding: 50px;
+        }
+
+        .test-box {
+            background: #1f2937;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .success {
+            background: #059669;
+            color: white;
+        }
+
+        .error {
+            background: #dc2626;
+            color: white;
+        }
+
+        .log {
+            background: #111827;
+            color: #a78bfa;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="test-box">
+        <h2>Firebase Connectivity Validator</h2>
+        <div id="auth-status" class="status">Testing Auth...</div>
+        <div id="db-status" class="status">Testing Firestore...</div>
+
+        <div class="log" id="test-log">Starting validation...</div>
+
+        <button onclick="runTest()"
+            style="margin-top: 20px; padding: 10px 20px; background: #6a5cff; border: none; color: white; border-radius: 6px; cursor: pointer;">Run
+            Diagnostics</button>
+        <a href="index.html"
+            style="color: #9ca3af; display: block; margin-top: 15px; text-decoration: none; font-size: 14px;">Return to
+            Site</a>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "./firebase-config.js";
+        import { signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        import { collection, addDoc, getDocs, query, limit } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+        const logEl = document.getElementById('test-log');
+        const authEl = document.getElementById('auth-status');
+        const dbEl = document.getElementById('db-status');
+
+        function addLog(msg) {
+            console.log(msg);
+            logEl.innerText += "\n> " + msg;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        async function runTest() {
+            logEl.innerText = "Initializing diagnostics...";
+            addLog("SDK Modules detected correctly.");
+
+            // 1. Validate Config & Initialization
+            try {
+                addLog("Project ID: ev-analytics-c36f7");
+                addLog("Auth Instance initialized: " + (auth ? "YES" : "NO"));
+                addLog("Firestore Instance initialized: " + (db ? "YES" : "NO"));
+            } catch (e) {
+                addLog("Initialization Error: " + e.message);
+            }
+
+            // 2. Test Auth Connection
+            try {
+                addLog("Attempting Anonymous Sign-in...");
+                // Note: Anonymous Auth must be enabled in Firebase Console for this specific test
+                // If not enabled, it will throw an error, which is also a valid "connection" test
+                await signInAnonymously(auth);
+                authEl.innerText = "Auth Connection: SUCCESS";
+                authEl.className = "status success";
+                addLog("Auth Connection verified.");
+            } catch (e) {
+                authEl.innerText = "Auth Connection: " + (e.code === "auth/operation-not-allowed" ? "READY (Anon disabled)" : "FAILED");
+                authEl.className = e.code === "auth/operation-not-allowed" ? "status success" : "status error";
+                addLog("Auth Info: " + e.message);
+            }
+
+            // 3. Test Firestore Read/Write
+            try {
+                addLog("Attempting Firestore Write to 'connection_tests'...");
+                const testDoc = await addDoc(collection(db, "connection_tests"), {
+                    timestamp: new Date(),
+                    status: "Validation Test Run"
+                });
+                addLog("Firestore Write SUCCESS. Doc ID: " + testDoc.id);
+
+                addLog("Attempting Firestore Read...");
+                const q = query(collection(db, "connection_tests"), limit(1));
+                const querySnapshot = await getDocs(q);
+                addLog("Firestore Read SUCCESS. Found " + querySnapshot.size + " docs.");
+
+                dbEl.innerText = "Firestore Connection: SUCCESS";
+                dbEl.className = "status success";
+            } catch (e) {
+                dbEl.innerText = "Firestore Connection: FAILED (Check Security Rules)";
+                dbEl.className = "status error";
+                addLog("Firestore Error: " + e.message);
+                addLog("Tip: Ensure Firestore is started in 'Test Mode' or rules allow 'connection_tests' writes.");
+            }
+
+            addLog("Diagnostics Complete.");
+        }
+
+        window.runTest = runTest;
+        window.onload = runTest;
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,27 @@
+/* TOP BAR */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.subtitle {
+  margin-bottom: 20px;
+  color: #666;
+}
+
+/* LOGOUT BUTTON */
+.logout-btn {
+  background-color: #ff4d4d;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.logout-btn:hover {
+  background-color: #e60000;
+}
