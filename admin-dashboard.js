@@ -128,7 +128,7 @@ function updateDashboard() {
     data: {
       labels: Object.keys(yearMap),
       datasets: [{
-        label: "Units Sold",
+        label: "Distance Travelled per Year",
         data: Object.values(yearMap),
         borderColor: powerBIColors[0],
         borderWidth: 2,
@@ -327,7 +327,8 @@ async function updateAdManager() {
     if (globalAdSnap.exists()) {
       const ad = globalAdSnap.data();
       document.getElementById("activeAdBrand").innerText = ad.brand;
-      document.getElementById("activeAdDetails").innerText = `Plan: ${ad.plan} | Expires: ${ad.expiresAt?.toDate().toLocaleDateString()}`;
+      const pages = ad.targetPages ? ad.targetPages.join(", ") : "All";
+      document.getElementById("activeAdDetails").innerText = `Plan: ${ad.plan} | Pages: ${pages} | Expires: ${ad.expiresAt?.toDate().toLocaleDateString()}`;
     } else {
       document.getElementById("activeAdBrand").innerText = "No Active Promo";
       document.getElementById("activeAdDetails").innerText = "-";
@@ -376,14 +377,22 @@ window.openAdReview = async function (docId) {
     document.getElementById("reviewAdPlan").value = data.plan;
 
     document.getElementById("reviewBrandDisplay").value = data.brand;
-    document.getElementById("reviewPlanDisplay").value = data.plan;
+    // document.getElementById("reviewPlanDisplay").value = data.plan; // Removed from HTML
 
     // Content Fields
     document.getElementById("reviewTitle").value = data.title || "";
     document.getElementById("reviewDesc").value = data.description || "";
     document.getElementById("reviewLink").value = data.targetLink || "";
     document.getElementById("reviewImage").value = data.imageUrl || "";
-    document.getElementById("imgPreview").src = data.imageUrl || "";
+    
+    // Update Preview Simulation
+    updatePreviewImage(data.imageUrl || "");
+    document.getElementById('titlePreviewSim').innerText = data.title || 'Ad Title Here';
+    document.getElementById('descPreviewSim').innerText = data.description || 'Your promotional message will appear here for users.';
+
+    // Reset checkboxes
+    const checkboxes = ["pageHome", "pageAbout", "pagePricing", "pageDashboard", "pageStore"];
+    checkboxes.forEach(id => document.getElementById(id).checked = (id === "pageHome"));
 
     const modal = new bootstrap.Modal(document.getElementById("adReviewModal"));
     modal.show();
@@ -397,6 +406,25 @@ window.publishAd = async function () {
   const docId = document.getElementById("reviewAdId").value;
   const brand = document.getElementById("reviewAdBrand").value;
   const plan = document.getElementById("reviewAdPlan").value;
+  const durationDays = parseInt(document.getElementById("reviewDuration").value) || 30;
+
+  // Collect Selected Pages
+  const targetPages = [];
+  const pageCheckboxes = [
+    { id: "pageHome", value: "Home" },
+    { id: "pageAbout", value: "About" },
+    { id: "pagePricing", value: "Pricing" },
+    { id: "pageDashboard", value: "Dashboard" },
+    { id: "pageStore", value: "Store" }
+  ];
+  pageCheckboxes.forEach(cb => {
+    if (document.getElementById(cb.id).checked) targetPages.push(cb.value);
+  });
+
+  if (targetPages.length === 0) {
+    alert("Please select at least one target page.");
+    return;
+  }
 
   // Captured Edited Data
   const adData = {
@@ -404,9 +432,10 @@ window.publishAd = async function () {
     description: document.getElementById("reviewDesc").value,
     targetLink: document.getElementById("reviewLink").value,
     imageUrl: document.getElementById("reviewImage").value,
+    targetPages: targetPages
   };
 
-  if (!confirm(`Confirm publishing this ad for ${brand}?`)) return;
+  if (!confirm(`Confirm publishing this ad for ${brand} on ${targetPages.join(', ')}?`)) return;
 
   try {
     // 1. Set Global Ad with new content
@@ -415,12 +444,16 @@ window.publishAd = async function () {
       plan: plan,
       requestId: docId,
       activatedAt: new Date(),
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Mock 30 days
+      expiresAt: new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000),
       ...adData
     });
 
     // 2. Update Request Status
-    await setDoc(doc(db, "ads_requests", docId), { status: 'active' }, { merge: true });
+    await setDoc(doc(db, "ads_requests", docId), { 
+        status: 'active',
+        publishedAt: new Date(),
+        targetPages: targetPages
+    }, { merge: true });
 
     alert("Ad Activated Successfully!");
 
