@@ -80,30 +80,27 @@ setInterval(updateTimeSpent, 1000);
 updateTimeSpent();
 
 // 📊 Load CSV data
-fetch("EV_Dataset_Cleaned.json")
-  .then(res => res.text())
+fetch("ev_vehicle_with_extra_10000.json")
+  .then(res => res.json())
   .then(data => {
 
-    const rows = data.trim().split("\n");
-    const headers = rows[0].split(",");
-
-    // ⚠️ Update column names if needed
-    const distanceIndex = headers.indexOf("Distance_km");
-    const batteryIndex = headers.indexOf("Battery_Health");
+    // Ensure we have an array
+    const rows = Array.isArray(data) ? data : data.data;
 
     let totalDistance = 0;
     let totalBattery = 0;
     let count = 0;
 
-    for (let i = 1; i < rows.length; i++) {
-      const cols = rows[i].split(",");
+    rows.forEach(ev => {
+      // Use Driving_Range_km from new JSON
+      const distance = Number(ev.Driving_Range_km) || 0;
+      // Use Battery_Health_Percentage if available, else default to 85 like dashboard.js
+      const battery = Number(ev.Battery_Health_Percentage) || 85;
 
-      if (cols.length > 1) {
-        totalDistance += Number(cols[distanceIndex]);
-        totalBattery += Number(cols[batteryIndex]);
-        count++;
-      }
-    }
+      totalDistance += distance;
+      totalBattery += battery;
+      count++;
+    });
 
     // 🧮 Calculations (matches your screenshot)
     const savings = Math.round(totalDistance * 2); // ₹2 per km

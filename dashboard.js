@@ -2,7 +2,7 @@
 alert("dashboard.js loaded");
 
 
-fetch("EV_Dataset_Cleaned.json")
+fetch("ev_vehicle_with_extra_10000.json")
   .then(response => {
     if (!response.ok) {
       throw new Error("JSON file not found");

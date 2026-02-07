@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!currentBrand) {
             const modal = new bootstrap.Modal(document.getElementById('brandLoginModal'));
             modal.show();
-            
+
             // Add click listener to brand name to re-open modal
             const brandDisplay = document.getElementById("brandNameDisplay");
             brandDisplay.style.cursor = "pointer";
@@ -65,7 +65,7 @@ function populateBrandSelect() {
     if (!brandSelect) return;
 
     const brands = new Set();
-    
+
     // Extract brands from nested EV_DATA structure
     if (EV_DATA) {
         Object.keys(EV_DATA).forEach(category => {
@@ -81,7 +81,7 @@ function populateBrandSelect() {
     ['Tesla', 'Hyundai', 'Kia', 'BMW', 'Mercedes'].forEach(b => brands.add(b));
 
     const sortedBrands = Array.from(brands).sort();
-    
+
     sortedBrands.forEach(brand => {
         const option = document.createElement("option");
         option.value = brand;
@@ -96,12 +96,12 @@ function populateBrandSelect() {
 window.setBrandSession = async function () {
     const brandSelect = document.getElementById("brandSelect");
     const brand = brandSelect.value;
-    
+
     if (brand) {
         sessionStorage.setItem("businessBrand", brand);
         currentBrand = brand;
         document.getElementById("brandNameDisplay").innerText = brand;
-        
+
         // Setup click-to-change again
         document.getElementById("brandNameDisplay").onclick = () => {
             const modal = new bootstrap.Modal(document.getElementById('brandLoginModal'));
@@ -129,7 +129,7 @@ window.setBrandSession = async function () {
 
 // Load EV Data for Analytics
 function loadData() {
-    fetch("EV_Dataset_Cleaned.json")
+    fetch("ev_vehicle_with_extra_10000.json")
         .then(res => res.json())
         .then(data => {
             evData = Array.isArray(data) ? data : data.data;
@@ -193,7 +193,7 @@ async function checkAdStatus() {
         console.log("No brand selected, skipping ad check.");
         return;
     }
-    
+
     try {
         // Simple query without orderBy to avoid index requirement
         const q = query(
@@ -202,11 +202,11 @@ async function checkAdStatus() {
         );
 
         const snap = await getDocs(q);
-        
+
         // Convert to array and sort in-memory (to avoid index error)
         let docs = [];
         snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
-        
+
         // Sort by timestamp desc
         docs.sort((a, b) => {
             const timeA = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp || 0);
@@ -222,7 +222,7 @@ async function checkAdStatus() {
 
         if (historyBody) historyBody.innerHTML = "";
         if (profileAdHistoryBody) profileAdHistoryBody.innerHTML = "";
-        
+
         let hasActivePlan = false;
         let activePlanInfo = null;
 
@@ -289,7 +289,7 @@ async function checkAdStatus() {
         const manageSection = document.getElementById("manage-ad-section");
         const createSection = document.getElementById("create-ad-section");
         const statusEl = document.getElementById("stats-ad-status");
-        
+
         // Plan & Publish UI Elements
         const publishActions = document.getElementById("publish-actions");
         const noPlanWarning = document.getElementById("no-plan-warning");
@@ -329,7 +329,7 @@ async function checkAdStatus() {
             // == SCENARIO B: No active ad content ==
             if (manageSection) manageSection.style.display = "none";
             if (createSection) createSection.style.display = "block";
-            
+
             if (statusEl) {
                 statusEl.innerText = hasActivePlan ? "Plan Active" : "Inactive";
                 statusEl.className = hasActivePlan ? "text-success fw-bold" : "text-secondary";
@@ -338,11 +338,11 @@ async function checkAdStatus() {
 
             // Check if they have an active plan (subscription) to determine which UI to show
             if (hasActivePlan) {
-                if(publishActions) publishActions.style.display = "block";
-                if(noPlanWarning) noPlanWarning.style.display = "none";
+                if (publishActions) publishActions.style.display = "block";
+                if (noPlanWarning) noPlanWarning.style.display = "none";
             } else {
-                if(publishActions) publishActions.style.display = "none";
-                if(noPlanWarning) noPlanWarning.style.display = "block";
+                if (publishActions) publishActions.style.display = "none";
+                if (noPlanWarning) noPlanWarning.style.display = "block";
             }
         }
 
@@ -411,7 +411,7 @@ window.cancelAd = async function () {
 }
 
 // Submit Ad for Approval (For users with ACTIVE Plan)
-window.submitAdForApproval = async function() {
+window.submitAdForApproval = async function () {
     const adData = {
         title: document.getElementById("adTitle").value.trim(),
         desc: document.getElementById("adDesc").value.trim(),
@@ -426,7 +426,7 @@ window.submitAdForApproval = async function() {
 
     try {
         const uid = sessionStorage.getItem("uid");
-        if(!uid) return;
+        if (!uid) return;
 
         // Verify sub from current data
         if (!currentUserData || !currentUserData.subscription || currentUserData.subscription.status !== 'active') {
@@ -439,7 +439,7 @@ window.submitAdForApproval = async function() {
             uid: uid,
             brand: currentBrand,
             plan: currentUserData.subscription.plan,
-            amount: 0, 
+            amount: 0,
             status: 'pending',
             timestamp: new Date(),
             expiresAt: currentUserData.subscription.expiresAt,
@@ -451,15 +451,15 @@ window.submitAdForApproval = async function() {
 
         alert("Ad Submitted for Approval!");
         checkAdStatus();
-        
+
         // Switch back to analytics view
         if (typeof showSection === 'function') {
             showSection('analytics');
         } else {
-             document.querySelector("button[onclick=\"showSection('analytics')\"]")?.click();
+            document.querySelector("button[onclick=\"showSection('analytics')\"]")?.click();
         }
 
-    } catch(err) {
+    } catch (err) {
         console.error("Error submitting ad:", err);
         alert("Failed to submit ad.");
     }
@@ -550,8 +550,8 @@ async function recordAdRequest(payId, plan, amount, adData) {
                 paymentId: payId
             });
         } else {
-             // Just record the payment/plan upgrade in ads_requests for history keeping
-             await addDoc(collection(db, "ads_requests"), {
+            // Just record the payment/plan upgrade in ads_requests for history keeping
+            await addDoc(collection(db, "ads_requests"), {
                 uid: uid,
                 brand: currentBrand,
                 plan: plan,
@@ -578,7 +578,7 @@ async function recordAdRequest(payId, plan, amount, adData) {
 
 function calculateExpiry(plan, currentExpiry = null) {
     let date = new Date();
-    
+
     // Stacking logic: If existing plan is still active, add to its expiry
     if (currentExpiry) {
         const expDate = currentExpiry.toDate ? currentExpiry.toDate() : new Date(currentExpiry);
@@ -590,7 +590,7 @@ function calculateExpiry(plan, currentExpiry = null) {
     if (plan === 'monthly') date.setMonth(date.getMonth() + 1);
     else if (plan === 'quarterly') date.setMonth(date.getMonth() + 3);
     else if (plan === 'yearly') date.setFullYear(date.getFullYear() + 1);
-    
+
     return date;
 }
 
@@ -603,7 +603,7 @@ function renderProfile() {
     document.getElementById("profile-email").innerText = currentUserData.email || "-";
     document.getElementById("profile-brand").innerText = currentBrand || "-";
     document.getElementById("profile-logins").innerText = currentUserData.loginCount || "0";
-    
+
     if (currentUserData.createdAt) {
         const joinedDate = currentUserData.createdAt.toDate ? currentUserData.createdAt.toDate() : new Date(currentUserData.createdAt);
         document.getElementById("profile-joined").innerText = joinedDate.toLocaleDateString();
@@ -614,20 +614,20 @@ function renderProfile() {
     document.getElementById("profile-avatar").src = avatarUrl;
 }
 
-window.showSection = function(sectionId) {
+window.showSection = function (sectionId) {
     if (!sectionId) return;
-    
+
     // Normalize ID
     const cleanId = sectionId.replace('section-', '').toLowerCase();
     const targetId = 'section-' + cleanId;
-    
+
     const sections = ['section-analytics', 'section-advertising', 'section-plans', 'section-profile'];
-    
+
     sections.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             if (id === targetId) {
-                el.style.display = 'block'; 
+                el.style.display = 'block';
                 el.style.visibility = 'visible';
                 el.style.opacity = '1';
                 el.classList.remove('d-none');
@@ -651,10 +651,10 @@ window.showSection = function(sectionId) {
         if (cleanId === 'profile') {
             renderProfile();
         }
-        
+
         // Refresh ad status for all dynamic sections
         if (['analytics', 'advertising', 'plans', 'profile'].includes(cleanId)) {
-            checkAdStatus(); 
+            checkAdStatus();
         }
     } catch (e) {
         console.error("Error updating section data:", e);

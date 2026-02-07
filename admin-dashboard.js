@@ -39,7 +39,7 @@ window.logout = function () {
 };
 
 // 📂 Load data
-fetch("EV_Dataset_Cleaned.json")
+fetch("ev_vehicle_with_extra_10000.json")
   .then(res => res.json())
   .then(data => {
     evData = Array.isArray(data) ? data : data.data;
@@ -384,7 +384,7 @@ window.openAdReview = async function (docId) {
     document.getElementById("reviewDesc").value = data.description || "";
     document.getElementById("reviewLink").value = data.targetLink || "";
     document.getElementById("reviewImage").value = data.imageUrl || "";
-    
+
     // Update Preview Simulation
     updatePreviewImage(data.imageUrl || "");
     document.getElementById('titlePreviewSim').innerText = data.title || 'Ad Title Here';
@@ -449,10 +449,10 @@ window.publishAd = async function () {
     });
 
     // 2. Update Request Status
-    await setDoc(doc(db, "ads_requests", docId), { 
-        status: 'active',
-        publishedAt: new Date(),
-        targetPages: targetPages
+    await setDoc(doc(db, "ads_requests", docId), {
+      status: 'active',
+      publishedAt: new Date(),
+      targetPages: targetPages
     }, { merge: true });
 
     alert("Ad Activated Successfully!");

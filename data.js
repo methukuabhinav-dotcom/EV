@@ -1,7 +1,8 @@
-fetch("EV_Dataset_Cleaned.json")
-  .then(res => res.text())
-  .then(csv => {
-    const rows = csv.split("\n").slice(1);
+fetch("ev_vehicle_with_extra_10000.json")
+  .then(res => res.json())
+  .then(data => {
+    // Ensure we have an array (handle if wrapped in { data: [...] })
+    const rows = Array.isArray(data) ? data : data.data;
 
     let totalSales = 0;
     let totalPrice = 0;
@@ -9,11 +10,9 @@ fetch("EV_Dataset_Cleaned.json")
     let yearSales = {};
 
     rows.forEach(row => {
-      const cols = row.split(",");
-
-      const units = Number(cols[1]);
-      const price = Number(cols[2]);
-      const year = cols[5];
+      const units = Number(row.Units_Sold_Per_Year);
+      const price = Number(row.Vehicle_Price);
+      const year = row.Purchase_Year;
 
       if (!isNaN(units)) {
         totalSales += units;

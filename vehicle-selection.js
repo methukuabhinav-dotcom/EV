@@ -4,7 +4,7 @@ let selectedBrand = "";
 let selectedModel = null;
 
 // Load Data
-fetch("EV_Dataset_Cleaned.json")
+fetch("ev_vehicle_with_extra_10000.json")
     .then(res => res.json())
     .then(data => {
         evData = Array.isArray(data) ? data : data.data;
