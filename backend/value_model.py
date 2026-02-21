@@ -1,6 +1,7 @@
 
 import os
 import pickle
+import traceback
 import numpy as np
 import pandas as pd
 import xgboost
@@ -25,6 +26,7 @@ class ValueModel:
                 
                 print(f"Value Model loaded successfully from {self.model_path}")
             except Exception as e:
+                traceback.print_exc()
                 print(f"Error loading Value Model: {e}")
         else:
             print(f"Value Model file not found at {self.model_path}")
@@ -103,13 +105,17 @@ class ValueModel:
             if self.feature_names is None:
                  raise ValueError("Model feature names not available.")
 
-            # Initialize all features to 0
-            final_input = pd.DataFrame(0, index=[0], columns=self.feature_names)
+            # Initialize all features to 0.0 with explicit float64 dtype
+            # This is required for XGBoost to accept the DataFrame without dtype errors
+            final_input = pd.DataFrame(
+                np.zeros((1, len(self.feature_names)), dtype=np.float64),
+                columns=self.feature_names
+            )
 
             # Fill numerical features
             for col in input_dict:
                 if col in final_input.columns:
-                    final_input.loc[0, col] = input_dict[col]
+                    final_input[col] = float(input_dict[col])
 
             # Set One-Hot Encoded features
             # Format: 'brand_BrandName', 'model_ModelName', 'vehicle_type_Type'
@@ -128,6 +134,7 @@ class ValueModel:
             return final_input
 
         except Exception as e:
+            traceback.print_exc()
             raise ValueError(f"Preprocessing error: {str(e)}")
 
     def predict(self, data):
