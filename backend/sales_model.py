@@ -38,9 +38,13 @@ class SalesModel:
             # Aggregate if yearly
             if granularity == 'yearly':
                 # Resample to Annual Sum
-                # Using 'A' for Annual (calendar year end)
-                predicted_mean = predicted_mean.resample('A').sum()
-                conf_int = conf_int.resample('A').sum()
+                # 'YE' is the updated alias in newer pandas; fallback to 'A' for older versions
+                try:
+                    predicted_mean = predicted_mean.resample('YE').sum()
+                    conf_int = conf_int.resample('YE').sum()
+                except ValueError:
+                    predicted_mean = predicted_mean.resample('A').sum()
+                    conf_int = conf_int.resample('A').sum()
                 
                 # Format dates as Year only
                 dates = predicted_mean.index.strftime('%Y').tolist()
