@@ -117,7 +117,7 @@ def health_check():
         'value_model_loaded': value_model.model is not None
     })
 
-if __name__ == '__main__':
-    print("Starting Flask Server...")
-    # Run on 0.0.0.0 to be accessible, port 5000
-    app.run(debug=True, port=5000)
+if __name__ == "__main__":
+    import os
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
