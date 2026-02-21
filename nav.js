@@ -19,12 +19,47 @@ export function updateNavbar() {
     const authContainer = document.getElementById("nav-auth-container");
 
     if (isAuth) {
-        // Show Dashboard link in nav links
+        // Show Dashboard link but handle locking
         if (dashboardLink) {
             dashboardLink.classList.remove("hidden");
             const dashboardUrl = userRole === "admin" ? "admin-dashboard.html" : "user-dashboard.html";
             dashboardLink.querySelector("a").href = dashboardUrl;
         }
+
+        // --- NAVIGATION LOCKING LOGIC ---
+        const mlLink = document.querySelector('a[href="ml_models.html"]');
+        const dashLinkAnchor = dashboardLink ? dashboardLink.querySelector("a") : null;
+        const userPlan = sessionStorage.getItem("userPlan");
+
+        // Helper to lock a link
+        const lockLink = (linkElement) => {
+            if (!linkElement) return;
+            linkElement.classList.add('nav-locked');
+            linkElement.innerHTML += ' <span style="font-size:12px">🔒</span>';
+            linkElement.addEventListener('click', (e) => {
+                e.preventDefault();
+                alert("🔒 This feature is locked. Please upgrade your plan to access.");
+            });
+        };
+
+        // Reset locks (in case of page reload/state change on SPA)
+        if (mlLink) mlLink.classList.remove('nav-locked');
+        if (dashLinkAnchor) dashLinkAnchor.classList.remove('nav-locked');
+
+        if (userRole === 'user') {
+            // Flexible check for plan names (handles "Standard", "Standard Plan", etc.)
+            if (userPlan && userPlan.includes('Standard')) {
+                // Unlock Dashboard, Lock ML
+                if (mlLink) lockLink(mlLink);
+            } else if (userPlan && userPlan.includes('Premium')) {
+                // Unlock All - Do nothing
+            } else {
+                // Free/No Plan - Lock Both
+                if (dashLinkAnchor) lockLink(dashLinkAnchor);
+                if (mlLink) lockLink(mlLink);
+            }
+        }
+        // --------------------------------
 
         // Replace Login button with Profile Icon
         if (authContainer) {
@@ -71,7 +106,35 @@ export function updateNavbar() {
             dashboardLink.classList.add("hidden");
         }
     }
+
+    // Footer Dashboard Link Logic
+    const footerDashboardLink = document.getElementById("footer-dashboard-link");
+    if (footerDashboardLink) {
+        if (isAuth) {
+            let targetUrl = "user-dashboard.html";
+            if (userRole === "admin") targetUrl = "admin-dashboard.html";
+            else if (userRole === "business") targetUrl = "business-dashboard.html";
+
+            footerDashboardLink.href = targetUrl;
+        } else {
+            footerDashboardLink.href = "login.html";
+        }
+    }
 }
+
+// Inject CSS for Locked State
+const style = document.createElement('style');
+style.innerHTML = `
+  .nav-locked {
+    opacity: 0.6;
+    cursor: not-allowed !important;
+    pointer-events: auto; /* Ensure click event fires for alert */
+  }
+  .nav-locked:hover {
+    color: #cbd5f5 !important; /* Prevent hover color change */
+  }
+`;
+document.head.appendChild(style);
 
 // Make logout available globally for the dropdown button
 window.handleLogout = handleLogout;

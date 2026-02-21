@@ -8,7 +8,8 @@ import {
   query,
   where,
   orderBy,
-  limit
+  limit,
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
 // 🔐 Admin Guard (Firebase + Firestore)
@@ -39,7 +40,7 @@ window.logout = function () {
 };
 
 // 📂 Load data
-fetch("ev_vehicle_with_extra_10000.json")
+fetch("backend-data/ev_vehicle_with_extra_10000.json")
   .then(res => res.json())
   .then(data => {
     evData = Array.isArray(data) ? data : data.data;
@@ -280,34 +281,47 @@ function chartOptions(isPie = false) {
    ========================================= */
 
 window.switchTab = function (tab) {
-  const evSection = document.getElementById("ev-insights");
-  const userSection = document.getElementById("user-analytics");
   const evTab = document.getElementById("tab-ev");
   const userTab = document.getElementById("tab-users");
+  const bookingsTab = document.getElementById("tab-bookings");
+
+  // Hide all sections first
+  const sections = ["ev-insights", "user-analytics", "ad-manager", "vehicles-booked", "user-revenue", "business-revenue"];
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
+
+  // Deactivate all tabs
+  [evTab, userTab, document.getElementById("tab-ads"), bookingsTab].forEach(t => {
+    if (t) t.classList.remove("active");
+  });
+
+  // Sidebar links active state
+  document.querySelectorAll('.nav-link-custom').forEach(l => l.classList.remove('active'));
 
   if (tab === 'ev') {
-    evSection.style.display = "block";
-    userSection.style.display = "none";
+    document.getElementById("ev-insights").style.display = "block";
     evTab.classList.add("active");
-    userTab.classList.remove("active");
     updateDashboard(); // Refresh EV data
   } else if (tab === 'users') {
-    evSection.style.display = "none";
-    userSection.style.display = "block";
-    document.getElementById("ad-manager").style.display = "none";
-    evTab.classList.remove("active");
+    document.getElementById("user-analytics").style.display = "block";
     userTab.classList.add("active");
-    document.getElementById("tab-ads").classList.remove("active");
     updateUserAnalytics();
   } else if (tab === 'ads') {
-    evSection.style.display = "none";
-    userSection.style.display = "none";
     document.getElementById("ad-manager").style.display = "block";
-
-    evTab.classList.remove("active");
-    userTab.classList.remove("active");
     document.getElementById("tab-ads").classList.add("active");
     updateAdManager();
+  } else if (tab === 'bookings') {
+    document.getElementById("vehicles-booked").style.display = "block";
+    bookingsTab.classList.add("active");
+    loadBookedVehicles();
+  } else if (tab === 'user-revenue') {
+    document.getElementById("user-revenue").style.display = "block";
+    updateUserRevenue();
+  } else if (tab === 'business-revenue') {
+    document.getElementById("business-revenue").style.display = "block";
+    updateBusinessRevenue();
   }
 }
 
@@ -315,6 +329,60 @@ window.switchTab = function (tab) {
 let userActivityTrendChart = null;
 let userDistChart = null;
 
+// ... [Existing User Analytics Code] ...
+
+// --- VEHICLES BOOKED LOGIC ---
+async function loadBookedVehicles() {
+  try {
+    const q = query(collection(db, "sales"), orderBy("timestamp", "desc"));
+    const snap = await getDocs(q);
+    const tbody = document.getElementById("bookingsTable");
+    tbody.innerHTML = "";
+
+    snap.forEach(doc => {
+      const data = doc.data();
+      const date = data.timestamp ? (data.timestamp.toDate ? data.timestamp.toDate().toLocaleString() : new Date(data.timestamp).toLocaleString()) : "-";
+      const amount = data.amount ? data.amount.toLocaleString() : "0";
+      const isShared = data.sharedWithBusiness === true;
+
+      tbody.innerHTML += `
+                <tr>
+                    <td class="ps-4">${date}</td>
+                    <td>
+                        <div class="fw-bold">${data.userName || "Guest"}</div>
+                        <div class="small text-muted">${data.userEmail || "-"}</div>
+                    </td>
+                    <td>${data.model || "-"}</td>
+                    <td class="fw-bold text-success">₹${amount}</td>
+                    <td><span class="badge bg-secondary">${data.brand || "-"}</span></td>
+                    <td class="text-center">
+                        <div class="form-check form-switch d-flex justify-content-center">
+                            <input class="form-check-input" type="checkbox" role="switch"
+                                id="share-${doc.id}"
+                                ${isShared ? "checked" : ""}
+                                onchange="toggleSalePermission('${doc.id}', this.checked)">
+                        </div>
+                    </td>
+                </tr>
+            `;
+    });
+  } catch (e) {
+    console.error("Error loading bookings:", e);
+  }
+}
+
+window.toggleSalePermission = async function (docId, isShared) {
+  try {
+    await updateDoc(doc(db, "sales", docId), {
+      sharedWithBusiness: isShared
+    });
+    console.log(`Sale ${docId} shared status updated to ${isShared}`);
+  } catch (e) {
+    console.error("Error updating permission", e);
+    alert("Failed to update permission.");
+    // Revert UI if needed (omitted for brevity)
+  }
+}
 // ... [Existing User Analytics Code] ...
 
 // --- AD MANAGER LOGIC ---
@@ -377,6 +445,10 @@ window.openAdReview = async function (docId) {
     document.getElementById("reviewAdPlan").value = data.plan;
 
     document.getElementById("reviewBrandDisplay").value = data.brand;
+    const pages = data.placements ? data.placements.join(", ") : "All";
+    const pagesEl = document.getElementById("reviewPagesDisplay");
+    if (pagesEl) pagesEl.value = pages;
+
     // document.getElementById("reviewPlanDisplay").value = data.plan; // Removed from HTML
 
     // Content Fields
@@ -389,10 +461,6 @@ window.openAdReview = async function (docId) {
     updatePreviewImage(data.imageUrl || "");
     document.getElementById('titlePreviewSim').innerText = data.title || 'Ad Title Here';
     document.getElementById('descPreviewSim').innerText = data.description || 'Your promotional message will appear here for users.';
-
-    // Reset checkboxes
-    const checkboxes = ["pageHome", "pageAbout", "pagePricing", "pageDashboard", "pageStore"];
-    checkboxes.forEach(id => document.getElementById(id).checked = (id === "pageHome"));
 
     const modal = new bootstrap.Modal(document.getElementById("adReviewModal"));
     modal.show();
@@ -408,18 +476,9 @@ window.publishAd = async function () {
   const plan = document.getElementById("reviewAdPlan").value;
   const durationDays = parseInt(document.getElementById("reviewDuration").value) || 30;
 
-  // Collect Selected Pages
-  const targetPages = [];
-  const pageCheckboxes = [
-    { id: "pageHome", value: "Home" },
-    { id: "pageAbout", value: "About" },
-    { id: "pagePricing", value: "Pricing" },
-    { id: "pageDashboard", value: "Dashboard" },
-    { id: "pageStore", value: "Store" }
-  ];
-  pageCheckboxes.forEach(cb => {
-    if (document.getElementById(cb.id).checked) targetPages.push(cb.value);
-  });
+  // Collect Selected Pages from Readonly Input
+  const pagesStr = document.getElementById("reviewPagesDisplay").value;
+  const targetPages = pagesStr ? pagesStr.split(", ") : [];
 
   if (targetPages.length === 0) {
     alert("Please select at least one target page.");
@@ -599,13 +658,30 @@ document.addEventListener('change', (e) => {
   }
 });
 
+// Pagination State
+let currentUserPage = 1;
+const USERS_PER_PAGE = 10;
+let cachedUsers = []; // Store users for pagination
+
 function renderUserTable(users, sessions) {
+  cachedUsers = users.sort((a, b) => (a.fullName || "").localeCompare(b.fullName || ""));
+  updateUserTableUI();
+}
+
+function updateUserTableUI() {
   const tbody = document.getElementById("userTableBody");
   if (!tbody) return;
   tbody.innerHTML = "";
 
-  users.sort((a, b) => (a.fullName || "").localeCompare(b.fullName || "")).forEach(user => {
-    const loginCount = user.loginCount || 0;
+  const start = (currentUserPage - 1) * USERS_PER_PAGE;
+  const end = start + USERS_PER_PAGE;
+  const displayedUsers = cachedUsers.slice(start, end);
+
+  displayedUsers.forEach(user => {
+    // Plan Logic (Mock for now if not in user object)
+    const plan = (user.subscription && user.subscription.plan) ? user.subscription.plan.toUpperCase() : "FREE";
+    const planBadge = plan === 'PREMIUM' || plan === 'YEARLY' ? 'bg-warning text-dark' : (plan === 'FREE' ? 'bg-secondary' : 'bg-info');
+
     const totalDurationMs = user.totalTimeSpent || 0;
     const totalMins = Math.round(totalDurationMs / 60000);
 
@@ -620,7 +696,7 @@ function renderUserTable(users, sessions) {
         <div class="fw-bold text-white">${user.fullName || "N/A"}</div>
         <small class="text-muted">${user.email}</small>
       </td>
-      <td class="text-center">${loginCount}</td>
+      <td class="text-center"><span class="badge ${planBadge}">${plan}</span></td>
       <td class="text-center text-primary fw-semibold">${totalMins}m</td>
       <td class="text-center small">${lastLoginStr}</td>
       <td class="text-center">
@@ -632,6 +708,19 @@ function renderUserTable(users, sessions) {
     `;
     tbody.appendChild(tr);
   });
+
+  // Update Controls
+  document.getElementById("user-current-page").innerText = currentUserPage;
+  document.getElementById("prev-users-btn").disabled = currentUserPage === 1;
+  document.getElementById("next-users-btn").disabled = end >= cachedUsers.length;
+}
+
+window.changeUserPage = function (delta) {
+  const newPage = currentUserPage + delta;
+  if (newPage > 0 && (newPage - 1) * USERS_PER_PAGE < cachedUsers.length) {
+    currentUserPage = newPage;
+    updateUserTableUI();
+  }
 }
 
 // View history modal function
@@ -682,6 +771,187 @@ window.viewUserDetails = async function (uid) {
     modal.show();
   } catch (error) {
     console.error("Error viewing user details:", error);
+  }
+}
+
+// --- USER REVENUE LOGIC ---
+window.updateUserRevenue = async function () {
+  try {
+    // 1. Fetch Users
+    const usersSnap = await getDocs(collection(db, "users"));
+    const users = [];
+    usersSnap.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
+
+    // 2. Fetch Vehicle Sales
+    const salesSnap = await getDocs(collection(db, "sales"));
+    const sales = [];
+    salesSnap.forEach(doc => sales.push(doc.data()));
+
+    let totalRevenue = 0;
+    const userFinancials = [];
+
+    // Loop through users to aggregate data
+    users.forEach(user => {
+      // Calculate Subscription Revenue (Simulated based on plan name)
+      let subRevenue = 0;
+      if (user.plan) {
+        const p = user.plan.toLowerCase();
+        if (p.includes('standard')) subRevenue = 299;
+        if (p.includes('premium')) subRevenue = 599;
+      }
+
+      // Calculate Vehicle Purchase Revenue
+      const userSales = sales.filter(s => s.userEmail === user.email);
+      // Ensure 'amount' is treated as a number
+      const salesRevenue = userSales.reduce((sum, s) => {
+        let amt = s.amount;
+        if (typeof amt === 'string') amt = parseFloat(amt.replace(/[^0-9.]/g, ''));
+        return sum + (Number(amt) || 0);
+      }, 0);
+
+      const totalUserSpend = subRevenue; // EXCLUDE salesRevenue as per request
+      totalRevenue += totalUserSpend;
+
+      // Only push if there's activity or we want to list all users
+      userFinancials.push({
+        name: user.fullName || "Unknown",
+        email: user.email,
+        plan: user.plan || "Free",
+        salesCount: userSales.length,
+        totalSpend: totalUserSpend,
+        status: user.status || "Active"
+      });
+    });
+
+    // Sort by Spend (Descending)
+    userFinancials.sort((a, b) => b.totalSpend - a.totalSpend);
+
+    // Update KPIs
+    const totalRevEl = document.getElementById("totalUserRevenue");
+    if (totalRevEl) totalRevEl.innerText = `₹${totalRevenue.toLocaleString()}`;
+
+    const avg = users.length ? Math.round(totalRevenue / users.length) : 0;
+    const avgRevEl = document.getElementById("avgUserRevenue");
+    if (avgRevEl) avgRevEl.innerText = `₹${avg.toLocaleString()}`;
+
+    if (userFinancials.length > 0) {
+      const topSpenderNameEl = document.getElementById("topSpenderName");
+      const topSpenderAmtEl = document.getElementById("topSpenderAmount");
+      if (topSpenderNameEl) topSpenderNameEl.innerText = userFinancials[0].name;
+      if (topSpenderAmtEl) topSpenderAmtEl.innerText = `₹${userFinancials[0].totalSpend.toLocaleString()}`;
+    }
+
+    // Render Table
+    const tbody = document.getElementById("userRevenueTable");
+    if (tbody) {
+      tbody.innerHTML = "";
+      userFinancials.forEach(u => {
+        const statusClass = u.status === 'Active' ? 'bg-success' : 'bg-danger';
+        tbody.innerHTML += `
+            <tr>
+              <td class="ps-4">
+                <div class="fw-bold">${u.name}</div>
+                <small class="text-muted">${u.email}</small>
+              </td>
+              <td><span class="badge bg-light text-dark border">${u.plan}</span></td>
+              <td>${u.salesCount} Vehicles</td>
+              <td class="fw-bold text-success">₹${u.totalSpend.toLocaleString()}</td>
+              <td><span class="badge ${statusClass}">${u.status}</span></td>
+            </tr>
+          `;
+      });
+    }
+
+  } catch (error) {
+    console.error("Error loading user revenue:", error);
+  }
+}
+
+// --- BUSINESS REVENUE LOGIC ---
+window.updateBusinessRevenue = async function () {
+  try {
+    // 1. Fetch Business Users/Plans via ad requests which indicate business activity
+    const adsSnap = await getDocs(collection(db, "ads_requests"));
+    const ads = [];
+    adsSnap.forEach(doc => ads.push({ id: doc.id, ...doc.data() }));
+
+    // Aggregate by Brand
+    const brandMap = {};
+
+    ads.forEach(ad => {
+      const brandKey = ad.brand || "Unknown Brand";
+
+      if (!brandMap[brandKey]) {
+        brandMap[brandKey] = {
+          name: brandKey,
+          email: "-", // Placeholder as ads request might not have email directly
+          plan: ad.plan || "None",
+          adSpend: 0,
+          planSpend: 0,
+          totalRev: 0,
+          adCount: 0
+        };
+      }
+
+      // Add Ad Revenue
+      let amt = ad.amount;
+      if (typeof amt === 'string') amt = parseFloat(amt.replace(/[^0-9.]/g, ''));
+      brandMap[brandKey].adSpend += (Number(amt) || 0);
+      brandMap[brandKey].adCount += 1;
+    });
+
+    // Convert to Array
+    const brands = Object.values(brandMap);
+
+    // Calculate Totals
+    let totalAdRev = 0;
+    let totalPlanRev = 0;
+
+    brands.forEach(b => {
+      // Logic could be expanded to check specific Plan costs if stored
+      b.totalRev = b.adSpend + b.planSpend;
+      totalAdRev += b.adSpend;
+      totalPlanRev += b.planSpend;
+    });
+
+    const totalRevenue = totalAdRev + totalPlanRev;
+
+    // Update KPIs
+    const totalBizRevEl = document.getElementById("totalBizRevenue");
+    if (totalBizRevEl) totalBizRevEl.innerText = `₹${totalRevenue.toLocaleString()}`;
+
+    const activePartnersEl = document.getElementById("activeBizPartners");
+    if (activePartnersEl) activePartnersEl.innerText = brands.length;
+
+    const adShare = totalRevenue > 0 ? ((totalAdRev / totalRevenue) * 100).toFixed(1) : 0;
+    const adShareEl = document.getElementById("adRevenueShare");
+    if (adShareEl) adShareEl.innerText = `${adShare}%`;
+
+    // Render Table
+    const tbody = document.getElementById("bizRevenueTable");
+    if (tbody) {
+      tbody.innerHTML = "";
+      // Sort by Revenue Desc
+      brands.sort((a, b) => b.totalRev - a.totalRev);
+
+      brands.forEach(b => {
+        tbody.innerHTML += `
+            <tr>
+              <td class="ps-4 fw-bold">${b.name}</td>
+              <td>${b.email}</td>
+              <td><span class="badge bg-info text-dark">${b.plan.toUpperCase()}</span></td>
+              <td>₹${b.adSpend.toLocaleString()} <small class="text-muted">(${b.adCount} ads)</small></td>
+              <td class="fw-bold text-primary">₹${b.totalRev.toLocaleString()}</td>
+              <td class="text-end pe-4">
+                <button class="btn btn-sm btn-outline-secondary">View Details</button>
+              </td>
+            </tr>
+          `;
+      });
+    }
+
+  } catch (error) {
+    console.error("Error loading business revenue:", error);
   }
 }
 

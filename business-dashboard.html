@@ -150,6 +150,9 @@
             <button class="nav-link-custom" onclick="showSection('advertising')">
                 <span>📢</span> Advertising
             </button>
+            <button class="nav-link-custom" onclick="showSection('bookings')">
+                <span>🛒</span> Bookings
+            </button>
             <button class="nav-link-custom" onclick="showSection('plans')">
                 <span>💳</span> Plans
             </button>
@@ -210,7 +213,7 @@
             <div class="row g-3">
                 <div class="col-md-8">
                     <div class="card-custom h-100">
-                        <h5 class="fw-bold mb-3">Make / Model Interest</h5>
+                        <h5 class="fw-bold mb-3">Make / Category Interest</h5>
                         <canvas id="brandInterestChart"></canvas>
                     </div>
                 </div>
@@ -326,9 +329,102 @@
                     </div>
                 </div>
 
+                <!-- 2. SELECT AD PLACEMENT -->
+                <div class="card-custom mb-4">
+                    <h5 class="fw-bold mb-3">2. Select Ad Placement</h5>
+                    <p class="text-muted small">Choose where your ad will appear. Higher visibility pages cost more.
+                    </p>
+
+                    <div class="row g-3">
+                        <!-- Premium Pages -->
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold text-primary">Premium Pages (₹599 each)</label>
+                            <div class="d-flex gap-3 flex-wrap">
+                                <div class="card p-2 border-primary bg-light d-flex flex-row align-items-center gap-2"
+                                    style="min-width: 150px;">
+                                    <input class="form-check-input m-0" type="checkbox" value="Home" id="pageHome"
+                                        data-price="599" onchange="calculateAdTotal()">
+                                    <label class="form-check-label fw-bold" for="pageHome">Home <span
+                                            class="badge bg-primary ms-1">Hot</span></label>
+                                </div>
+                                <div class="card p-2 border-primary bg-light d-flex flex-row align-items-center gap-2"
+                                    style="min-width: 150px;">
+                                    <input class="form-check-input m-0" type="checkbox" value="Dashboard"
+                                        id="pageDashboard" data-price="599" onchange="calculateAdTotal()">
+                                    <label class="form-check-label fw-bold" for="pageDashboard">Dashboard</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Standard Pages -->
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold text-secondary">Standard Pages (₹299 each)</label>
+                            <div class="d-flex gap-3 flex-wrap">
+                                <div class="card p-2 d-flex flex-row align-items-center gap-2"
+                                    style="min-width: 150px;">
+                                    <input class="form-check-input m-0" type="checkbox" value="About" id="pageAbout"
+                                        data-price="299" onchange="calculateAdTotal()">
+                                    <label class="form-check-label" for="pageAbout">About</label>
+                                </div>
+                                <div class="card p-2 d-flex flex-row align-items-center gap-2"
+                                    style="min-width: 150px;">
+                                    <input class="form-check-input m-0" type="checkbox" value="Pricing" id="pagePricing"
+                                        data-price="299" onchange="calculateAdTotal()">
+                                    <label class="form-check-label" for="pagePricing">Pricing</label>
+                                </div>
+                                <div class="card p-2 d-flex flex-row align-items-center gap-2"
+                                    style="min-width: 150px;">
+                                    <input class="form-check-input m-0" type="checkbox" value="Contact" id="pageContact"
+                                        data-price="299" onchange="calculateAdTotal()">
+                                    <label class="form-check-label" for="pageContact">Contact</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Estimate -->
+                    <div class="mt-4 p-3 bg-light rounded text-center border">
+                        <h5 class="mb-1">Total Estimated Cost</h5>
+                        <h2 class="text-success fw-bold display-6" id="adTotalDisplay">₹0</h2>
+                        <small class="text-muted">Funds will be deducted from your wallet or invoiced.</small>
+                    </div>
+                </div>
+
+                <!-- 3. SELECT PAYMENT METHOD -->
+                <div class="card-custom mb-5">
+                    <h5 class="fw-bold mb-3">3. Select Payment Method</h5>
+                    <div class="row g-3">
+                        <!-- Razorpay Payment Option -->
+                        <div class="col-md-12">
+                            <div class="card p-3 border border-primary bg-light h-100 position-relative"
+                                id="cardOnline">
+                                <div class="form-check d-flex align-items-center gap-3">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="payOnline"
+                                        value="razorpay" checked>
+                                    <label class="form-check-label w-100 cursor-pointer" for="payOnline">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-0 fw-bold"><i
+                                                        class="bi bi-credit-card-2-front text-primary me-2"></i>Pay
+                                                    via Razorpay</h6>
+                                                <small class="text-muted">Secure payment with UPI, Credit/Debit
+                                                    Cards, NetBanking</small>
+                                            </div>
+                                            <i class="bi bi-check-circle-fill text-primary" id="checkOnline"></i>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
                 <div id="publish-actions" class="text-center mb-5" style="display: none;">
                     <div class="alert alert-success d-inline-block mb-3">
-                        <i class="bi bi-check-circle-fill"></i> You have an active plan! You can publish ads directly.
+                        <i class="bi bi-check-circle-fill"></i> You have an active plan! You can publish ads
+                        directly.
                     </div>
                     <br>
                     <button id="publish-btn" class="btn btn-success btn-lg px-5 rounded-pill"
@@ -348,6 +444,34 @@
 
         </div>
 
+        <!-- BOOKINGS SECTION -->
+        <div id="section-bookings" style="display: none;">
+            <h2 class="mb-4">Vehicle Bookings</h2>
+            <p class="text-muted">View bookings for your brand that have been approved by the admin.</p>
+
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="ps-4">Date</th>
+                                    <th>User Name</th>
+                                    <th>User Email</th>
+                                    <th>Model</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="brandBookingsTable">
+                                <!-- Injected via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- PLANS SECTION -->
         <div id="section-plans" style="display: none;">
             <div class="card-custom mb-4 bg-light">
@@ -360,9 +484,9 @@
                 <div class="row g-4 mb-4">
                     <!-- Monthly Plan -->
                     <div class="col-md-4">
-                        <div class="card-custom plan-card text-center" onclick="selectPlan('monthly', 4999)">
+                        <div class="card-custom plan-card text-center" onclick="selectPlan('monthly', 999)">
                             <h3 class="fw-bold">Monthly</h3>
-                            <h1 class="text-primary display-4 fw-bold">₹4,999</h1>
+                            <h1 class="text-primary display-4 fw-bold">₹999</h1>
                             <p class="text-muted">per month</p>
                             <ul class="list-unstyled text-start mx-auto" style="max-width: 200px;">
                                 <li class="mb-2">✓ Business Analytics</li>
@@ -375,31 +499,31 @@
                     <!-- Quarterly Plan -->
                     <div class="col-md-4">
                         <div class="card-custom plan-card text-center highlight position-relative"
-                            onclick="selectPlan('quarterly', 12999)">
+                            onclick="selectPlan('quarterly', 2499)">
                             <span
                                 class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-warning text-dark">BEST
                                 VALUE</span>
                             <h3 class="fw-bold">Quarterly</h3>
-                            <h1 class="text-primary display-4 fw-bold">₹12,999</h1>
+                            <h1 class="text-primary display-4 fw-bold">₹2,499</h1>
                             <p class="text-muted">for 3 months</p>
                             <ul class="list-unstyled text-start mx-auto" style="max-width: 200px;">
                                 <li class="mb-2">✓ All Monthly Features</li>
                                 <li class="mb-2">✓ Email Campaign Feature</li>
-                                <li class="mb-2">✓ <strong>Save ₹2,000</strong></li>
+                                <li class="mb-2">✓ <strong>Save ₹500</strong></li>
                             </ul>
                         </div>
                     </div>
 
                     <!-- Yearly Plan -->
                     <div class="col-md-4">
-                        <div class="card-custom plan-card text-center" onclick="selectPlan('yearly', 44999)">
+                        <div class="card-custom plan-card text-center" onclick="selectPlan('yearly', 9999)">
                             <h3 class="fw-bold">Yearly</h3>
-                            <h1 class="text-primary display-4 fw-bold">₹44,999</h1>
+                            <h1 class="text-primary display-4 fw-bold">₹9,999</h1>
                             <p class="text-muted">per year</p>
                             <ul class="list-unstyled text-start mx-auto" style="max-width: 200px;">
                                 <li class="mb-2">✓ Full Brand Takeover</li>
                                 <li class="mb-2">✓ Dedicated Account Mgr</li>
-                                <li class="mb-2">✓ <strong>Save ₹15,000</strong></li>
+                                <li class="mb-2">✓ <strong>Save ₹2,000</strong></li>
                             </ul>
                         </div>
                     </div>
@@ -408,6 +532,26 @@
 
             <div id="plan-payment-actions" class="text-center" style="display: none;">
                 <p class="mb-2">Selected Plan: <strong id="selected-plan-details">None</strong></p>
+
+                <!-- Razorpay Payment Option for Plans -->
+                <div class="card p-3 border border-primary bg-light mb-4 mx-auto text-start" style="max-width: 500px;">
+                    <div class="form-check d-flex align-items-center gap-3">
+                        <input class="form-check-input" type="radio" name="planPaymentMethod" id="payPlanRazorpay"
+                            value="razorpay" checked>
+                        <label class="form-check-label w-100 cursor-pointer" for="payPlanRazorpay">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0 fw-bold"><i
+                                            class="bi bi-credit-card-2-front text-primary me-2"></i>Pay via Razorpay
+                                    </h6>
+                                    <small class="text-muted">Cards, UPI, NetBanking</small>
+                                </div>
+                                <i class="bi bi-check-circle-fill text-primary"></i>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
                 <button id="plan-pay-btn" class="btn btn-primary btn-lg px-5 rounded-pill" onclick="initiatePayment()">
                     Pay Now & Update Subscription
                 </button>
@@ -496,18 +640,30 @@
     <div class="modal fade" id="brandLoginModal" data-bs-backdrop="static" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Business Login</h5>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold">Business Portal Login</h5>
                 </div>
-                <div class="modal-body">
-                    <p>Please select your Brand Name to access your dashboard.</p>
-                    <select id="brandSelect" class="form-select">
-                        <option value="" selected disabled>Select a Brand...</option>
-                        <!-- Options populated by JS -->
-                    </select>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="setBrandSession()">Access Dashboard</button>
+                <div class="modal-body p-4">
+                    <p class="text-muted mb-4">Enter your brand credentials to access the dashboard.</p>
+                    <form id="brandLoginForm" onsubmit="event.preventDefault(); handleBrandLogin();">
+                        <div class="mb-3">
+                            <label for="brandEmail" class="form-label fw-bold">Brand Email</label>
+                            <input type="email" class="form-control" id="brandEmail"
+                                placeholder="Enter your brand email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="brandPassword" class="form-label fw-bold">Password</label>
+                            <input type="password" class="form-control" id="brandPassword"
+                                placeholder="Enter your password" required>
+                        </div>
+                        <div id="loginError" class="alert alert-danger py-2 small" style="display: none;">
+                            Invalid credentials. Please try again.
+                        </div>
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">Secure Login</button>
+                        </div>
+                    </form>
+
                 </div>
             </div>
         </div>

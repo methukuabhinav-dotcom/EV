@@ -2,7 +2,7 @@
 alert("dashboard.js loaded");
 
 
-fetch("ev_vehicle_with_extra_10000.json")
+fetch("backend-data/ev_vehicle_with_extra_10000.json")
   .then(response => {
     if (!response.ok) {
       throw new Error("JSON file not found");

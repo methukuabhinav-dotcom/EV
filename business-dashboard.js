@@ -1,662 +1,705 @@
-import { protectRoute } from "./guard.js";
+import { fetchEVData } from "./vehicle-data.js";
 import { db } from "./firebase-config.js";
-import { EV_DATA } from "./vehicle-data.js";
-import {
-    collection,
-    addDoc,
-    getDocs,
-    getDoc,
-    doc,
-    updateDoc,
-    deleteDoc,
-    query,
-    where,
-    orderBy,
-    limit
-} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { collection, query, where, getDocs, orderBy, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-// Global State
+// ==========================================
+// 1. MOCK USER & GLOBAL STATE
+// ==========================================
+const MOCK_USER = {
+    uid: "mock-business-user-123",
+    fullName: "Business Admin",
+    email: "business@voltevs.com",
+    photoURL: "https://ui-avatars.com/api/?name=Business+Admin&background=6366f1&color=fff",
+    role: "business",
+    createdAt: new Date("2024-01-01"),
+    loginCount: 42,
+    subscription: {
+        plan: "yearly",
+        status: "active",
+        expiresAt: new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+    },
+    walletBalance: 15400
+};
+
 let currentBrand = sessionStorage.getItem("businessBrand");
 let evData = [];
-let currentUserData = null;
+let currentUserData = MOCK_USER;
 
-// Initialize
-document.addEventListener("DOMContentLoaded", () => {
-    protectRoute('business').then(userData => {
-        console.log("Business User Verified:", userData.email);
-        currentUserData = userData;
+// ==========================================
+// 2. INITIALIZATION
+// ==========================================
+document.addEventListener("DOMContentLoaded", async () => {
+    console.log("🚀 Business Dashboard Loaded (JSON-Only Mode)");
 
-        populateBrandSelect();
+    // Initialize UI
+    // Initialize UI
+    // Brand selection is now handled via Login Modal
 
-        // Auto-set brand from profile if exists
-        if (userData.brand && !currentBrand) {
-            currentBrand = userData.brand;
-            sessionStorage.setItem("businessBrand", currentBrand);
-        }
+    if (!currentBrand) {
+        const modal = new bootstrap.Modal(document.getElementById('brandLoginModal'));
+        modal.show();
+    } else {
+        initDashboard();
+    }
 
-        if (!currentBrand) {
-            const modal = new bootstrap.Modal(document.getElementById('brandLoginModal'));
-            modal.show();
-
-            // Add click listener to brand name to re-open modal
-            const brandDisplay = document.getElementById("brandNameDisplay");
-            brandDisplay.style.cursor = "pointer";
-            brandDisplay.onclick = () => modal.show();
-        } else {
-            document.getElementById("brandNameDisplay").innerText = currentBrand;
-            // Add click listener to brand name to re-open modal
-            const brandDisplay = document.getElementById("brandNameDisplay");
-            brandDisplay.style.cursor = "pointer";
-            brandDisplay.onclick = () => {
-                const modal = new bootstrap.Modal(document.getElementById('brandLoginModal'));
-                modal.show();
-            };
-
-            loadData();
-            checkAdStatus();
-            renderProfile();
-            showSection('analytics');
-        }
-    });
+    // Setup Event Listeners
+    setupBrandModalListeners();
 });
 
-function populateBrandSelect() {
-    const brandSelect = document.getElementById("brandSelect");
-    if (!brandSelect) return;
-
-    const brands = new Set();
-
-    // Extract brands from nested EV_DATA structure
-    if (EV_DATA) {
-        Object.keys(EV_DATA).forEach(category => {
-            if (EV_DATA[category].brands) {
-                Object.keys(EV_DATA[category].brands).forEach(brand => {
-                    brands.add(brand);
-                });
-            }
-        });
+function initDashboard() {
+    document.getElementById("brandNameDisplay").innerText = currentBrand;
+    if (document.getElementById("walletBalanceDisplay")) {
+        document.getElementById("walletBalanceDisplay").innerText = `₹${currentUserData.walletBalance.toLocaleString()}`;
     }
-
-    // Add manually if any missing or from other sources
-    ['Tesla', 'Hyundai', 'Kia', 'BMW', 'Mercedes'].forEach(b => brands.add(b));
-
-    const sortedBrands = Array.from(brands).sort();
-
-    sortedBrands.forEach(brand => {
-        const option = document.createElement("option");
-        option.value = brand;
-        option.textContent = brand;
-        brandSelect.appendChild(option);
-    });
+    loadData(); // Load Analytics from JSON
+    renderProfile();
+    showSection('analytics');
 }
 
+// ==========================================
+// 3. BRAND SELECTION LOGIC
+// ==========================================
+// ==========================================
+// 3. AUTHENTICATION LOGIC
+// ==========================================
 
-// Mock Login
-// Login / Set Brand
-window.setBrandSession = async function () {
-    const brandSelect = document.getElementById("brandSelect");
-    const brand = brandSelect.value;
+const BRAND_CREDENTIALS = {
+    "ather@gmail.com": { password: "ather@123", brand: "Ather" },
+    "byd@gmail.com": { password: "byd@123", brand: "BYD" },
+    "mg@gmail.com": { password: "mg@123", brand: "MG" },
+    "mahindra@gmail.com": { password: "mahindra@123", brand: "Mahindra" },
+    "ola@gmail.com": { password: "ola@123", brand: "Ola" },
+    "revolt@gmail.com": { password: "revolt@123", brand: "Revolt" },
+    "tvs@gmail.com": { password: "tvs@123", brand: "TVS" },
+    "tata@gmail.com": { password: "tata@123", brand: "Tata" }
+};
 
-    if (brand) {
-        sessionStorage.setItem("businessBrand", brand);
-        currentBrand = brand;
-        document.getElementById("brandNameDisplay").innerText = brand;
+window.handleBrandLogin = function () {
+    const emailInput = document.getElementById("brandEmail");
+    const passwordInput = document.getElementById("brandPassword");
+    const errorMsg = document.getElementById("loginError");
 
-        // Setup click-to-change again
-        document.getElementById("brandNameDisplay").onclick = () => {
-            const modal = new bootstrap.Modal(document.getElementById('brandLoginModal'));
-            modal.show();
+    const email = emailInput.value.toLowerCase().trim();
+    const password = passwordInput.value.trim();
+
+    if (BRAND_CREDENTIALS[email] && BRAND_CREDENTIALS[email].password === password) {
+        // Successful Login
+        const brandName = BRAND_CREDENTIALS[email].brand;
+
+        // Save Session
+        sessionStorage.setItem("businessBrand", brandName);
+        sessionStorage.setItem("businessEmail", email);
+
+        currentBrand = brandName;
+        currentUserData = { ...MOCK_USER, email: email, fullName: brandName + " Admin" };
+
+        // Hide Modal
+        const modalEl = document.getElementById('brandLoginModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) modal.hide();
+
+        // Refresh UI
+        initDashboard();
+
+        // Clear form
+        emailInput.value = "";
+        passwordInput.value = "";
+        errorMsg.style.display = "none";
+
+    } else {
+        // Invalid Credentials
+        errorMsg.style.display = "block";
+        passwordInput.value = "";
+    }
+};
+
+// Removed populateBrandSelect as it's no longer needed
+
+// Helper for Title Case
+// toTitleCase and setBrandSession removed
+function setupBrandModalListeners() {
+    const brandDisplay = document.getElementById("brandNameDisplay");
+    if (brandDisplay) {
+        brandDisplay.style.cursor = "pointer";
+        brandDisplay.onclick = () => {
+            new bootstrap.Modal(document.getElementById('brandLoginModal')).show();
         };
-
-        // Persist to Firestore
-        try {
-            const uid = sessionStorage.getItem("uid");
-            if (uid) {
-                const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js");
-                await setDoc(doc(db, "users", uid), { brand: brand }, { merge: true });
-                console.log("Brand saved to profile");
-            }
-        } catch (e) {
-            console.error("Error saving brand:", e);
-        }
-
-        const modal = bootstrap.Modal.getInstance(document.getElementById('brandLoginModal'));
-        modal.hide();
-        loadData();
-        checkAdStatus();
     }
 }
 
-// Load EV Data for Analytics
+// ==========================================
+// 4. ANALYTICS (Charts & KPIs)
+// ==========================================
 function loadData() {
-    fetch("ev_vehicle_with_extra_10000.json")
+    fetch("backend-data/ev_vehicle_with_extra_10000.json")
         .then(res => res.json())
         .then(data => {
-            evData = Array.isArray(data) ? data : data.data;
+            const rawData = Array.isArray(data) ? data : data.data;
+            // Basic cleanup
+            evData = rawData.filter(d => !['Tesla', 'Hyundai'].includes(d.Brand));
             processAnalytics();
-        });
+        })
+        .catch(err => console.error("Failed to load analytics data:", err));
+}
+
+window.togglePaymentUI = function () {
+    const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+
+    // Reset styles
+    const cardWallet = document.getElementById('cardWallet');
+    const cardOnline = document.getElementById('cardOnline');
+    const checkWallet = document.getElementById('checkWallet');
+    const checkOnline = document.getElementById('checkOnline');
+
+    if (cardWallet) cardWallet.classList.remove('border-primary', 'bg-light');
+    if (cardOnline) cardOnline.classList.remove('border-primary', 'bg-light');
+    if (checkWallet) checkWallet.classList.add('d-none');
+    if (checkOnline) checkOnline.classList.add('d-none');
+
+    // Apply active style
+    if (method === 'wallet') {
+        if (cardWallet) cardWallet.classList.add('border-primary', 'bg-light');
+        if (checkWallet) checkWallet.classList.remove('d-none');
+    } else if (method === 'razorpay') {
+        if (cardOnline) cardOnline.classList.add('border-primary', 'bg-light');
+        if (checkOnline) checkOnline.classList.remove('d-none');
+    }
 }
 
 function processAnalytics() {
     // Filter for this brand
     const brandData = evData.filter(d => d.Brand.toLowerCase() === currentBrand.toLowerCase());
 
-    // Mock Metrics based on filtered data count
-    const baseCount = brandData.length || 50;
-    const views = baseCount * 125;
+    if (!brandData.length) {
+        console.warn("No data for brand:", currentBrand);
+    }
+
+    // Mock Metrics
+    const baseCount = brandData.length || 0;
+    const views = baseCount * 125; // Simulated multiplier
     const leads = Math.floor(views * 0.08); // 8% conversion
-    const engagement = 60 + Math.floor(Math.random() * 20); // 60-80%
+    const engagement = baseCount > 0 ? (60 + Math.floor(Math.random() * 20)) : 0;
 
-    // Update Stats
-    document.getElementById("stats-views").innerText = views.toLocaleString();
-    document.getElementById("stats-leads").innerText = leads.toLocaleString();
-    document.getElementById("stats-engagement").innerText = engagement + "%";
+    // Update KPIs
+    if (document.getElementById("stats-views")) document.getElementById("stats-views").innerText = views.toLocaleString();
+    if (document.getElementById("stats-leads")) document.getElementById("stats-leads").innerText = leads.toLocaleString();
+    if (document.getElementById("stats-engagement")) document.getElementById("stats-engagement").innerText = engagement + "%";
 
-    // Chart 1: Model Interest
-    const modelMap = {};
+    // Chart 1: Category Interest
+    const categoryMap = {};
     brandData.forEach(d => {
-        modelMap[d.Model] = (modelMap[d.Model] || 0) + (d.Units_Sold_Per_Year || 10);
+        const category = d.Vehicle_Category || "Unknown";
+        categoryMap[category] = (categoryMap[category] || 0) + (Number(d.Units_Sold_Per_Year) || 1);
     });
 
-    const ctx1 = document.getElementById("brandInterestChart");
-    new Chart(ctx1, {
-        type: "bar",
-        data: {
-            labels: Object.keys(modelMap),
-            datasets: [{
-                label: "User Interest (Units)",
-                data: Object.values(modelMap),
-                backgroundColor: "#6366f1"
-            }]
-        },
-        options: { responsive: true, plugins: { legend: { display: false } } }
+    renderChart("brandInterestChart", "bar", Object.keys(categoryMap), Object.values(categoryMap), "Units Sold", "#6366f1");
+
+    // Chart 2: Usage Type
+    const usageMap = {};
+    brandData.forEach(d => {
+        const usage = d.Usage_Type || "Unknown";
+        usageMap[usage] = (usageMap[usage] || 0) + 1;
     });
 
-    // Chart 2: Demographics (Mock)
-    const ctx2 = document.getElementById("demographicsChart");
-    new Chart(ctx2, {
-        type: "doughnut",
+    renderChart("demographicsChart", "doughnut", Object.keys(usageMap), Object.values(usageMap), "Distribution", ["#cbd5e1", "#6366f1", "#10b981", "#f59e0b"]);
+}
+
+function renderChart(canvasId, type, labels, data, label, colors) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+
+    const existingChart = Chart.getChart(ctx);
+    if (existingChart) existingChart.destroy();
+
+    new Chart(ctx, {
+        type: type,
         data: {
-            labels: ["18-24", "25-34", "35-50", "50+"],
+            labels: labels,
             datasets: [{
-                data: [15, 45, 30, 10],
-                backgroundColor: ["#cbd5e1", "#6366f1", "#10b981", "#f59e0b"]
+                label: label,
+                data: data,
+                backgroundColor: colors
             }]
         },
-        options: { responsive: true }
+        options: {
+            responsive: true,
+            plugins: { legend: { display: type === 'doughnut' } }
+        }
     });
 }
 
-// Check Ad Status in Firestore
-async function checkAdStatus() {
-    if (!currentBrand) {
-        console.log("No brand selected, skipping ad check.");
+// ==========================================
+// 5. BOOKINGS (REAL FIRESTORE DATA)
+// ==========================================
+async function loadBrandBookings() {
+    const tbody = document.getElementById("brandBookingsTable");
+    if (!tbody) return;
+
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center">Loading approved bookings...</td></tr>';
+
+    try {
+        console.log("Fetching bookings for:", currentBrand);
+
+        // Strategy: Run two queries to handle casing mismatch (e.g. "Revolt" vs "REVOLT")
+        // Query 1: Exact match
+        const q1 = query(
+            collection(db, "sales"),
+            where("brand", "==", currentBrand),
+            where("sharedWithBusiness", "==", true)
+        );
+
+        // Query 2: Uppercase match (if different)
+        let q2 = null;
+        if (currentBrand.toUpperCase() !== currentBrand) {
+            q2 = query(
+                collection(db, "sales"),
+                where("brand", "==", currentBrand.toUpperCase()),
+                where("sharedWithBusiness", "==", true)
+            );
+        }
+
+        // Execute queries
+        const results = await Promise.all([
+            getDocs(q1),
+            q2 ? getDocs(q2) : Promise.resolve({ forEach: () => { } })
+        ]);
+
+        const bookingsMap = new Map(); // Use Map to dedup by ID
+
+        results.forEach(snap => {
+            snap.forEach(doc => {
+                if (!bookingsMap.has(doc.id)) {
+                    const data = doc.data();
+                    bookingsMap.set(doc.id, {
+                        date: data.timestamp ? (data.timestamp.toDate ? data.timestamp.toDate() : new Date(data.timestamp)) : new Date(),
+                        user: data.userName || "Guest",
+                        email: data.userEmail || "-", // Added Email
+                        model: data.model || "Unknown",
+                        price: data.amount || 0,
+                        status: "Approved"
+                    });
+                }
+            });
+        });
+
+        const bookings = Array.from(bookingsMap.values());
+
+        // Client-side sort to be safe against missing indexes
+        bookings.sort((a, b) => b.date - a.date);
+
+        renderBookingsTable(bookings, tbody);
+
+    } catch (e) {
+        console.error("Error fetching bookings:", e);
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading bookings. Ensure Admin has shared them.</td></tr>';
+    }
+}
+
+function renderBookingsTable(bookings, tbody) {
+    tbody.innerHTML = "";
+    if (bookings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center">No bookings found.</td></tr>';
         return;
     }
 
+    bookings.forEach(b => {
+        tbody.innerHTML += `
+            <tr>
+                <td class="ps-4">${b.date.toLocaleDateString()}</td>
+                <td class="fw-bold">${b.user}</td>
+                <td class="text-muted small">${b.email}</td>
+                <td>${b.model}</td>
+                <td class="text-success fw-bold">₹${Number(b.price).toLocaleString()}</td>
+                <td><span class="badge bg-success">${b.status}</span></td>
+            </tr>
+        `;
+    });
+}
+
+
+// ==========================================
+// 6. ADVERTISING & SUBSCRIPTION
+// ==========================================
+function checkAdStatus() {
+    if (!currentBrand) return;
+
+    // Simulate an active ad if they have a plan
+    const hasActivePlan = currentUserData.subscription.status === 'active';
+    const statusEl = document.getElementById("stats-ad-status");
+
+    // Update simple status Text
+    if (statusEl) {
+        statusEl.innerText = hasActivePlan ? "Plan Active" : "Inactive";
+        statusEl.className = hasActivePlan ? "text-success fw-bold" : "text-secondary";
+    }
+
+    // Load Real Subscription History
+    loadSubscriptionHistory();
+
+    // Show/Hide Sections based on "Plan"
+    const manageSection = document.getElementById("manage-ad-section");
+    const createSection = document.getElementById("create-ad-section");
+    const publishActions = document.getElementById("publish-actions");
+
+    // Default to "Create New" view for simplicity in this demo
+    if (manageSection) manageSection.style.display = 'none';
+    if (createSection) createSection.style.display = 'block';
+    if (publishActions) publishActions.style.display = 'block';
+}
+
+async function loadSubscriptionHistory() {
+    const historyBody = document.getElementById("adHistoryBody");
+    if (!historyBody) return;
+
     try {
-        // Simple query without orderBy to avoid index requirement
+        const q = query(
+            collection(db, "brand_subscriptions"),
+            where("brand", "==", currentBrand)
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            // MOCK FALLBACK: If using the Mock User and no history exists, show the default mock plan logic
+            if (currentUserData.uid === MOCK_USER.uid) {
+                const mockDate = new Date();
+                mockDate.setFullYear(mockDate.getFullYear() - 1); // Bought 1 year ago (renewed?) or just now
+                // Actually, Mock User says "Expires in 1 year". So let's say bought today.
+                const today = new Date().toLocaleDateString();
+                const expiry = currentUserData.subscription.expiresAt.toLocaleDateString();
+
+                historyBody.innerHTML = `
+                    <tr>
+                        <td>${today}</td>
+                        <td class="fw-bold text-primary">YEARLY</td>
+                        <td>₹44,999</td>
+                        <td><span class="badge bg-success">PAID</span></td>
+                        <td>${expiry}</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            historyBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No subscription history found.</td></tr>';
+            return;
+        }
+
+        const historyItems = [];
+        querySnapshot.forEach((doc) => {
+            historyItems.push(doc.data());
+        });
+
+        // Sort by timestamp descending (Client-side to avoid index requirement)
+        historyItems.sort((a, b) => {
+            const tA = a.timestamp ? (a.timestamp.toDate ? a.timestamp.toDate() : new Date(a.timestamp)) : new Date(0);
+            const tB = b.timestamp ? (b.timestamp.toDate ? b.timestamp.toDate() : new Date(b.timestamp)) : new Date(0);
+            return tB - tA;
+        });
+
+        historyBody.innerHTML = "";
+        historyItems.forEach((data) => {
+            const date = data.timestamp ? (data.timestamp.toDate ? data.timestamp.toDate().toLocaleDateString() : new Date(data.timestamp).toLocaleDateString()) : "-";
+            const expires = data.expiresAt ? (data.expiresAt.toDate ? data.expiresAt.toDate().toLocaleDateString() : new Date(data.expiresAt).toLocaleDateString()) : "-";
+
+            historyBody.innerHTML += `
+                <tr>
+                    <td>${date}</td>
+                    <td class="fw-bold text-primary">${data.plan ? data.plan.toUpperCase() : 'UNKNOWN'}</td>
+                    <td>₹${(data.amount || 0).toLocaleString()}</td>
+                    <td><span class="badge bg-success">PAID</span></td>
+                    <td>${expires}</td>
+                </tr>
+            `;
+        });
+
+    } catch (e) {
+        console.error("Error loading history:", e);
+        historyBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading history.</td></tr>';
+    }
+}
+
+// Mock Ad Submission
+// Calculate Ad Total
+window.calculateAdTotal = function () {
+    const checkboxes = document.querySelectorAll('#create-ad-section input[type="checkbox"]:checked');
+    let total = 0;
+    checkboxes.forEach(cb => {
+        total += parseInt(cb.getAttribute('data-price') || 0);
+    });
+
+    const display = document.getElementById("adTotalDisplay");
+    if (display) display.innerText = `₹${total.toLocaleString()}`;
+    return total;
+}
+
+// Submit Ad to Firestore
+window.submitAdForApproval = async function () {
+    const title = document.getElementById("adTitle").value;
+    const link = document.getElementById("adLink").value;
+    const desc = document.getElementById("adDesc").value;
+    const image = document.getElementById("adImage").value;
+
+    // Get selected pages
+    const selectedPages = [];
+    const checkboxes = document.querySelectorAll('#create-ad-section input[type="checkbox"]:checked');
+    checkboxes.forEach(cb => selectedPages.push(cb.value));
+
+    // Validation
+    if (!title || !link || !desc || !image) {
+        alert("Please fill in all ad details.");
+        return;
+    }
+    if (selectedPages.length === 0) {
+        alert("Please select at least one page for ad placement.");
+        return;
+    }
+
+    const totalCost = window.calculateAdTotal();
+
+    // Payment Validation (Razorpay Only)
+    const paymentMethod = "razorpay";
+
+    try {
+        const adData = {
+            brand: currentBrand,
+            brandEmail: currentUserData.email,
+            title: title,
+            link: link,
+            description: desc,
+            imageUrl: image,
+            placements: selectedPages,
+            amount: totalCost,
+            plan: "Custom (Placement)",
+            paymentMethod: paymentMethod,
+            timestamp: serverTimestamp(),
+            userUid: currentUserData.uid
+        };
+
+        window.startRazorpayPayment(totalCost, currentUserData.email, async (paymentId) => {
+            adData.paymentId = paymentId;
+            adData.status = "pending";
+
+            await addDoc(collection(db, "ads_requests"), adData);
+            alert(`Payment Successful (ID: ${paymentId})!\nAd request submitted for approval.`);
+
+            // Reset form
+            document.getElementById("adTitle").value = "";
+            document.getElementById("adLink").value = "";
+            document.getElementById("adDesc").value = "";
+            document.getElementById("adImage").value = "";
+            document.querySelectorAll('#create-ad-section input[type="checkbox"]').forEach(cb => cb.checked = false);
+            window.calculateAdTotal(); // Reset total
+            showSection('analytics');
+        });
+
+    } catch (e) {
+        console.error("Error submitting ad:", e);
+        alert("Failed to submit ad. Please try again.");
+    }
+}
+
+window.initiatePayment = function () {
+    const selectedPlan = window.selectedPlan || "monthly";
+    const amount = window.selectedPlanPrice || 4999;
+
+    window.startRazorpayPayment(amount, currentUserData.email, async (paymentId) => {
+        console.log("Plan Payment Successful:", paymentId);
+
+        // Calculate Expiry
+        const expiresAt = new Date();
+        expiresAt.setMonth(expiresAt.getMonth() + (selectedPlan === 'monthly' ? 1 : selectedPlan === 'quarterly' ? 3 : 12));
+
+        // Update Local State
+        currentUserData.subscription.plan = selectedPlan;
+        currentUserData.subscription.status = "active";
+        currentUserData.subscription.expiresAt = expiresAt;
+
+        // Save to Firestore
+        try {
+            await addDoc(collection(db, "brand_subscriptions"), {
+                brand: currentBrand,
+                email: currentUserData.email,
+                plan: selectedPlan,
+                amount: amount,
+                paymentId: paymentId,
+                timestamp: serverTimestamp(),
+                expiresAt: expiresAt, // Note: This might need to be converted to Timestamp if strict, but JS Date works often
+            });
+        } catch (e) {
+            console.error("Error saving subscription:", e);
+            alert("Warning: Payment succeeded locally, but saving to history failed (Firestore Error).");
+        }
+
+        alert(`Payment Successful (ID: ${paymentId})!\nPlan upgraded to ${selectedPlan.toUpperCase()}.`);
+
+        // Refresh UI
+        checkAdStatus();
+        showSection('plans'); // Stay on plans to see history
+    });
+}
+
+// ==========================================
+// 7. PROFILE & NAVIGATION
+// ==========================================
+// ==========================================
+// 7. PROFILE & NAVIGATION
+// ==========================================
+function renderProfile() {
+    if (!currentUserData) return;
+    document.getElementById("profile-name").innerText = currentUserData.fullName;
+    document.getElementById("profile-email").innerText = currentUserData.email;
+    document.getElementById("profile-brand").innerText = currentBrand;
+    document.getElementById("profile-avatar").src = currentUserData.photoURL;
+
+    loadActivePlans();
+    loadBrandAds();
+}
+
+function loadActivePlans() {
+    const container = document.getElementById("active-plans-container");
+    if (!container) return;
+
+    // Check custom subscription object
+    if (currentUserData.subscription && currentUserData.subscription.status === 'active') {
+        const plan = currentUserData.subscription.plan.toUpperCase();
+        const expires = currentUserData.subscription.expiresAt.toLocaleDateString();
+
+        container.innerHTML = `
+            <div class="col-md-6">
+                <div class="card p-3 border-primary bg-light">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="fw-bold mb-0 text-primary">${plan} PLAN</h5>
+                        <span class="badge bg-success">ACTIVE</span>
+                    </div>
+                    <p class="mb-1 text-muted small">Expires on: <strong>${expires}</strong></p>
+                    <button class="btn btn-sm btn-outline-primary mt-2" onclick="showSection('plans')">Manage / Upgrade</button>
+                </div>
+            </div>
+        `;
+    } else {
+        container.innerHTML = `
+            <div class="col-12 text-center py-4 text-muted" id="no-active-plans">
+                No active subscription plans found. <a href="#" onclick="showSection('plans')">Upgrade Now</a>
+            </div>
+        `;
+    }
+}
+
+async function loadBrandAds() {
+    const tbody = document.querySelector("#section-profile table tbody");
+    if (!tbody) return;
+
+    try {
         const q = query(
             collection(db, "ads_requests"),
             where("brand", "==", currentBrand)
         );
 
-        const snap = await getDocs(q);
+        const querySnapshot = await getDocs(q);
 
-        // Convert to array and sort in-memory (to avoid index error)
-        let docs = [];
-        snap.forEach(d => docs.push({ id: d.id, ...d.data() }));
-
-        // Sort by timestamp desc
-        docs.sort((a, b) => {
-            const timeA = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp || 0);
-            const timeB = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(b.timestamp || 0);
-            return timeB - timeA;
-        });
-
-        // 1. RENDER HISTORY & DETERMINE PLAN STATUS
-        const historyBody = document.getElementById("adHistoryBody");
-        const profileAdHistoryBody = document.getElementById("profileAdHistoryBody");
-        const activePlansContainer = document.getElementById("active-plans-container");
-        const noActivePlansEl = document.getElementById("no-active-plans");
-
-        if (historyBody) historyBody.innerHTML = "";
-        if (profileAdHistoryBody) profileAdHistoryBody.innerHTML = "";
-
-        let hasActivePlan = false;
-        let activePlanInfo = null;
-
-        const now = new Date();
-
-        // A. Check user doc for subscription FIRST
-        if (currentUserData && currentUserData.subscription) {
-            const sub = currentUserData.subscription;
-            if (sub.status === 'active' && sub.expiresAt && (sub.expiresAt.toDate ? sub.expiresAt.toDate() : new Date(sub.expiresAt)) > now) {
-                hasActivePlan = true;
-                activePlanInfo = sub;
-            }
-        }
-
-        // B. Load historical ads from ads_requests
-        docs.forEach(data => {
-            const status = data.status || 'expired';
-            const expiry = data.expiresAt ? (data.expiresAt.toDate ? data.expiresAt.toDate().toLocaleDateString() : new Date(data.expiresAt).toLocaleDateString()) : '-';
-            const date = data.timestamp ? (data.timestamp.toDate ? data.timestamp.toDate().toLocaleDateString() : new Date(data.timestamp).toLocaleDateString()) : '-';
-
-            const row = `
-                <tr>
-                    <td>${date}</td>
-                    <td>${data.plan ? data.plan.toUpperCase() : 'N/A'}</td>
-                    <td>₹${data.amount || 0}</td>
-                    <td><span class="badge ${getStatusBadge(status)}">${status.toUpperCase()}</span></td>
-                    <td>${expiry}</td>
-                </tr>
-            `;
-            if (historyBody) historyBody.innerHTML += row;
-
-            if (profileAdHistoryBody && data.title) {
-                profileAdHistoryBody.innerHTML += `
-                    <tr>
-                        <td>${date}</td>
-                        <td><span class="fw-bold">${data.title}</span></td>
-                        <td>${data.plan ? data.plan.toUpperCase() : 'N/A'}</td>
-                        <td><span class="badge ${getStatusBadge(status)}">${status.toUpperCase()}</span></td>
-                    </tr>
-                `;
-            }
-        });
-
-        // Populate Active Plans in Profile
-        if (activePlansContainer) {
-            activePlansContainer.innerHTML = "";
-            if (hasActivePlan) {
-                const expiryDate = (activePlanInfo.expiresAt.toDate ? activePlanInfo.expiresAt.toDate() : new Date(activePlanInfo.expiresAt)).toLocaleDateString();
-                activePlansContainer.innerHTML = `
-                    <div class="col-md-6">
-                        <div class="p-3 border rounded border-primary bg-light">
-                            <h6 class="fw-bold text-primary mb-1">${activePlanInfo.plan.toUpperCase()} Plan</h6>
-                            <p class="small mb-2 text-muted">Expires: ${expiryDate}</p>
-                            <div class="badge bg-success">ACTIVE</div>
-                        </div>
-                    </div>
-                `;
-            } else {
-                activePlansContainer.innerHTML = `<div class="col-12 text-center py-4 text-muted">No active subscription plans found.</div>`;
-            }
-        }
-
-        // 2. TOGGLE VIEWS
-        const manageSection = document.getElementById("manage-ad-section");
-        const createSection = document.getElementById("create-ad-section");
-        const statusEl = document.getElementById("stats-ad-status");
-
-        // Plan & Publish UI Elements
-        const publishActions = document.getElementById("publish-actions");
-        const noPlanWarning = document.getElementById("no-plan-warning");
-
-        // Use a separate variable to check for CURRENTLY running AD content
-        let activeOrPendingAd = null;
-        docs.forEach(data => {
-            if (!activeOrPendingAd && (data.status === 'active' || data.status === 'pending') && data.title) {
-                activeOrPendingAd = data;
-            }
-        });
-
-        if (activeOrPendingAd) {
-            // == SCENARIO A: Ad is currently running or pending ==
-            if (manageSection) manageSection.style.display = "block";
-            if (createSection) createSection.style.display = "none";
-
-            if (document.getElementById("manageTitle")) document.getElementById("manageTitle").innerText = activeOrPendingAd.title || "No Title";
-            if (document.getElementById("manageDesc")) document.getElementById("manageDesc").innerText = activeOrPendingAd.description || "No Description";
-            if (document.getElementById("manageLink")) document.getElementById("manageLink").href = activeOrPendingAd.targetLink || "#";
-            if (document.getElementById("manageImage")) document.getElementById("manageImage").src = activeOrPendingAd.imageUrl || "https://via.placeholder.com/400x200?text=No+Image";
-
-            const badge = document.getElementById("manageStatusBadge");
-            if (badge) {
-                badge.innerText = activeOrPendingAd.status.toUpperCase();
-                badge.className = `badge ${getStatusBadge(activeOrPendingAd.status)} p-2`;
-            }
-
-            if (statusEl) {
-                statusEl.innerText = activeOrPendingAd.status === 'active' ? "ACTIVE ✅" : "PENDING ⏳";
-                statusEl.className = activeOrPendingAd.status === 'active' ? "text-success fw-bold" : "text-warning fw-bold";
-            }
-
-            sessionStorage.setItem("currentAdId", activeOrPendingAd.id);
-
-        } else {
-            // == SCENARIO B: No active ad content ==
-            if (manageSection) manageSection.style.display = "none";
-            if (createSection) createSection.style.display = "block";
-
-            if (statusEl) {
-                statusEl.innerText = hasActivePlan ? "Plan Active" : "Inactive";
-                statusEl.className = hasActivePlan ? "text-success fw-bold" : "text-secondary";
-            }
-            sessionStorage.removeItem("currentAdId");
-
-            // Check if they have an active plan (subscription) to determine which UI to show
-            if (hasActivePlan) {
-                if (publishActions) publishActions.style.display = "block";
-                if (noPlanWarning) noPlanWarning.style.display = "none";
-            } else {
-                if (publishActions) publishActions.style.display = "none";
-                if (noPlanWarning) noPlanWarning.style.display = "block";
-            }
-        }
-
-    } catch (err) {
-        console.error("Ad check error:", err);
-    }
-}
-
-function getStatusBadge(status) {
-    if (status === 'active') return 'bg-success';
-    if (status === 'pending') return 'bg-warning text-dark';
-    return 'bg-secondary';
-}
-
-// ================= AD MANAGEMENT FUNCTIONS =================
-
-window.enableEditMode = function () {
-    document.getElementById("edit-ad-form").style.display = "block";
-    // Pre-fill
-    document.getElementById("editTitle").value = document.getElementById("manageTitle").innerText;
-    document.getElementById("editDesc").value = document.getElementById("manageDesc").innerText;
-    document.getElementById("editLink").value = document.getElementById("manageLink").href;
-    document.getElementById("editImage").value = document.getElementById("manageImage").src;
-}
-
-window.disableEditMode = function () {
-    document.getElementById("edit-ad-form").style.display = "none";
-}
-
-window.updateAdContent = async function () {
-    const docId = sessionStorage.getItem("currentAdId");
-    if (!docId) return;
-
-    const newContent = {
-        title: document.getElementById("editTitle").value,
-        description: document.getElementById("editDesc").value,
-        targetLink: document.getElementById("editLink").value,
-        imageUrl: document.getElementById("editImage").value,
-        status: 'pending' // Reset to pending for Admin approval
-    };
-
-    try {
-        await updateDoc(doc(db, "ads_requests", docId), newContent);
-        alert("Ad updated! It has been sent for Admin approval.");
-        disableEditMode();
-        checkAdStatus(); // Refresh UI
-    } catch (e) {
-        console.error("Update failed", e);
-        alert("Update failed. Please try again.");
-    }
-}
-
-window.cancelAd = async function () {
-    const docId = sessionStorage.getItem("currentAdId");
-    if (!docId) return;
-
-    if (confirm("Are you sure you want to stop this promotion? This cannot be undone and no refund will be issued automatically.")) {
-        try {
-            await updateDoc(doc(db, "ads_requests", docId), { status: 'cancelled' });
-            alert("Promotion stopped.");
-            checkAdStatus();
-        } catch (e) {
-            console.error("Cancel failed", e);
-        }
-    }
-}
-
-// Submit Ad for Approval (For users with ACTIVE Plan)
-window.submitAdForApproval = async function () {
-    const adData = {
-        title: document.getElementById("adTitle").value.trim(),
-        desc: document.getElementById("adDesc").value.trim(),
-        image: document.getElementById("adImage").value.trim(),
-        link: document.getElementById("adLink").value.trim()
-    };
-
-    if (!adData.title || !adData.desc || !adData.link) {
-        alert("Please fill in the Ad Title, Description, and Link.");
-        return;
-    }
-
-    try {
-        const uid = sessionStorage.getItem("uid");
-        if (!uid) return;
-
-        // Verify sub from current data
-        if (!currentUserData || !currentUserData.subscription || currentUserData.subscription.status !== 'active') {
-            alert("Your subscription is not active. Please subscribe first.");
+        if (querySnapshot.empty) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No advertisements found.</td></tr>';
             return;
         }
 
-        // Create new Ad Request linked to the user's active sub
-        await addDoc(collection(db, "ads_requests"), {
-            uid: uid,
-            brand: currentBrand,
-            plan: currentUserData.subscription.plan,
-            amount: 0,
-            status: 'pending',
-            timestamp: new Date(),
-            expiresAt: currentUserData.subscription.expiresAt,
-            title: adData.title,
-            description: adData.desc,
-            imageUrl: adData.image,
-            targetLink: adData.link
+        const ads = [];
+        querySnapshot.forEach(doc => ads.push(doc.data()));
+
+        // Sort client-side
+        ads.sort((a, b) => {
+            const tA = a.timestamp ? (a.timestamp.toDate ? a.timestamp.toDate() : new Date(a.timestamp)) : new Date(0);
+            const tB = b.timestamp ? (b.timestamp.toDate ? b.timestamp.toDate() : new Date(b.timestamp)) : new Date(0);
+            return tB - tA;
         });
 
-        alert("Ad Submitted for Approval!");
-        checkAdStatus();
+        tbody.innerHTML = "";
+        ads.forEach(ad => {
+            const date = ad.timestamp ? (ad.timestamp.toDate ? ad.timestamp.toDate().toLocaleDateString() : new Date(ad.timestamp).toLocaleDateString()) : "-";
+            const statusBadge = ad.status === 'active' || ad.status === 'approved' ? '<span class="badge bg-success">Active</span>' :
+                ad.status === 'rejected' ? '<span class="badge bg-danger">Rejected</span>' :
+                    '<span class="badge bg-warning text-dark">Pending</span>';
 
-        // Switch back to analytics view
-        if (typeof showSection === 'function') {
-            showSection('analytics');
-        } else {
-            document.querySelector("button[onclick=\"showSection('analytics')\"]")?.click();
-        }
+            tbody.innerHTML += `
+                <tr>
+                    <td>${date}</td>
+                    <td class="fw-bold">${ad.title || "Untitled Ad"}</td>
+                    <td>${ad.plan}</td>
+                    <td>${statusBadge}</td>
+                </tr>
+            `;
+        });
 
-    } catch (err) {
-        console.error("Error submitting ad:", err);
-        alert("Failed to submit ad.");
+    } catch (e) {
+        console.error("Error loading brand ads:", e);
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Error loading advertisements.</td></tr>';
     }
-};
-
-
-// Payment Logic
-window.initiatePayment = function () {
-    const amount = window.selectedAmount;
-    const plan = window.selectedPlan;
-
-    if (!amount || !plan) {
-        alert("Please select a plan first.");
-        return;
-    }
-
-    // Optional: Capture Ad Preview data if they filled it out in Advertising section
-    const adData = {
-        title: document.getElementById("adTitle")?.value.trim() || "",
-        desc: document.getElementById("adDesc")?.value.trim() || "",
-        image: document.getElementById("adImage")?.value.trim() || "",
-        link: document.getElementById("adLink")?.value.trim() || ""
-    };
-
-    const options = {
-        "key": "rzp_test_S7Gb21AIbAKorp", // Use your Key ID
-        "amount": amount * 100,
-        "currency": "INR",
-        "name": "Volt Analytics Business",
-        "description": `Sub Upgrade - ${plan.toUpperCase()} Plan`,
-        "image": "https://cdn-icons-png.flaticon.com/512/3063/3063822.png",
-        "handler": function (response) {
-            recordAdRequest(response.razorpay_payment_id, plan, amount, adData);
-        },
-        "prefill": {
-            "name": currentBrand + " Rep",
-            "email": currentUserData?.email || "business@voltevs.com"
-        },
-        "theme": { "color": "#6366f1" }
-    };
-
-    const rzp = new Razorpay(options);
-    rzp.open();
-}
-
-async function recordAdRequest(payId, plan, amount, adData) {
-    try {
-        const uid = sessionStorage.getItem("uid");
-        if (!uid) return;
-
-        // Check current expiry for stacking
-        let currentExpiry = null;
-        if (currentUserData && currentUserData.subscription && currentUserData.subscription.expiresAt) {
-            currentExpiry = currentUserData.subscription.expiresAt;
-        }
-
-        const expiry = calculateExpiry(plan, currentExpiry);
-
-        // 1. Update User Subscription in 'users' collection
-        const userRef = doc(db, "users", uid);
-        const subData = {
-            plan: plan,
-            status: 'active',
-            expiresAt: expiry,
-            lastRenewal: new Date(),
-            paymentId: payId
-        };
-        await updateDoc(userRef, { subscription: subData });
-
-        // Update local state
-        if (!currentUserData) currentUserData = {};
-        currentUserData.subscription = subData;
-
-        // 2. Log logic: If they provided ad content during payment, create the request
-        if (adData && adData.title && adData.link) {
-            await addDoc(collection(db, "ads_requests"), {
-                uid: uid,
-                brand: currentBrand,
-                plan: plan,
-                amount: amount,
-                status: 'pending',
-                timestamp: new Date(),
-                expiresAt: expiry,
-                title: adData.title,
-                description: adData.desc,
-                imageUrl: adData.image,
-                targetLink: adData.link,
-                paymentId: payId
-            });
-        } else {
-            // Just record the payment/plan upgrade in ads_requests for history keeping
-            await addDoc(collection(db, "ads_requests"), {
-                uid: uid,
-                brand: currentBrand,
-                plan: plan,
-                amount: amount,
-                status: 'subscription_upgrade',
-                timestamp: new Date(),
-                expiresAt: expiry,
-                paymentId: payId
-            });
-        }
-
-        alert("Subscription Updated Successfully! Time has been added to your account.");
-        checkAdStatus();
-        renderProfile();
-
-        // Switch back to advertising so they can publish
-        showSection('advertising');
-
-    } catch (err) {
-        console.error("Error recordAdRequest:", err);
-        alert("Payment successful but failed to update subscription. Please contact support.");
-    }
-}
-
-function calculateExpiry(plan, currentExpiry = null) {
-    let date = new Date();
-
-    // Stacking logic: If existing plan is still active, add to its expiry
-    if (currentExpiry) {
-        const expDate = currentExpiry.toDate ? currentExpiry.toDate() : new Date(currentExpiry);
-        if (expDate > date) {
-            date = expDate;
-        }
-    }
-
-    if (plan === 'monthly') date.setMonth(date.getMonth() + 1);
-    else if (plan === 'quarterly') date.setMonth(date.getMonth() + 3);
-    else if (plan === 'yearly') date.setFullYear(date.getFullYear() + 1);
-
-    return date;
-}
-
-// Render Profile Info
-function renderProfile() {
-    if (!currentUserData) return;
-
-    // Basic Info
-    document.getElementById("profile-name").innerText = currentUserData.fullName || "Business User";
-    document.getElementById("profile-email").innerText = currentUserData.email || "-";
-    document.getElementById("profile-brand").innerText = currentBrand || "-";
-    document.getElementById("profile-logins").innerText = currentUserData.loginCount || "0";
-
-    if (currentUserData.createdAt) {
-        const joinedDate = currentUserData.createdAt.toDate ? currentUserData.createdAt.toDate() : new Date(currentUserData.createdAt);
-        document.getElementById("profile-joined").innerText = joinedDate.toLocaleDateString();
-    }
-
-    // Avatar
-    const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUserData.fullName)}&background=6366f1&color=fff&size=128`;
-    document.getElementById("profile-avatar").src = avatarUrl;
 }
 
 window.showSection = function (sectionId) {
-    if (!sectionId) return;
-
-    // Normalize ID
+    // Normalize ID (handle both 'analytics' and 'section-analytics')
     const cleanId = sectionId.replace('section-', '').toLowerCase();
     const targetId = 'section-' + cleanId;
 
-    const sections = ['section-analytics', 'section-advertising', 'section-plans', 'section-profile'];
-
+    // Hide all
+    const sections = ['section-analytics', 'section-advertising', 'section-plans', 'section-profile', 'section-bookings'];
     sections.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
-            if (id === targetId) {
-                el.style.display = 'block';
-                el.style.visibility = 'visible';
-                el.style.opacity = '1';
-                el.classList.remove('d-none');
-            } else {
-                el.style.display = 'none';
-            }
+            el.style.display = 'none';
+            el.classList.add('d-none'); // Ensure bootstrap class is applied
         }
     });
 
-    // Update Sidebar Navigation UI
+    // Show target
+    const target = document.getElementById(targetId);
+    if (target) {
+        target.style.display = 'block';
+        target.classList.remove('d-none');
+    }
+
+    // Load Data triggers
+    if (cleanId === 'bookings') loadBrandBookings();
+    if (cleanId === 'ads' || cleanId === 'advertising') checkAdStatus(); // ensure ad status is fresh
+    if (['analytics', 'advertising', 'plans', 'profile'].includes(cleanId)) checkAdStatus();
+
+    // Update Sidebar Active State
     document.querySelectorAll('.nav-link-custom').forEach(el => {
         el.classList.remove('active');
-        const onclickAttr = el.getAttribute('onclick');
-        if (onclickAttr && onclickAttr.toLowerCase().includes(cleanId)) {
+        if (el.getAttribute('onclick')?.includes(cleanId)) {
             el.classList.add('active');
         }
     });
+}
 
-    // Load data for specific sections
-    try {
-        if (cleanId === 'profile') {
-            renderProfile();
+window.logout = function () {
+    sessionStorage.clear();
+    window.location.href = "login.html"; // Or reload
+}
+// Razorpay Payment Integration
+window.startRazorpayPayment = function (amount, brandEmail, onSuccess) {
+    const options = {
+        "key": "rzp_test_1DP5mmOlF5G5ag", // Standard Razorpay Test Key
+        "amount": amount * 100, // Amount is in currency subunits. Default currency is INR.
+        "currency": "INR",
+        "name": "EV Analytics",
+        "description": "Ad Placement Charges",
+        "image": "https://via.placeholder.com/150",
+        "handler": function (response) {
+            console.log("Payment Successful", response);
+            onSuccess(response.razorpay_payment_id);
+        },
+        "prefill": {
+            "name": currentUserData.fullName,
+            "email": brandEmail,
+            "contact": "9999999999"
+        },
+        "theme": {
+            "color": "#3399cc"
         }
-
-        // Refresh ad status for all dynamic sections
-        if (['analytics', 'advertising', 'plans', 'profile'].includes(cleanId)) {
-            checkAdStatus();
-        }
-    } catch (e) {
-        console.error("Error updating section data:", e);
-    }
+    };
+    const rzp1 = new Razorpay(options);
+    rzp1.on('payment.failed', function (response) {
+        alert("Payment Failed: " + response.error.description);
+    });
+    rzp1.open();
 }

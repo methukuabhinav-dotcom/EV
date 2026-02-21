@@ -256,6 +256,13 @@
       <a href="admin-dashboard.html" class="nav-link-custom active">
         <span>📊</span> Admin Dashboard
       </a>
+
+      <a href="#" class="nav-link-custom" onclick="switchTab('user-revenue')">
+        <span>💰</span> User Revenue
+      </a>
+      <a href="#" class="nav-link-custom" onclick="switchTab('business-revenue')">
+        <span>💼</span> Business Revenue
+      </a>
       <a href="index.html" class="nav-link-custom">
         <span>🏠</span> Home
       </a>
@@ -285,7 +292,38 @@
       <li class="nav-item">
         <a class="nav-link fw-bold" href="#" id="tab-ads" onclick="switchTab('ads')">Ad Manager</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link fw-bold" href="#" id="tab-bookings" onclick="switchTab('bookings')">Vehicles Booked</a>
+      </li>
     </ul>
+
+    <!-- =======================
+         VEHICLES BOOKED SECTION
+         ======================= -->
+    <div id="vehicles-booked" style="display: none;">
+      <h5 class="fw-bold mb-3">Recent Bookings</h5>
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th class="ps-4">Date</th>
+                  <th>User</th>
+                  <th>Vehicle</th>
+                  <th>Amount</th>
+                  <th>Brand</th>
+                  <th class="text-center">Share with Business</th>
+                </tr>
+              </thead>
+              <tbody id="bookingsTable">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- =======================
          EV INSIGHTS SECTION
@@ -514,11 +552,11 @@
             <div class="chart-title">User Database</div>
             <div class="card-body p-0">
               <div class="table-responsive">
-                <table class="table table-dark table-hover align-middle mb-0">
-                  <thead>
+                <table class="table table-dark table-hover align-middle">
+                  <thead class="table-dark">
                     <tr>
                       <th class="ps-4">Name / Email</th>
-                      <th class="text-center">Total Logins</th>
+                      <th class="text-center">Plan</th>
                       <th class="text-center">Total Time Spent</th>
                       <th class="text-center">Last Login</th>
                       <th class="text-center">Status</th>
@@ -529,6 +567,13 @@
                     <!-- JS Generates Rows -->
                   </tbody>
                 </table>
+              </div>
+              <div class="d-flex justify-content-between align-items-center p-3">
+                <button id="prev-users-btn" class="btn btn-outline-light btn-sm" style="color: black;"
+                  onclick="changeUserPage(-1)" disabled>Previous</button>
+                <span class="text-muted small">Page <span id="user-current-page">1</span></span>
+                <button id="next-users-btn" class="btn btn-outline-light btn-sm" style="color: black;"
+                  onclick="changeUserPage(1)">Next Page</button>
               </div>
             </div>
           </div>
@@ -582,6 +627,115 @@
         </div>
       </div>
 
+    </div>
+
+    <!-- =======================
+         USER REVENUE SECTION
+         ======================= -->
+    <div id="user-revenue" style="display: none;">
+      <h4 class="fw-bold mb-4">💰 User Revenue Analysis</h4>
+
+      <!-- KPI Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="kpi-card p-4 text-center">
+            <h6>Total User Revenue</h6>
+            <h2 id="totalUserRevenue" class="text-success">₹0</h2>
+            <small class="text-muted">Subscriptions Only</small>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="kpi-card p-4 text-center">
+            <h6>Avg Revenue / User</h6>
+            <h2 id="avgUserRevenue">₹0</h2>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="kpi-card p-4 text-center">
+            <h6>Top Spender</h6>
+            <h2 id="topSpenderName" style="font-size: 1.2rem;">-</h2>
+            <small id="topSpenderAmount" class="fw-bold text-primary">₹0</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Revenue Table -->
+      <div class="card chart-card">
+        <div class="chart-title">User Financial Details</div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th class="ps-4">User Name</th>
+                  <th>Subscription Plan</th>
+                  <th>Vehicle Purchases</th>
+                  <th>Total Spend</th>
+                  <th class="text-end pe-4">Status</th>
+                </tr>
+              </thead>
+              <tbody id="userRevenueTable">
+                <!-- Data from JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =======================
+         BUSINESS REVENUE SECTION
+         ======================= -->
+    <div id="business-revenue" style="display: none;">
+      <h4 class="fw-bold mb-4">💼 Business Revenue Analysis</h4>
+
+      <!-- KPI Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="kpi-card p-4 text-center">
+            <h6>Total Business Revenue</h6>
+            <h2 id="totalBizRevenue" class="text-primary">₹0</h2>
+            <small class="text-muted">Plans + Ad Campaigns</small>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="kpi-card p-4 text-center">
+            <h6>Active Business Partners</h6>
+            <h2 id="activeBizPartners">0</h2>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="kpi-card p-4 text-center">
+            <h6>Ad Revenue Share</h6>
+            <h2 id="adRevenueShare">0%</h2>
+            <small class="text-muted">of Total Business Revenue</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Business Revenue Table -->
+      <div class="card chart-card">
+        <div class="chart-title">Business Partner Financials</div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th class="ps-4">Brand</th>
+                  <th>Contact Email</th>
+                  <th>Active Plan</th>
+                  <th>Ad Spend</th>
+                  <th>Total Revenue</th>
+                  <th class="text-end pe-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="bizRevenueTable">
+                <!-- Data from JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ADMIN INSIGHTS SECTION (GLOBAL FOOTER) -->
@@ -690,6 +844,10 @@
                   <label class="form-label small text-muted">Ad Duration (Days)</label>
                   <input type="number" class="form-control" id="reviewDuration" value="30">
                 </div>
+                <div class="col-12">
+                  <label class="form-label small text-muted">Target Pages</label>
+                  <input type="text" class="form-control bg-light" id="reviewPagesDisplay" readonly>
+                </div>
 
                 <div class="col-12">
                   <label class="form-label small text-muted">Ad Title</label>
@@ -711,32 +869,7 @@
                 </div>
 
                 <div class="col-12">
-                  <hr class="my-3">
-                  <h6 class="fw-bold mb-3 text-primary d-flex align-items-center gap-2">
-                    <span>📍</span> Select Target Pages
-                  </h6>
-                  <div class="d-flex flex-wrap gap-4 px-2">
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="Home" id="pageHome" checked>
-                      <label class="form-check-label" for="pageHome">Home Page</label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="About" id="pageAbout">
-                      <label class="form-check-label" for="pageAbout">About Us</label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="Pricing" id="pagePricing">
-                      <label class="form-check-label" for="pagePricing">Pricing</label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="Dashboard" id="pageDashboard">
-                      <label class="form-check-label" for="pageDashboard">User Dashboard</label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="Store" id="pageStore">
-                      <label class="form-check-label" for="pageStore">EV Store</label>
-                    </div>
-                  </div>
+                  <!-- Target Pages selection removed, now displayed in readonly field above -->
                 </div>
               </div>
             </div>

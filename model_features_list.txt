@@ -1,0 +1,40 @@
+Type: <class 'xgboost.sklearn.XGBRegressor'>
+Features list:
+brand_Ather
+brand_Bajaj
+brand_Hyundai
+brand_MG
+brand_Mahindra
+brand_Ola
+brand_TVS
+brand_Tata
+model_Ather 450X
+model_Bajaj Chetak
+model_Hyundai Kona Electric
+model_MG ZS EV
+model_Mahindra XUV400
+model_Ola S1 Pro
+model_TVS iQube
+model_Tata Nexon EV
+vehicle_type_Bike
+vehicle_type_Car
+initial_battery_capacity_kwh
+current_battery_capacity_kwh
+battery_health_pct
+range_km
+top_speed_kmph
+odometer_km
+warranty_remaining_years
+annual_maintenance_cost
+Purchase_Year
+Current_Year
+Purchase_Price_L
+Initial_Mileage
+Current_Mileage
+Initial_Perf
+Current_Perf
+Resale_Value_L
+vehicle_age
+battery_loss_pct
+performance_drop
+battery_efficiency

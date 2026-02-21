@@ -3,7 +3,7 @@ import { db } from "./firebase-config.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
 // 🔐 User Guard (Firebase + Firestore)
-protectRoute('user').then(async (userData) => {
+protectRoute('user', ['Standard Plan', 'Premium Plan']).then(async (userData) => {
   console.log("User Verified:", userData.fullName);
   if (document.getElementById("profileEmail")) document.getElementById("profileEmail").innerText = userData.email;
   if (document.getElementById("profileRole")) document.getElementById("profileRole").innerText = userData.role.toUpperCase();
@@ -79,140 +79,57 @@ function updateTimeSpent() {
 setInterval(updateTimeSpent, 1000);
 updateTimeSpent();
 
-// 📊 Load CSV data
-fetch("ev_vehicle_with_extra_10000.json")
-  .then(res => res.json())
-  .then(data => {
+// 📊 Load & Process CSV data
+let allEVData = [];
 
-    // Ensure we have an array
-    const rows = Array.isArray(data) ? data : data.data;
+// Using an async IIFE to allow await at the top level
+(async () => {
 
-    let totalDistance = 0;
-    let totalBattery = 0;
-    let count = 0;
+  const response = await fetch('backend-data/ev_vehicle_with_extra_10000.json');
+  const data = await response.json();
 
-    rows.forEach(ev => {
-      // Use Driving_Range_km from new JSON
-      const distance = Number(ev.Driving_Range_km) || 0;
-      // Use Battery_Health_Percentage if available, else default to 85 like dashboard.js
-      const battery = Number(ev.Battery_Health_Percentage) || 85;
+  // Ensure we have an array
+  let rawData = Array.isArray(data) ? data : data.data;
 
-      totalDistance += distance;
-      totalBattery += battery;
-      count++;
-    });
+  // Filter out Tesla and Hyundai
+  allEVData = rawData.filter(d =>
+    !['Tesla', 'Hyundai'].includes(d.Brand)
+  );
 
-    // 🧮 Calculations (matches your screenshot)
-    const savings = Math.round(totalDistance * 2); // ₹2 per km
-    const co2 = Math.round(totalDistance * 0.076); // kg CO₂
-    const battery = Math.round(totalBattery / count);
+  // Initialize with saved filter or default to All
+  const savedBrand = localStorage.getItem("selectedBrand") || "All";
+  const brandFilter = document.getElementById("brandFilter");
+  if (brandFilter) brandFilter.value = savedBrand;
 
-    // 🖥 Show values (General Stats)
-    if (document.getElementById("totalSavings")) document.getElementById("totalSavings").innerText = "₹" + savings;
-    // Note: co2Saved might be overwritten by the brand filter logic below, which is fine
-    if (document.getElementById("co2Saved")) document.getElementById("co2Saved").innerText = co2 + " kg";
-    if (document.getElementById("totalDistance")) document.getElementById("totalDistance").innerText = totalDistance + " km";
-    if (document.getElementById("batteryHealth")) document.getElementById("batteryHealth").innerText = battery + "%";
-  });
-
+  initCharts();
+  updateDashboard(savedBrand);
+})()
+  .catch(e => console.error("Failed to load EV data:", e));
 
 /* =========================================
    BRAND FILTER & CHART LOGIC
    ========================================= */
 
-// Dummy Data for Brands
-const brandData = {
-  "All": {
-    satisfaction: "5.52",
-    channel: "Corporate",
-    battery: "85 kWh",
-    co2: "145M",
-    chargingData: [420, 300, 380, 260, 240, 200],
-    batteryData: [30, 22, 15, 13, 12, 8]
-  },
-  "Tesla": {
-    satisfaction: "4.9",
-    channel: "Direct",
-    battery: "100 kWh",
-    co2: "50M",
-    chargingData: [120, 80, 150, 60, 40, 90],
-    batteryData: [50, 10, 20, 5, 5, 10]
-  },
-  "Tata": {
-    satisfaction: "4.5",
-    channel: "Dealership",
-    battery: "40.5 kWh",
-    co2: "35M",
-    chargingData: [200, 150, 180, 120, 100, 90],
-    batteryData: [15, 30, 25, 10, 10, 10]
-  },
-  "Hyundai": {
-    satisfaction: "4.7",
-    channel: "Online/Dealer",
-    battery: "72.6 kWh",
-    co2: "28M",
-    chargingData: [180, 120, 220, 100, 80, 70],
-    batteryData: [20, 25, 30, 10, 5, 10]
-  },
-  "MG": {
-    satisfaction: "4.6",
-    channel: "Dealership",
-    battery: "50.3 kWh",
-    co2: "22M",
-    chargingData: [160, 140, 190, 110, 90, 80],
-    batteryData: [25, 20, 20, 15, 10, 10]
-  },
-  "Mahindra": {
-    satisfaction: "4.4",
-    channel: "Dealership",
-    battery: "39.4 kWh",
-    co2: "30M",
-    chargingData: [220, 180, 200, 130, 110, 100],
-    batteryData: [10, 35, 25, 15, 5, 10]
-  },
-  "Ather": {
-    satisfaction: "4.6",
-    channel: "Experience Center",
-    battery: "3.7 kWh",
-    co2: "15M",
-    chargingData: [0, 300, 0, 0, 100, 0], // Mostly bikes/scooters
-    batteryData: [0, 0, 40, 0, 60, 0]
-  },
-  "BYD": {
-    satisfaction: "4.8",
-    channel: "Dealership",
-    battery: "71.7 kWh",
-    co2: "40M",
-    chargingData: [150, 0, 250, 100, 0, 50],
-    batteryData: [30, 40, 0, 10, 0, 20]
-  },
-  "Ola": {
-    satisfaction: "4.3",
-    channel: "Direct Online",
-    battery: "4 kWh",
-    co2: "18M",
-    chargingData: [0, 320, 0, 0, 150, 0],
-    batteryData: [0, 0, 30, 0, 70, 0]
-  }
-};
-
-// Global Chart Instances
+// Initialize Charts
 let chargingChartInstance = null;
 let batteryChartInstance = null;
+let brandChartInstance = null;
+let priceChartInstance = null;
 
-// Initialize Charts
 function initCharts() {
   const ctxCharging = document.getElementById('chargingChart');
   const ctxBattery = document.getElementById('batteryChart');
+  const ctxBrand = document.getElementById('brandChart');
+  const ctxPrice = document.getElementById('priceChart');
 
   if (ctxCharging) {
     chargingChartInstance = new Chart(ctxCharging, {
       type: 'bar',
       data: {
-        labels: ['Sedan', 'Bike', 'SUV', 'Fleet Van', 'Scooter', 'Hatchback'],
+        labels: [],
         datasets: [{
-          label: 'Charging Hours',
-          data: [], // Will be filled by updateDashboard
+          label: 'Avg Charging Time (Hours)',
+          data: [],
           backgroundColor: ['#0d6efd', '#fd7e14', '#6610f2', '#198754', '#d63384', '#6c757d']
         }]
       }
@@ -223,24 +140,23 @@ function initCharts() {
     batteryChartInstance = new Chart(ctxBattery, {
       type: 'pie',
       data: {
-        labels: ['Sedan', 'SUV', 'Bike', 'Hatchback', 'Scooter', 'Fleet Van'],
+        labels: [],
         datasets: [{
-          data: [], // Will be filled by updateDashboard
+          data: [],
           backgroundColor: ['#0d6efd', '#6610f2', '#fd7e14', '#6c757d', '#d63384', '#198754']
         }]
       }
     });
   }
 
-  // Static Charts (Market Overview)
-  if (document.getElementById('brandChart')) {
-    new Chart(document.getElementById('brandChart'), {
-      type: 'bar',
+  if (ctxBrand) {
+    brandChartInstance = new Chart(ctxBrand, {
+      type: 'bar', // Changed to horizontal bar for readability if many brands
       data: {
-        labels: ['Ather', 'BYD', 'Hyundai', 'Mahindra', 'MG', 'Ola', 'Tata'],
+        labels: [],
         datasets: [{
-          label: 'Count',
-          data: [6520, 6000, 6570, 6670, 6640, 6670, 6700],
+          label: 'Vehicle Count',
+          data: [],
           backgroundColor: '#0d6efd'
         }]
       },
@@ -248,13 +164,14 @@ function initCharts() {
     });
   }
 
-  if (document.getElementById('priceChart')) {
-    new Chart(document.getElementById('priceChart'), {
+  if (ctxPrice) {
+    priceChartInstance = new Chart(ctxPrice, {
       type: 'doughnut',
       data: {
-        labels: ['Sedan', 'SUV', 'Bike', 'Hatchback', 'Scooter', 'Fleet Van'],
+        labels: [],
         datasets: [{
-          data: [23, 16, 15, 15, 15, 16],
+          label: 'Avg Price (Lakhs)',
+          data: [],
           backgroundColor: ['#0d6efd', '#6610f2', '#fd7e14', '#6c757d', '#d63384', '#198754']
         }]
       }
@@ -264,23 +181,182 @@ function initCharts() {
 
 // Update Dashboard Function
 function updateDashboard(brand) {
-  const data = brandData[brand] || brandData["All"];
+  if (!allEVData.length) return;
 
-  // Update KPIs
-  if (document.getElementById("kpi-satisfaction")) document.getElementById("kpi-satisfaction").innerText = data.satisfaction;
-  if (document.getElementById("kpi-channel")) document.getElementById("kpi-channel").innerText = data.channel;
-  if (document.getElementById("kpi-battery")) document.getElementById("kpi-battery").innerText = data.battery;
-  if (document.getElementById("kpi-co2")) document.getElementById("kpi-co2").innerText = data.co2;
+  // Filter Data
+  const filteredData = brand === "All"
+    ? allEVData
+    : allEVData.filter(d => d.Brand === brand);
 
-  // Update Charts
+  if (filteredData.length === 0) {
+    console.warn("No data found for brand:", brand);
+    return;
+  }
+
+  // 1. Calculate KPIs
+  let totalEfficiency = 0;
+  let maxBattery = 0;
+  let totalCO2 = 0;
+  let totalDistance = 0;
+  let totalBatteryHealth = 0; // Simulated if not present
+
+  // For Mode/Channel calculation
+  const channels = {};
+
+  filteredData.forEach(d => {
+    totalEfficiency += Number(d.Efficiency_km_per_kWh) || 0;
+    const bat = Number(d.Battery_Capacity_kWh) || 0;
+    if (bat > maxBattery) maxBattery = bat;
+
+    totalCO2 += Number(d.CO2_Emissions_Saved_kg) || 0;
+    totalDistance += Number(d.Driving_Range_km) || 0;
+
+    // Channel isn't in JSON, we can use Region or Usage_Type as proxy or keep simulated
+    // Let's use Usage_Type for the KPI text
+    const usage = d.Usage_Type || "Unknown";
+    channels[usage] = (channels[usage] || 0) + 1;
+  });
+
+  const avgEfficiency = (totalEfficiency / filteredData.length).toFixed(2);
+  const topUse = Object.keys(channels).reduce((a, b) => channels[a] > channels[b] ? a : b, "N/A");
+
+  // Overall Savings Calculation (Simulated logic from previous code)
+  const savings = Math.round(totalDistance * 2); // ₹2 per km
+  const avgBatHealth = 85;
+
+  // Update DOM KPIs
+  // Re-purposing Satisfaction -> Efficiency
+  if (document.getElementById("kpi-satisfaction")) {
+    document.getElementById("kpi-satisfaction").innerText = avgEfficiency;
+    const label = document.getElementById("kpi-satisfaction").nextElementSibling;
+    if (label) label.innerText = "Avg Efficiency (km/kWh)";
+  }
+
+  // Re-purposing Channel -> Top Usage Type
+  if (document.getElementById("kpi-channel")) {
+    document.getElementById("kpi-channel").innerText = topUse;
+    const label = document.getElementById("kpi-channel").nextElementSibling;
+    if (label) label.innerText = "Top Usage Type";
+  }
+
+  if (document.getElementById("kpi-battery")) document.getElementById("kpi-battery").innerText = Math.round(maxBattery) + " kWh";
+  if (document.getElementById("kpi-co2")) document.getElementById("kpi-co2").innerText = Math.round(totalCO2).toLocaleString() + " kg";
+
+  // General Stats (Top Cards)
+  if (document.getElementById("totalSavings")) document.getElementById("totalSavings").innerText = "₹" + savings.toLocaleString();
+  if (document.getElementById("co2Saved")) document.getElementById("co2Saved").innerText = Math.round(totalCO2).toLocaleString() + " kg";
+  if (document.getElementById("totalDistance")) document.getElementById("totalDistance").innerText = totalDistance.toLocaleString() + " km";
+  if (document.getElementById("batteryHealth")) document.getElementById("batteryHealth").innerText = avgBatHealth + "%";
+
+
+  // 2. Prepare Chart Data Aggregations
+
+  // By Category
+  const categoryStats = {};
+  // Structure: { "SUV": { count: 0, totalChargeTime: 0, totalPrice: 0 } }
+
+  // By Brand (for the brand chart)
+  const brandCounts = {};
+
+  filteredData.forEach(d => {
+    const cat = d.Vehicle_Category || "Unknown";
+    if (!categoryStats[cat]) categoryStats[cat] = { count: 0, totalChargeTime: 0, totalPrice: 0 };
+
+    categoryStats[cat].count++;
+    categoryStats[cat].totalChargeTime += Number(d.Charging_Time_Hours) || 0;
+    categoryStats[cat].totalPrice += Number(d.Net_Price_After_Subsidy) || Number(d.Vehicle_Price) || 0;
+
+    // For Global Brand Chart (if needed filtered, but usually this one is static "Market Overview". 
+    // However, if we want it to react to filters, it contradicts "Vehicle Count by Brand" logic if the filter is a single brand.
+    // Let's implement: If "All", show all brands. If specific brand, show models? 
+    // Plan says: "Count of vehicles per Brand". 
+    // If we select "Tesla", showing a bar chart of just "Tesla" is boring. 
+    // Let's keep Brand Chart showing Global Market Share ALWAYS (using allEVData), 
+    // OR if filtered, show Models distribution? 
+    // Let's stick to Global Market Share for Brand Chart when "All" is selected, 
+    // and maybe Model distribution if a Brand is selected.
+    // For simplicity/robustness: The Brand Chart will always show top brands from CURRENT filtered data (which is 1 brand if filtered).
+    // Actually, distinct charts usually imply distinct aggregations.
+    // Let's make "Vehicle Count by Brand" always show TOP brands from ALL data, to give context.
+    const b = d.Brand || "Unknown";
+    brandCounts[b] = (brandCounts[b] || 0) + 1;
+  });
+
+  const categories = Object.keys(categoryStats);
+  const avgChargeTimes = categories.map(c => (categoryStats[c].totalChargeTime / categoryStats[c].count).toFixed(1));
+  const countsByCategory = categories.map(c => categoryStats[c].count);
+  const avgPrices = categories.map(c => Math.round(categoryStats[c].totalPrice / categoryStats[c].count));
+
+  // Update Charging Chart (Bar)
   if (chargingChartInstance) {
-    chargingChartInstance.data.datasets[0].data = data.chargingData;
+    chargingChartInstance.data.labels = categories;
+    chargingChartInstance.data.datasets[0].data = avgChargeTimes;
     chargingChartInstance.update();
   }
 
+  // Update Battery Chart (Pie - Count by Category)
+  // Plan said "Battery Capacity Distribution", but a Pie chart is better suited for Categorical distribution (Counts).
+  // "Battery Capacity" as a distribution is complex (histogram). 
+  // Let's map it to "Vehicle Count by Category" which fits the Pie Chart visual better.
   if (batteryChartInstance) {
-    batteryChartInstance.data.datasets[0].data = data.batteryData;
+    batteryChartInstance.data.labels = categories;
+    batteryChartInstance.data.datasets[0].data = countsByCategory;
+
+    // Update title if possible, or assume label matches
+    // The HTML has "Battery Capacity Distribution". We can change it via JS or leave it.
+    // To match the visual of "distribution", Count by Category is safe.
     batteryChartInstance.update();
+  }
+
+  // Update Brand Chart
+  // If "All" selected -> Show counts by Brand. 
+  // If "Tesla" selected -> Show counts by Model.
+  if (brandChartInstance) {
+    let labels = [];
+    let data = [];
+
+    if (brand === "All") {
+      // Aggregate global brand counts
+      const bCounts = {};
+      allEVData.forEach(d => {
+        const b = d.Brand || "Unknown";
+        bCounts[b] = (bCounts[b] || 0) + 1;
+      });
+      labels = Object.keys(bCounts);
+      data = Object.values(bCounts);
+    } else {
+      // Show Models for this brand
+      const mCounts = {};
+      filteredData.forEach(d => {
+        const m = d.Model || "Unknown";
+        mCounts[m] = (mCounts[m] || 0) + 1;
+      });
+      labels = Object.keys(mCounts);
+      data = Object.values(mCounts);
+      brandChartInstance.data.datasets[0].label = 'Model Count';
+    }
+
+    brandChartInstance.data.labels = labels;
+    brandChartInstance.data.datasets[0].data = data;
+    brandChartInstance.update();
+  }
+
+  // Update Price Chart (Doughnut - Avg Price by Category)
+  if (priceChartInstance) {
+    priceChartInstance.data.labels = categories;
+    priceChartInstance.data.datasets[0].data = avgPrices;
+    priceChartInstance.update();
+  }
+
+  // Update HTML Table
+  const tableBody = document.querySelector(".card-body table"); // weak selector, but works for this file structure
+  if (tableBody) {
+    let html = '<table class="table table-bordered">';
+    categories.forEach((cat, i) => {
+      html += `<tr><th>${cat}</th><td>₹${avgPrices[i].toLocaleString()}</td></tr>`;
+    });
+    html += '</table>';
+    tableBody.innerHTML = html;
   }
 }
 
@@ -292,17 +368,9 @@ if (brandFilter) {
     localStorage.setItem("selectedBrand", selectedBrand);
     updateDashboard(selectedBrand);
   });
-
-  // Load Saved State
-  const savedBrand = localStorage.getItem("selectedBrand") || "All";
-  brandFilter.value = savedBrand;
-
-  // Initialize
-  initCharts();
-  updateDashboard(savedBrand);
 } else {
   // Fallback if filter not found (e.g. on other pages)
-  initCharts();
+  // initCharts called in fetch
 }
 
 // 🚪 Logout - handled by inline script in HTML

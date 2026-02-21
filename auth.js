@@ -196,6 +196,7 @@ export const handleLogin = window.handleLogin = async () => {
     // 5. Set Session State
     sessionStorage.setItem("isAuth", "true");
     sessionStorage.setItem("userRole", userData.role);
+    sessionStorage.setItem("userPlan", userData.plan || 'Free'); // Store Plan
     sessionStorage.setItem("userName", userData.fullName);
     sessionStorage.setItem("userEmail", userData.email);
     sessionStorage.setItem("uid", user.uid);

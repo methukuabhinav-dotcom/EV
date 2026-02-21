@@ -159,6 +159,7 @@
             <li><a href="pricing.html" class="active">Pricing</a></li>
             <li><a href="contact.html">Contact</a></li>
             <li id="nav-dashboard-link" class="hidden"><a href="user-dashboard.html">Dashboard</a></li>
+            <li><a href="ml_models.html">ML Models</a></li>
         </ul>
         <div id="nav-auth-container">
             <a href="login.html"><button class="btn">Login</button></a>
@@ -183,14 +184,14 @@
                 <li>Basic EV information (bikes & cars)</li>
                 <li>Brand availability list</li>
                 <li>Model specifications</li>
-                <li>Limited dashboard access</li>
                 <li>Suitable for first-time users</li>
             </ul>
             <button class="plan-btn btn-outline" onclick="selectPlan('Free Plan', '₹0')">Get Started</button>
         </div>
 
         <!-- STANDARD PLAN -->
-        <div class="pricing-card">
+        <div class="pricing-card highlight">
+            <div class="popular-tag">Most Popular</div>
             <div class="plan-name">Standard Plan</div>
             <div class="price">₹299</div>
             <div class="duration">/ Month</div>
@@ -198,42 +199,27 @@
                 <li>Full user dashboard access</li>
                 <li>Vehicle vs Fuel cost comparison</li>
                 <li>Total savings & charging analysis</li>
-                <li>Login & time-spent tracking</li>
             </ul>
-            <button class="plan-btn btn-outline" onclick="selectPlan('Standard Plan', '₹299')">Subscribe Now</button>
+            <button class="plan-btn btn-filled" onclick="selectPlan('Standard Plan', '₹299')">Go
+                Standard</button>
         </div>
 
         <!-- PREMIUM PLAN -->
-        <div class="pricing-card highlight">
-            <div class="popular-tag">Most Popular</div>
+        <div class="pricing-card ">
+
             <div class="plan-name">Premium Plan</div>
             <div class="price">₹599</div>
             <div class="duration">/ Month</div>
             <ul class="features">
                 <li>All Standard features</li>
-                <li>Advanced brand/model insights</li>
-                <li>High-selling brand analysis</li>
+                <li>ML model access</li>
                 <li>Personalized recommendations</li>
                 <li>Priority new feature access</li>
             </ul>
-            <button class="plan-btn btn-filled" onclick="selectPlan('Premium Plan', '₹599')">Go Premium</button>
+            <button class="plan-btn btn-outline" onclick="selectPlan('Premium Plan', '₹599')">Go Premium</button>
         </div>
 
-        <!-- ADMIN PLAN -->
-        <div class="pricing-card">
-            <div class="plan-name">Admin / Enterprise</div>
-            <div class="price">₹1,499</div>
-            <div class="duration">/ Month</div>
-            <ul class="features">
-                <li>Full Admin Dashboard Access</li>
-                <li>Industry-level sales analytics</li>
-                <li>Revenue & Interest insights</li>
-                <li>Customer behavior analysis</li>
-                <li>Downloadable business reports</li>
-            </ul>
-            <button class="plan-btn btn-outline" onclick="selectPlan('Admin / Enterprise', '₹1,499')">Contact
-                Sales</button>
-        </div>
+
 
     </div>
 
@@ -324,6 +310,15 @@
         const RZP_KEY_ID = 'rzp_test_S7Gb21AIbAKorp'; // Updated with User Key ID
 
         function selectPlan(name, price) {
+            // Check for authentication
+            const isAuth = sessionStorage.getItem("isAuth") === "true";
+
+            if (!isAuth) {
+                alert("Please login first to subscribe to a plan.");
+                window.location.href = "login.html";
+                return;
+            }
+
             // Show section
             const section = document.getElementById('payment-section');
             section.style.display = 'block';
@@ -460,8 +455,11 @@
 
             sessionStorage.setItem('paymentSuccess', JSON.stringify(paymentSuccessData));
 
-            // Redirect to success page
-            window.location.href = 'payment-success.html';
+            // Update Plan in Session Storage for Navbar
+            sessionStorage.setItem('userPlan', tempPlan.name);
+
+            // Redirect to dashboard
+            window.location.href = 'user-dashboard.html';
         }
     </script>
 
