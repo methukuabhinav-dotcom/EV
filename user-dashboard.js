@@ -260,11 +260,12 @@ function updateDashboard(brand) {
 
   filteredData.forEach(d => {
     const cat = d.Vehicle_Category || "Unknown";
-    if (!categoryStats[cat]) categoryStats[cat] = { count: 0, totalChargeTime: 0, totalPrice: 0 };
+    if (!categoryStats[cat]) categoryStats[cat] = { count: 0, totalChargeTime: 0, totalPrice: 0, totalBattery: 0 };
 
     categoryStats[cat].count++;
     categoryStats[cat].totalChargeTime += Number(d.Charging_Time_Hours) || 0;
     categoryStats[cat].totalPrice += Number(d.Net_Price_After_Subsidy) || Number(d.Vehicle_Price) || 0;
+    categoryStats[cat].totalBattery += Number(d.Battery_Capacity_kWh) || 0;
 
     // For Global Brand Chart (if needed filtered, but usually this one is static "Market Overview". 
     // However, if we want it to react to filters, it contradicts "Vehicle Count by Brand" logic if the filter is a single brand.
@@ -285,6 +286,7 @@ function updateDashboard(brand) {
   const categories = Object.keys(categoryStats);
   const avgChargeTimes = categories.map(c => (categoryStats[c].totalChargeTime / categoryStats[c].count).toFixed(1));
   const countsByCategory = categories.map(c => categoryStats[c].count);
+  const avgBatteryCapacity = categories.map(c => parseFloat((categoryStats[c].totalBattery / categoryStats[c].count).toFixed(1)));
   const avgPrices = categories.map(c => Math.round(categoryStats[c].totalPrice / categoryStats[c].count));
 
   // Update Charging Chart (Bar)
@@ -294,17 +296,11 @@ function updateDashboard(brand) {
     chargingChartInstance.update();
   }
 
-  // Update Battery Chart (Pie - Count by Category)
-  // Plan said "Battery Capacity Distribution", but a Pie chart is better suited for Categorical distribution (Counts).
-  // "Battery Capacity" as a distribution is complex (histogram). 
-  // Let's map it to "Vehicle Count by Category" which fits the Pie Chart visual better.
+  // Update Battery Chart (Pie - Avg Battery Capacity by Category in kWh)
   if (batteryChartInstance) {
     batteryChartInstance.data.labels = categories;
-    batteryChartInstance.data.datasets[0].data = countsByCategory;
-
-    // Update title if possible, or assume label matches
-    // The HTML has "Battery Capacity Distribution". We can change it via JS or leave it.
-    // To match the visual of "distribution", Count by Category is safe.
+    batteryChartInstance.data.datasets[0].data = avgBatteryCapacity;
+    batteryChartInstance.data.datasets[0].label = 'Avg Battery Capacity (kWh)';
     batteryChartInstance.update();
   }
 
@@ -326,9 +322,10 @@ function updateDashboard(brand) {
       data = Object.values(bCounts);
     } else {
       // Show Models for this brand
+      // Strip trailing _NUMBER suffix (e.g. "MG_Hatchback_208" → "MG_Hatchback")
       const mCounts = {};
       filteredData.forEach(d => {
-        const m = d.Model || "Unknown";
+        const m = (d.Model || "Unknown").replace(/_\d+$/, '');
         mCounts[m] = (mCounts[m] || 0) + 1;
       });
       labels = Object.keys(mCounts);
