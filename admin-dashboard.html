@@ -124,19 +124,34 @@
       transform: translateY(-2px);
     }
 
+    .kpi-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100px;
+    }
+
     .kpi-card h6 {
-      font-size: 13px;
+      font-size: 12px;
       color: #64748b;
       text-transform: uppercase;
       font-weight: 700;
       letter-spacing: 0.05em;
+      min-height: 2.4em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      margin-bottom: 0;
     }
 
     .kpi-card h2 {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 800;
       color: var(--primary-color);
-      margin: 0.5rem 0;
+      margin: 0.4rem 0 0;
+      line-height: 1;
     }
 
     .chart-title {
@@ -360,38 +375,32 @@
         </div>
         <div class="col-md">
           <div class="kpi-card p-3 text-center">
-            <h6>Total Distance (km)</h6>
-            <h2 id="distance">0</h2>
-          </div>
-        </div>
-        <div class="col-md">
-          <div class="kpi-card p-3 text-center">
-            <h6>Total Savings (₹)</h6>
-            <h2 id="savings">0</h2>
-          </div>
-        </div>
-        <div class="col-md">
-          <div class="kpi-card p-3 text-center">
             <h6>CO₂ Saved (kg)</h6>
             <h2 id="co2">0</h2>
           </div>
         </div>
         <div class="col-md">
           <div class="kpi-card p-3 text-center">
-            <h6>Avg Battery Health (%)</h6>
-            <h2 id="battery">0</h2>
+            <h6>Avg Efficiency (km/kWh)</h6>
+            <h2 id="avg-efficiency">0</h2>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="kpi-card p-3 text-center">
+            <h6>Avg Battery (kWh)</h6>
+            <h2 id="avg-battery">0</h2>
           </div>
         </div>
         <div class="col-md">
           <div class="kpi-card p-3 text-center" style="border-left: 4px solid #10b981;">
-            <h6>Total Sales (Store)</h6>
-            <h2 id="store-sales">0</h2>
+            <h6>Total Units Sold</h6>
+            <h2 id="total-units">0</h2>
           </div>
         </div>
         <div class="col-md">
           <div class="kpi-card p-3 text-center" style="border-left: 4px solid #f59e0b;">
-            <h6>Store Revenue (₹)</h6>
-            <h2 id="store-revenue">0</h2>
+            <h6>Avg Vehicle Price (₹)</h6>
+            <h2 id="avg-price">0</h2>
           </div>
         </div>
       </div>

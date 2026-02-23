@@ -91,29 +91,24 @@ function updateDashboard() {
   });
 
   // ================= KPIs =================
-  let distance = 0, co2 = 0, battery = 0;
+  let co2 = 0, efficiency = 0, batteryKwh = 0, units = 0, price = 0;
 
   rows.forEach(r => {
-    distance += (Number(r.Daily_Driving_Distance_km) || 0) * 30;
     co2 += Number(r.CO2_Emissions_Saved_kg) || 0;
-    battery += Number(r.Resale_Value_Percentage) || 0;
+    efficiency += Number(r.Efficiency_km_per_kWh) || 0;
+    batteryKwh += Number(r.Battery_Capacity_kWh) || 0;
+    units += Number(r.Units_Sold_Per_Year) || 1;
+    price += Number(r.Vehicle_Price) || 0;
   });
 
-  document.getElementById("users").innerText = rows.length;
-  document.getElementById("distance").innerText = distance.toLocaleString();
-  document.getElementById("savings").innerText = (distance * 2).toLocaleString();
-  document.getElementById("co2").innerText = Math.round(co2);
-  document.getElementById("battery").innerText =
-    rows.length ? Math.round(battery / rows.length) : 0;
+  const count = rows.length || 1;
 
-  // --- Fetch Store Stats ---
-  getDoc(doc(db, "site_stats", "dashboard")).then(snap => {
-    if (snap.exists()) {
-      const data = snap.data();
-      document.getElementById("store-sales").innerText = data.totalSalesCount || 0;
-      document.getElementById("store-revenue").innerText = (data.totalRevenue || 0).toLocaleString();
-    }
-  });
+  document.getElementById("users").innerText = rows.length.toLocaleString();
+  document.getElementById("co2").innerText = Math.round(co2).toLocaleString();
+  document.getElementById("avg-efficiency").innerText = (efficiency / count).toFixed(1);
+  document.getElementById("avg-battery").innerText = Math.round(batteryKwh / count);
+  document.getElementById("total-units").innerText = Math.round(units).toLocaleString();
+  document.getElementById("avg-price").innerText = "₹" + Math.round(price / count).toLocaleString();
 
   Object.values(charts).forEach(c => c.destroy());
 
