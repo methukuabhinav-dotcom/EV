@@ -226,6 +226,106 @@
             margin-bottom: 8px;
             display: inline-block;
         }
+
+        /* ===== RESPONSIVE ===== */
+
+        /* Tablet */
+        @media (max-width: 768px) {
+            .step-progress {
+                gap: 16px;
+                margin: 24px 0;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .step-item {
+                font-size: 12px;
+                gap: 6px;
+            }
+
+            .step-number {
+                width: 26px;
+                height: 26px;
+                font-size: 12px;
+            }
+
+            .step-card {
+                padding: 24px 20px;
+                border-radius: 16px;
+            }
+
+            .cat-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 14px;
+            }
+
+            .cat-card {
+                padding: 20px 14px;
+            }
+
+            .cat-icon {
+                font-size: 36px;
+            }
+
+            .spec-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .price-badge {
+                font-size: 24px;
+            }
+
+            .btn-modern {
+                padding: 14px 20px;
+                font-size: 15px;
+            }
+
+            .navbar-brand {
+                font-size: 18px;
+            }
+        }
+
+        /* Small mobile */
+        @media (max-width: 480px) {
+            .step-progress {
+                gap: 10px;
+            }
+
+            .step-item {
+                font-size: 11px;
+            }
+
+            .step-card {
+                padding: 18px 14px;
+            }
+
+            .cat-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .cat-card {
+                padding: 18px;
+            }
+
+            .store-container {
+                padding: 0 12px;
+            }
+
+            .spec-grid {
+                gap: 10px;
+            }
+
+            .spec-value {
+                font-size: 15px;
+            }
+
+            #step-4 .py-5 {
+                padding-top: 2rem !important;
+                padding-bottom: 2rem !important;
+            }
+        }
     </style>
 </head>
 

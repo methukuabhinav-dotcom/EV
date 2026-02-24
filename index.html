@@ -2,6 +2,8 @@
 <html>
 
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EV Analytics | Home</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -10,7 +12,10 @@
 
   <nav class="navbar">
     <div class="logo">⚡<span>EV ANALYTICS</span></div>
-    <ul class="nav-links">
+    <button class="hamburger" id="hamburger-btn" aria-label="Toggle navigation">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="nav-links">
 
       <li><a class="active" href="index.html">Home</a></li>
       <li><a href="about.html">About</a></li>
@@ -33,7 +38,7 @@
       performance monitoring, and sustainable mobility.
     </p>
 
-    <div style="display:flex;gap:200px;margin-top:70px;">
+    <div class="hero-cards">
       <div class="card">
         <h2>⚡EV Benefits</h2>
         <p>Lower costs & higher efficiency</p>

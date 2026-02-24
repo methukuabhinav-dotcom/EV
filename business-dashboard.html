@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EV Analytics | Business Dashboard</title>
 
     <!-- Bootstrap -->
@@ -133,13 +134,129 @@
             border-color: var(--primary-color);
             background: rgba(99, 102, 241, 0.05);
         }
+
+        /* ===== MOBILE TOP-BAR ===== */
+        .mobile-topbar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1100;
+            background: var(--sidebar-bg);
+            padding: 14px 20px;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .mobile-topbar .brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .sidebar-toggle {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 4px;
+        }
+
+        .sidebar-toggle span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            background: #cbd5e1;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-toggle.open span:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .sidebar-toggle.open span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .sidebar-toggle.open span:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 900;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .mobile-topbar {
+                display: flex;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1000;
+                height: 100%;
+                position: fixed;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 1rem;
+                padding-top: 70px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 0.75rem;
+                padding-top: 66px;
+            }
+
+            .stat-card h2 {
+                font-size: 1.4rem;
+            }
+        }
     </style>
 </head>
 
 <body>
 
+    <!-- MOBILE TOP-BAR (visible only on mobile) -->
+    <div class="mobile-topbar">
+        <span class="brand">⚡ Business Portal</span>
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+
+    <!-- SIDEBAR OVERLAY -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <span>⚡ Business Portal</span>
         </div>
@@ -695,6 +812,25 @@
                 actionsEl.scrollIntoView({ behavior: 'smooth' });
             }
         }
+    </script>
+
+    <!-- Sidebar Toggle (Mobile) -->
+    <script>
+        (function () {
+            const toggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('active'); toggle.classList.add('open'); }
+            function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('active'); toggle.classList.remove('open'); }
+
+            if (toggle) toggle.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
+            if (overlay) overlay.addEventListener('click', closeSidebar);
+
+            if (sidebar) {
+                sidebar.querySelectorAll('a, button').forEach(el => el.addEventListener('click', closeSidebar));
+            }
+        })();
     </script>
 </body>
 

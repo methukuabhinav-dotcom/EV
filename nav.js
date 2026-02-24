@@ -7,6 +7,25 @@ import { handleLogout } from "./auth.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     updateNavbar();
+
+    // ── Hamburger menu toggle ──
+    const hamburgerBtn = document.getElementById("hamburger-btn");
+    const navLinks = document.getElementById("nav-links");
+
+    if (hamburgerBtn && navLinks) {
+        hamburgerBtn.addEventListener("click", () => {
+            hamburgerBtn.classList.toggle("open");
+            navLinks.classList.toggle("open");
+        });
+
+        // Close menu when any nav link is clicked
+        navLinks.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", () => {
+                hamburgerBtn.classList.remove("open");
+                navLinks.classList.remove("open");
+            });
+        });
+    }
 });
 
 export function updateNavbar() {
