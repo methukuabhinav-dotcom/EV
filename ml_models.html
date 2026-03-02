@@ -11,16 +11,24 @@
     <style>
         :root {
             --sidebar-width: 260px;
-            --primary-color: #6366f1;
+            --primary-color: #6a5cff;
             --sidebar-bg: #0f172a;
-            --content-bg: #f8fafc;
+            --content-bg: #0f172a;
+            --card-bg: rgba(106, 92, 255, 0.05);
+            --card-border: rgba(106, 92, 255, 0.2);
+            --text-muted: #cbd5f5;
+            --accent: #6a5cff;
+            --cyan: #22d3ee;
         }
 
         body {
-            background: var(--content-bg);
+            background: linear-gradient(135deg, #0f172a 0%, #1a1f3a 60%, #2d1b69 100%);
+            background-attachment: fixed;
+            color: white;
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             margin: 0;
             display: flex;
+            min-height: 100vh;
         }
 
         /* Sidebar Styles */
@@ -61,21 +69,22 @@
             align-items: center;
             gap: 12px;
             padding: 0.75rem 1rem;
-            color: #94a3b8;
-            text-decoration: none;
+            color: #94a3b8 !important;
+            text-decoration: none !important;
             border-radius: 8px;
             transition: all 0.3s ease;
             font-weight: 500;
         }
 
         .nav-link-custom:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
+            background: rgba(255, 255, 255, 0.08);
+            color: white !important;
         }
 
         .nav-link-custom.active {
             background: var(--primary-color);
-            color: white;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
         }
 
         .logout-btn-nav {
@@ -107,39 +116,39 @@
         }
 
         .card-custom {
-            background: white;
-            border: none;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
             border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             padding: 1.5rem;
-            transition: transform 0.2s ease;
+            transition: all 0.3s ease;
+            color: white;
         }
 
         .card-custom:hover {
-            transform: translateY(-2px);
-        }
-
-        .card-custom:hover {
-            transform: translateY(-2px);
+            transform: translateY(-4px);
+            border-color: rgba(106, 92, 255, 0.4);
+            box-shadow: 0 20px 40px rgba(106, 92, 255, 0.15);
         }
 
         /* ML Model Style Enhancements */
         .ml-card {
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid rgba(99, 102, 241, 0.1);
+            background: linear-gradient(135deg, rgba(106, 92, 255, 0.08) 0%, rgba(34, 211, 238, 0.03) 100%);
+            border: 1px solid rgba(106, 92, 255, 0.2);
             border-radius: 20px;
             padding: 2rem;
             height: 100%;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
 
         .ml-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.15), 0 8px 10px -6px rgba(99, 102, 241, 0.1);
-            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(106, 92, 255, 0.2);
+            border-color: rgba(106, 92, 255, 0.5);
+            background: linear-gradient(135deg, rgba(106, 92, 255, 0.15) 0%, rgba(34, 211, 238, 0.06) 100%);
         }
 
         .ml-card::before {
@@ -149,7 +158,7 @@
             left: 0;
             width: 100%;
             height: 4px;
-            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            background: linear-gradient(90deg, #6a5cff, #22d3ee);
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -161,24 +170,24 @@
         .ml-icon-wrapper {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            background: linear-gradient(135deg, rgba(106, 92, 255, 0.2), rgba(34, 211, 238, 0.1));
             border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.75rem;
             margin-bottom: 1.5rem;
-            color: #6366f1;
+            border: 1px solid rgba(106, 92, 255, 0.3);
         }
 
         .ml-card h3 {
             font-weight: 700;
-            color: #1e293b;
+            color: white;
             margin-bottom: 0.75rem;
         }
 
         .ml-card p {
-            color: #64748b;
+            color: #cbd5f5;
             margin-bottom: 2rem;
             line-height: 1.6;
         }
@@ -201,12 +210,12 @@
         }
 
         .form-section {
-            background: white;
+            background: linear-gradient(135deg, rgba(106, 92, 255, 0.07) 0%, rgba(34, 211, 238, 0.03) 100%);
             border-radius: 24px;
             padding: 2.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
             margin-top: 2rem;
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            border: 1px solid rgba(106, 92, 255, 0.2);
             animation: slideDown 0.4s ease-out;
         }
 
@@ -228,47 +237,68 @@
             align-items: center;
             margin-bottom: 2rem;
             padding-bottom: 1rem;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid rgba(106, 92, 255, 0.2);
+        }
+
+        .form-header h3,
+        .form-header p {
+            color: white;
+        }
+
+        .form-header p {
+            color: #cbd5f5 !important;
         }
 
         .form-control-custom {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(106, 92, 255, 0.25);
             border-radius: 10px;
             padding: 0.75rem 1rem;
             transition: all 0.2s;
+            color: white;
+        }
+
+        .form-control-custom::placeholder {
+            color: rgba(203, 213, 245, 0.4);
         }
 
         .form-control-custom:focus {
-            background-color: white;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background-color: rgba(106, 92, 255, 0.1);
+            border-color: #6a5cff;
+            box-shadow: 0 0 0 3px rgba(106, 92, 255, 0.2);
             outline: none;
+            color: white;
+        }
+
+        .form-control-custom option {
+            background: #1a1f3a;
+            color: white;
         }
 
         .form-label {
             font-weight: 500;
-            color: #475569;
+            color: #cbd5f5;
             margin-bottom: 0.5rem;
             font-size: 0.9rem;
         }
 
         .btn-close-form {
-            background: #f1f5f9;
-            border: none;
+            background: rgba(106, 92, 255, 0.15);
+            border: 1px solid rgba(106, 92, 255, 0.3);
             width: 36px;
             height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #64748b;
+            color: #cbd5f5;
             transition: all 0.2s;
         }
 
         .btn-close-form:hover {
-            background: #e2e8f0;
-            color: #ef4444;
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #f87171;
             transform: rotate(90deg);
         }
 
@@ -358,7 +388,7 @@
         .bh-metric-bar {
             height: 8px;
             border-radius: 8px;
-            background: #e2e8f0;
+            background: rgba(255, 255, 255, 0.1);
             overflow: hidden;
             margin-top: 6px;
         }
@@ -371,11 +401,12 @@
         }
 
         .bh-card {
-            background: white;
+            background: linear-gradient(135deg, rgba(106, 92, 255, 0.08) 0%, rgba(34, 211, 238, 0.03) 100%);
             border-radius: 16px;
-            border: 1px solid #f1f5f9;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(106, 92, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             padding: 1.2rem 1.5rem;
+            color: #e2e8f0;
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 0.5s ease, transform 0.5s ease;
@@ -384,6 +415,174 @@
         .bh-card.visible {
             opacity: 1;
             transform: translateY(0);
+        }
+
+        .bh-card h6 {
+            color: #cbd5f5 !important;
+        }
+
+        .bh-card p,
+        .bh-card li {
+            color: #94a3b8 !important;
+        }
+
+        .bh-card .text-muted {
+            color: #94a3b8 !important;
+        }
+
+        .bh-card table {
+            --bs-table-color: #cbd5f5;
+        }
+
+        .bh-card table td {
+            border-color: rgba(106, 92, 255, 0.15) !important;
+        }
+
+        /* ===== Slider Styles ===== */
+        .slider-group {
+            margin-bottom: 0;
+        }
+
+        .slider-val-display {
+            display: inline-block;
+            background: linear-gradient(135deg, #6a5cff, #22d3ee);
+            color: white;
+            font-weight: 700;
+            font-size: 0.82rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            min-width: 54px;
+            text-align: center;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        input[type=range].range-custom {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 6px;
+            background: rgba(106, 92, 255, 0.25);
+            outline: none;
+            margin: 6px 0 2px;
+        }
+
+        input[type=range].range-custom::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6a5cff, #22d3ee);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(106, 92, 255, 0.4);
+            transition: transform 0.15s;
+        }
+
+        input[type=range].range-custom::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+        }
+
+        /* ===== Tooltip Styles ===== */
+        .field-tooltip {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background: rgba(106, 92, 255, 0.3);
+            border-radius: 50%;
+            font-size: 0.65rem;
+            text-align: center;
+            line-height: 16px;
+            cursor: pointer;
+            margin-left: 5px;
+            color: #cbd5f5;
+            font-weight: 700;
+            position: relative;
+            top: -1px;
+            border: 1px solid rgba(106, 92, 255, 0.4);
+        }
+
+        .field-tooltip:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            left: 120%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            white-space: nowrap;
+            max-width: 220px;
+            white-space: normal;
+            width: 200px;
+            z-index: 9999;
+            border: 1px solid rgba(106, 92, 255, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            line-height: 1.4;
+            font-weight: 400;
+        }
+
+        /* ===== Validation Styles ===== */
+        .form-control-custom.is-valid {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
+        }
+
+        .form-control-custom.is-invalid {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+        }
+
+        .field-error {
+            font-size: 0.76rem;
+            color: #f87171;
+            margin-top: 3px;
+            display: none;
+        }
+
+        .field-error.show {
+            display: block;
+        }
+
+        /* ===== Result Action Buttons ===== */
+        .result-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-result-action {
+            padding: 0.5rem 1.2rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(106, 92, 255, 0.4);
+            background: rgba(106, 92, 255, 0.12);
+            color: #cbd5f5;
+        }
+
+        .btn-result-action:hover {
+            background: rgba(106, 92, 255, 0.28);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        @keyframes pulseRing {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
         }
 
         .bh-risk-bar {
@@ -576,8 +775,22 @@
     <main class="main-content">
         <div class="row align-items-center mb-4">
             <div class="col">
-                <h2 class="fw-bold mb-0" style="color: black;">Advanced ML Models</h2>
-                <p class="text-muted">Explore our predictive analytics powered by machine learning.</p>
+                <h2 class="fw-bold mb-0"
+                    style="background: linear-gradient(135deg, #fff, #6a5cff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    Our ML Models</h2>
+                <p style="color: #cbd5f5;">Explore our predictive analytics powered by machine learning.</p>
+            </div>
+        </div>
+
+        <!-- ML Disclaimer -->
+        <div class="alert d-flex align-items-center mb-4 shadow-sm" role="alert"
+            style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: #fde68a; border-radius: 12px; padding: 1rem; animation: slideDown 0.5s ease-out;">
+            <div style="font-size: 1.5rem; margin-right: 15px;">⚠️</div>
+            <div>
+                <strong>AI Disclaimer:</strong> The predictions provided by our Machine Learning models are estimates
+                based on learned data patterns. These models can occasionally make mistakes or display variances from
+                real-world conditions. Please use these results as guidance and not as absolute financial or technical
+                guarantees.
             </div>
         </div>
 
@@ -640,57 +853,131 @@
             <form id="batteryHealthForm">
                 <div class="row g-4">
                     <div class="col-md-6">
-                        <label class="form-label">Vehicle Age (years)</label>
-                        <input type="number" class="form-control form-control-custom" name="vehicle_age_years"
-                            step="0.1" placeholder="e.g. 1" value="1" required>
+                        <label class="form-label">Vehicle Age (years) <span class="field-tooltip"
+                                data-tip="How many years since the vehicle was first registered.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="0" max="15" step="0.5" value="1"
+                                oninput="syncInput(this,'bh_age_num')">
+                            <span class="slider-val-display" id="bh_age_disp">1</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_age_num"
+                            name="vehicle_age_years" step="0.1" value="1" required
+                            oninput="syncSlider(this,'bh_age_num',0,15,'bh_age_disp')">
+                        <div class="field-error" id="err_age">Must be between 0 and 15 years.</div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Total Charge Cycles</label>
-                        <input type="number" class="form-control form-control-custom" name="total_charge_cycles"
-                            placeholder="e.g. 326" value="326" required>
+                        <label class="form-label">Total Charge Cycles <span class="field-tooltip"
+                                data-tip="Number of full charge-discharge cycles completed.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="0" max="2000" step="10"
+                                value="326" oninput="syncInput(this,'bh_cycles_num')">
+                            <span class="slider-val-display" id="bh_cycles_disp">326</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_cycles_num"
+                            name="total_charge_cycles" value="326" required
+                            oninput="syncSlider(this,'bh_cycles_num',0,2000,'bh_cycles_disp')">
+                        <div class="field-error" id="err_cycles">Must be between 0 and 2000.</div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Max Battery Temperature (°C)</label>
-                        <input type="number" class="form-control form-control-custom" name="max_battery_temperature_c"
-                            step="0.1" placeholder="e.g. 36" value="36" required>
+                        <label class="form-label">Max Battery Temperature (°C) <span class="field-tooltip"
+                                data-tip="Peak temperature recorded, higher values accelerate degradation.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="0" max="80" step="0.5" value="36"
+                                oninput="syncInput(this,'bh_maxtemp_num')">
+                            <span class="slider-val-display" id="bh_maxtemp_disp">36</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_maxtemp_num"
+                            name="max_battery_temperature_c" step="0.1" value="36" required
+                            oninput="syncSlider(this,'bh_maxtemp_num',0,80,'bh_maxtemp_disp')">
+                        <div class="field-error" id="err_maxtemp">Must be between 0 and 80°C.</div>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Avg Battery Temperature (°C)</label>
-                        <input type="number" class="form-control form-control-custom" name="avg_battery_temperature_c"
-                            step="0.1" placeholder="e.g. 26" value="26" required>
+                        <label class="form-label">Avg Battery Temperature (°C) <span class="field-tooltip"
+                                data-tip="Typical operating temperature during normal use.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="0" max="60" step="0.5" value="26"
+                                oninput="syncInput(this,'bh_avgtemp_num')">
+                            <span class="slider-val-display" id="bh_avgtemp_disp">26</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_avgtemp_num"
+                            name="avg_battery_temperature_c" step="0.1" value="26" required
+                            oninput="syncSlider(this,'bh_avgtemp_num',0,60,'bh_avgtemp_disp')">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Avg Charging Time (hours)</label>
-                        <input type="number" class="form-control form-control-custom" name="avg_charging_time_hours"
-                            step="0.1" placeholder="e.g. 2" value="2" required>
+                        <label class="form-label">Avg Charging Time (hours) <span class="field-tooltip"
+                                data-tip="Average time taken to charge from 0-100%.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="0.5" max="24" step="0.5" value="2"
+                                oninput="syncInput(this,'bh_chgtime_num')">
+                            <span class="slider-val-display" id="bh_chgtime_disp">2</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_chgtime_num"
+                            name="avg_charging_time_hours" step="0.1" value="2" required
+                            oninput="syncSlider(this,'bh_chgtime_num',0.5,24,'bh_chgtime_disp')">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Avg Depth of Discharge (%)</label>
-                        <input type="number" class="form-control form-control-custom"
-                            name="avg_depth_of_discharge_percent" step="0.1" placeholder="e.g. 56" value="56" required>
+                        <label class="form-label">Avg Depth of Discharge (%) <span class="field-tooltip"
+                                data-tip="How far the battery is typically drained before recharging — lower is better.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="0" max="100" step="1" value="56"
+                                oninput="syncInput(this,'bh_dod_num')">
+                            <span class="slider-val-display" id="bh_dod_disp">56%</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_dod_num"
+                            name="avg_depth_of_discharge_percent" step="0.1" value="56" required
+                            oninput="syncSlider(this,'bh_dod_num',0,100,'bh_dod_disp','%')">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Fast Charging Frequency (%)</label>
-                        <input type="number" class="form-control form-control-custom"
-                            name="fast_charging_frequency_percent" step="0.1" placeholder="e.g. 5" value="5" required>
+                        <label class="form-label">Fast Charging Frequency (%) <span class="field-tooltip"
+                                data-tip="% of sessions using DC fast charging — higher values degrade the battery faster.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="0" max="100" step="1" value="5"
+                                oninput="syncInput(this,'bh_fastchg_num')">
+                            <span class="slider-val-display" id="bh_fastchg_disp">5%</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_fastchg_num"
+                            name="fast_charging_frequency_percent" step="0.1" value="5" required
+                            oninput="syncSlider(this,'bh_fastchg_num',0,100,'bh_fastchg_disp','%')">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Average Voltage (V)</label>
-                        <input type="number" class="form-control form-control-custom" name="avg_voltage" step="0.1"
-                            placeholder="e.g. 3" value="3" required>
+                        <label class="form-label">Average Voltage (V) <span class="field-tooltip"
+                                data-tip="Mean cell voltage during operation (nominal ~3.6V for Li-ion).">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="2" max="5" step="0.1" value="3"
+                                oninput="syncInput(this,'bh_volt_num')">
+                            <span class="slider-val-display" id="bh_volt_disp">3V</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_volt_num"
+                            name="avg_voltage" step="0.1" value="3" required
+                            oninput="syncSlider(this,'bh_volt_num',2,5,'bh_volt_disp','V')">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Internal Resistance (mΩ)</label>
-                        <input type="number" class="form-control form-control-custom" name="internal_resistance_mohm"
-                            step="0.01" placeholder="e.g. 11" value="11" required>
+                        <label class="form-label">Internal Resistance (mΩ) <span class="field-tooltip"
+                                data-tip="Higher resistance = reduced power delivery & capacity. Rising values signal ageing.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="1" max="100" step="0.5" value="11"
+                                oninput="syncInput(this,'bh_resist_num')">
+                            <span class="slider-val-display" id="bh_resist_disp">11</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_resist_num"
+                            name="internal_resistance_mohm" step="0.01" value="11" required
+                            oninput="syncSlider(this,'bh_resist_num',1,100,'bh_resist_disp')">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">Capacity Retention (%)</label>
-                        <input type="number" class="form-control form-control-custom" name="capacity_retention_percent"
-                            step="0.1" placeholder="e.g. 91" value="91" required>
+                        <label class="form-label">Capacity Retention (%) <span class="field-tooltip"
+                                data-tip="Current capacity vs original — above 80% is generally considered healthy.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="0" max="100" step="0.5" value="91"
+                                oninput="syncInput(this,'bh_cap_num')">
+                            <span class="slider-val-display" id="bh_cap_disp">91%</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_cap_num"
+                            name="capacity_retention_percent" step="0.1" value="91" required
+                            oninput="syncSlider(this,'bh_cap_num',0,100,'bh_cap_disp','%')">
                     </div>
-                    <div class="col-12 mt-4">
-                        <button type="submit" class="btn-predict" style="max-width: 250px;">Run Diagnosis</button>
+                    <div class="col-12 mt-4 d-flex align-items-center gap-3">
+                        <button type="submit" class="btn-predict" style="max-width: 220px;">🔬 Run Diagnosis</button>
+                        <button type="button" class="btn-result-action" onclick="resetBatteryForm()">↺ Reset</button>
                     </div>
                 </div>
                 <!-- Result Area -->
@@ -710,12 +997,14 @@
             <form id="valueForm">
                 <div class="row g-4">
                     <div class="col-md-4">
-                        <label class="form-label">Brand</label>
+                        <label class="form-label">Brand <span class="field-tooltip"
+                                data-tip="Manufacturer name, e.g. BYD, Tata, Ather.">?</span></label>
                         <input type="text" class="form-control form-control-custom" name="brand" placeholder="e.g. BYD"
                             value="BYD" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Vehicle Type</label>
+                        <label class="form-label">Vehicle Type <span class="field-tooltip"
+                                data-tip="Select the vehicle category that best describes your EV.">?</span></label>
                         <select class="form-select form-control-custom" name="vehicle_type">
                             <option value="Car" selected>Car</option>
                             <option value="Bike">Bike</option>
@@ -723,67 +1012,80 @@
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Battery Health (%)</label>
+                        <label class="form-label">Battery Health (%) <span class="field-tooltip"
+                                data-tip="Current battery capacity as a percentage of original rated capacity.">?</span></label>
                         <input type="number" class="form-control form-control-custom" name="battery_health_pct"
-                            step="0.1" placeholder="e.g. 81" value="81" required>
+                            step="0.1" placeholder="e.g. 81" value="81" min="0" max="100" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Range (km)</label>
+                        <label class="form-label">Range (km) <span class="field-tooltip"
+                                data-tip="Current single-charge driving range in km.">?</span></label>
                         <input type="number" class="form-control form-control-custom" name="range_km" step="0.1"
                             placeholder="e.g. 105" value="105" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Top Speed (kmph)</label>
+                        <label class="form-label">Top Speed (kmph) <span class="field-tooltip"
+                                data-tip="Maximum rated speed of the vehicle.">?</span></label>
                         <input type="number" class="form-control form-control-custom" name="top_speed_kmph" step="0.1"
                             placeholder="e.g. 144" value="144" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Odometer Reading (km)</label>
+                        <label class="form-label">Odometer Reading (km) <span class="field-tooltip"
+                                data-tip="Total km driven since vehicle was new.">?</span></label>
                         <input type="number" class="form-control form-control-custom" name="odometer_km" step="0.1"
                             placeholder="e.g. 140236" value="140236" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Warranty Remaining (years)</label>
+                        <label class="form-label">Warranty Remaining (years) <span class="field-tooltip"
+                                data-tip="Years left on manufacturer battery warranty.">?</span></label>
                         <input type="number" class="form-control form-control-custom" name="warranty_remaining_years"
                             step="0.1" placeholder="e.g. 1" value="1" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Annual Maintenance Cost</label>
+                        <label class="form-label">Annual Maintenance Cost (₹) <span class="field-tooltip"
+                                data-tip="Yearly cost for servicing and repairs.">?</span></label>
                         <input type="number" class="form-control form-control-custom" name="annual_maintenance_cost"
-                            step="0.01" placeholder="e.g. 32026" value="32026" required>
+                            step="1" placeholder="e.g. 32026" value="32026" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Purchase Price</label>
-                        <input type="number" class="form-control form-control-custom" name="Purchase_Price_L"
-                            step="0.01" placeholder="e.g. 2093043" value="2093043" required>
+                        <label class="form-label">Purchase Price (₹) <span class="field-tooltip"
+                                data-tip="Original on-road price when the vehicle was purchased.">?</span></label>
+                        <input type="number" class="form-control form-control-custom" name="Purchase_Price_L" step="1"
+                            placeholder="e.g. 2093043" value="2093043" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Purchase Year</label>
+                        <label class="form-label">Purchase Year <span class="field-tooltip"
+                                data-tip="Year when the vehicle was first purchased.">?</span></label>
                         <input type="number" class="form-control form-control-custom" name="Purchase_Year" min="2000"
                             max="2050" placeholder="e.g. 2023" value="2023" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Current Year</label>
-                        <input type="number" class="form-control form-control-custom" name="Current_Year" value="2025"
-                            placeholder="e.g. 2025" required>
+                        <label class="form-label">Current Year <span class="field-tooltip"
+                                data-tip="The current calendar year for depreciation calculation.">?</span></label>
+                        <input type="number" class="form-control form-control-custom" name="Current_Year" value="2026"
+                            placeholder="e.g. 2026" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Initial Mileage (km)</label>
+                        <label class="form-label">Initial Mileage (km) <span class="field-tooltip"
+                                data-tip="Odometer reading when you first took ownership.">?</span></label>
                         <input type="number" class="form-control form-control-custom" name="Initial_Mileage" step="0.1"
                             placeholder="e.g. 202" value="202" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Current Mileage (km)</label>
+                        <label class="form-label">Current Mileage (km) <span class="field-tooltip"
+                                data-tip="Odometer reading at the time of this valuation.">?</span></label>
                         <input type="number" class="form-control form-control-custom" name="Current_Mileage" step="0.1"
                             placeholder="e.g. 166" value="166" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Expected Resale Price</label>
-                        <input type="number" class="form-control form-control-custom" name="Resale_Value_L" step="0.01"
+                        <label class="form-label">Expected Resale Price (₹) <span class="field-tooltip"
+                                data-tip="The price you expect to sell or buy the vehicle for. The model will tell you if it is fair.">?</span></label>
+                        <input type="number" class="form-control form-control-custom" name="Resale_Value_L" step="1"
                             placeholder="e.g. 1475081" value="1475081" required>
                     </div>
-                    <div class="col-12 mt-4 text-center">
-                        <button type="submit" class="btn-predict" style="max-width: 250px;">Calculate Value</button>
+                    <div class="col-12 mt-4 d-flex align-items-center gap-3">
+                        <button type="submit" class="btn-predict" style="max-width: 220px;">💰 Calculate Value</button>
+                        <button type="button" class="btn-result-action" onclick="resetValueForm()">↺ Reset</button>
                     </div>
                 </div>
                 <!-- Value Result Area -->
@@ -833,6 +1135,98 @@
 
 
     </main>
+
+    <!-- ===== Utility Functions (plain script, runs immediately) ===== -->
+    <script>
+        // Sync slider -> number input + badge display
+        function syncInput(rangeEl, numId, unit) {
+            const numEl = document.getElementById(numId);
+            if (numEl) numEl.value = rangeEl.value;
+            const disp = rangeEl.parentElement.querySelector('.slider-val-display');
+            if (disp) disp.textContent = rangeEl.value + (unit || '');
+            if (numEl) {
+                numEl.classList.remove('is-invalid');
+                numEl.classList.add('is-valid');
+            }
+        }
+
+        // Sync number input -> closest range slider + badge
+        function syncSlider(numEl, numId, min, max, dispId, unit) {
+            unit = unit || '';
+            let v = parseFloat(numEl.value);
+            const disp = document.getElementById(dispId);
+            const rangeEl = numEl.closest('.col-md-6, .col-md-4, .col-12')
+                ?.querySelector('input[type="range"]');
+            if (!isNaN(v)) {
+                v = Math.min(Math.max(v, min), max);
+                if (rangeEl) rangeEl.value = v;
+                if (disp) disp.textContent = v + unit;
+                numEl.classList.remove('is-invalid');
+                numEl.classList.add('is-valid');
+            } else {
+                numEl.classList.add('is-invalid');
+                numEl.classList.remove('is-valid');
+            }
+        }
+
+        // Reset Battery Health form
+        function resetBatteryForm() {
+            document.getElementById('batteryHealthForm').reset();
+            // Reset all slider displays
+            const defaults = {
+                bh_age_disp: '1', bh_cycles_disp: '326', bh_maxtemp_disp: '36',
+                bh_avgtemp_disp: '26', bh_chgtime_disp: '2', bh_dod_disp: '56%',
+                bh_fastchg_disp: '5%', bh_volt_disp: '3V', bh_resist_disp: '11', bh_cap_disp: '91%'
+            };
+            Object.entries(defaults).forEach(([id, val]) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val;
+            });
+            // Reset range sliders to match default numbers
+            document.querySelectorAll('#batteryHealthForm input[type="range"]').forEach(r => {
+                const numId = r.getAttribute('oninput').match(/'([^']+)'\)/)?.[1];
+                const numEl = document.getElementById(numId);
+                if (numEl) r.value = numEl.defaultValue;
+            });
+            // Hide result
+            const res = document.getElementById('predictionResult');
+            if (res) { res.innerHTML = ''; res.classList.add('d-none'); }
+            // Clear validation states
+            document.querySelectorAll('#batteryHealthForm .form-control-custom').forEach(el => {
+                el.classList.remove('is-valid', 'is-invalid');
+            });
+        }
+
+        // Reset Value form
+        function resetValueForm() {
+            document.getElementById('valueForm').reset();
+            const res = document.getElementById('valueResult');
+            if (res) { res.innerHTML = ''; res.classList.add('d-none'); }
+            document.querySelectorAll('#valueForm .form-control-custom').forEach(el => {
+                el.classList.remove('is-valid', 'is-invalid');
+            });
+        }
+
+        // Live validation on all form inputs
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.form-control-custom[required]').forEach(input => {
+                input.addEventListener('blur', () => {
+                    if (input.value && input.checkValidity()) {
+                        input.classList.add('is-valid');
+                        input.classList.remove('is-invalid');
+                    } else if (!input.value && input.hasAttribute('required')) {
+                        input.classList.add('is-invalid');
+                        input.classList.remove('is-valid');
+                    }
+                });
+                input.addEventListener('input', () => {
+                    if (input.value) {
+                        input.classList.remove('is-invalid');
+                    }
+                });
+            });
+        });
+    </script>
 
     <script type="module">
         import { protectRoute } from "./guard.js";
@@ -937,7 +1331,7 @@
 
                     const metricHTML = metrics.map((m, i) => `
                         <div style="margin-bottom: 14px;">
-                            <div class="d-flex justify-content-between" style="font-size:0.82rem; font-weight:600; color:#475569;">
+                            <div class="d-flex justify-content-between" style="font-size:0.82rem; font-weight:600; color:#94a3b8;">
                                 <span>${m.label}</span>
                                 <span style="color:${m.color}">${m.value}${m.unit}</span>
                             </div>
@@ -959,7 +1353,7 @@
 
                             <!-- Metric Bars -->
                             <div class="bh-card mb-3" id="bh-metrics">
-                                <h6 class="fw-bold mb-3" style="color:#1e293b;">📊 Key Metrics</h6>
+                                <h6 class="fw-bold mb-3" style="color:#cbd5f5;">📊 Key Metrics</h6>
                                 ${metricHTML}
                             </div>
 
@@ -968,15 +1362,15 @@
                                 <div class="col-md-6">
                                     <div class="bh-card h-100" id="bh-rec">
                                         <div style="font-size:1.5rem; margin-bottom:8px;">💡</div>
-                                        <h6 class="fw-bold mb-1" style="color:#1e293b;">Recommendation</h6>
-                                        <p class="mb-0" style="font-size:0.9rem; color:#64748b; line-height:1.6;">${result.recommendation}</p>
+                                        <h6 class="fw-bold mb-1" style="color:#cbd5f5;">Recommendation</h6>
+                                        <p class="mb-0" style="font-size:0.9rem; color:#94a3b8; line-height:1.6;">${result.recommendation}</p>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="bh-card h-100" id="bh-insight">
                                         <div style="font-size:1.5rem; margin-bottom:8px;">🔬</div>
-                                        <h6 class="fw-bold mb-1" style="color:#1e293b;">AI Insight</h6>
-                                        <p class="mb-0" style="font-size:0.9rem; color:#64748b; line-height:1.6;">${result.insight}</p>
+                                        <h6 class="fw-bold mb-1" style="color:#cbd5f5;">AI Insight</h6>
+                                        <p class="mb-0" style="font-size:0.9rem; color:#94a3b8; line-height:1.6;">${result.insight}</p>
                                     </div>
                                 </div>
                             </div>
@@ -984,7 +1378,7 @@
                             <!-- Risk Meter -->
                             <div class="bh-card" id="bh-risk">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h6 class="fw-bold mb-0" style="color:#1e293b;">⚡ Risk Level</h6>
+                                    <h6 class="fw-bold mb-0" style="color:#cbd5f5;">⚡ Risk Level</h6>
                                     <span style="font-weight:700; font-size:1rem;">${riskLabel}</span>
                                 </div>
                                 <div style="position:relative; padding: 8px 0 24px;">
@@ -1059,94 +1453,169 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    const condScore = (result.condition_score ?? 0).toFixed(2);
-                    const predResale = (result.predicted_resale ?? 0).toLocaleString('en-IN', { maximumFractionDigits: 1 });
-                    const userPrice = (result.user_price ?? 0).toLocaleString('en-IN', { maximumFractionDigits: 1 });
+                    const condRaw = result.condition_score ?? 0;
+                    const condScore = condRaw.toFixed(2);
+                    const predResaleRaw = result.predicted_resale ?? 0;
+                    const userPriceRaw = result.user_price ?? 0;
+                    const predResale = predResaleRaw.toLocaleString('en-IN', { maximumFractionDigits: 1 });
+                    const userPrice = userPriceRaw.toLocaleString('en-IN', { maximumFractionDigits: 1 });
                     const priceDiff = (result.price_diff_pct ?? 0).toFixed(2);
                     const rec = result.recommendation || '';
                     const recColor = rec === 'Overpriced' ? '#ef4444' : rec === 'Fair Price' ? '#f59e0b' : '#10b981';
+                    const recBg = rec === 'Overpriced' ? 'rgba(239,68,68,0.12)' : rec === 'Fair Price' ? 'rgba(245,158,11,0.12)' : 'rgba(16,185,129,0.12)';
                     const recIcon = rec === 'Overpriced' ? '⚠️' : rec === 'Fair Price' ? '👍' : '✅';
+                    const condColor = condRaw >= 70 ? '#10b981' : condRaw >= 45 ? '#f59e0b' : '#ef4444';
 
-                    // Condition score colour
-                    const condColor = condScore >= 70 ? '#10b981' : condScore >= 45 ? '#f59e0b' : '#ef4444';
+                    // SVG donut gauge params
+                    const radius = 54, circ = 2 * Math.PI * radius;
+                    const dashOffset = circ - (condRaw / 100) * circ;
+
+                    // Price bar: which is bigger?
+                    const maxPrice = Math.max(predResaleRaw, userPriceRaw);
+                    const predPct = maxPrice > 0 ? (predResaleRaw / maxPrice * 100).toFixed(1) : 0;
+                    const userPct = maxPrice > 0 ? (userPriceRaw / maxPrice * 100).toFixed(1) : 0;
 
                     resultDiv.innerHTML = `
                         <div class="bh-result-wrapper">
 
-                            <!-- Header Row: Condition Score + Recommendation -->
+                            <!-- Row 1: Donut Gauge + Recommendation Badge -->
                             <div class="row g-3 mb-3">
                                 <div class="col-md-6">
                                     <div class="bh-card h-100 text-center" id="vc-cond">
-                                        <h6 class="fw-bold mb-2" style="color:#1e293b;">🔧 Vehicle Condition Score</h6>
-                                        <div style="font-size:2.8rem; font-weight:800; color:${condColor};">${condScore}%</div>
-                                        <div class="bh-metric-bar mt-2">
-                                            <div class="bh-metric-fill" id="condBar" style="background:${condColor}; width:0%;"></div>
+                                        <div style="font-size:0.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#94a3b8;margin-bottom:12px;">🔧 Vehicle Condition Score</div>
+                                        <div style="position:relative;display:inline-block;width:140px;height:140px;margin-bottom:10px;">
+                                            <svg width="140" height="140" viewBox="0 0 140 140">
+                                                <circle cx="70" cy="70" r="${radius}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="14"/>
+                                                <circle id="gaugeArc" cx="70" cy="70" r="${radius}" fill="none"
+                                                    stroke="${condColor}" stroke-width="14"
+                                                    stroke-linecap="round"
+                                                    stroke-dasharray="${circ.toFixed(2)}"
+                                                    stroke-dashoffset="${circ.toFixed(2)}"
+                                                    transform="rotate(-90 70 70)"
+                                                    style="transition: stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1);"
+                                                />
+                                            </svg>
+                                            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                                                <div id="condCounter" style="font-size:1.9rem;font-weight:800;color:${condColor};line-height:1;">0%</div>
+                                                <div style="font-size:0.65rem;color:#64748b;font-weight:600;">SCORE</div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="bh-card h-100 text-center" id="vc-rec">
-                                        <h6 class="fw-bold mb-2" style="color:#1e293b;">📌 Recommendation</h6>
-                                        <div style="font-size:2rem;">${recIcon}</div>
-                                        <div style="font-size:1.4rem; font-weight:800; color:${recColor};">${rec}</div>
+                                    <div class="bh-card h-100 d-flex flex-column align-items-center justify-content-center text-center" id="vc-rec"
+                                         style="border-color:${recColor}40; background:${recBg};">
+                                        <div style="font-size:0.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#94a3b8;margin-bottom:14px;">📌 Recommendation</div>
+                                        <div style="font-size:3rem;margin-bottom:8px;">${recIcon}</div>
+                                        <div style="font-size:1.5rem;font-weight:800;color:${recColor};
+                                            text-shadow: 0 0 20px ${recColor}60;
+                                            animation: pulseRing 2s ease-in-out infinite;">${rec}</div>
+                                        <div style="font-size:0.78rem;color:#64748b;margin-top:8px;">Price diff: <strong style="color:${recColor}">${priceDiff}%</strong></div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Price Table -->
+                            <!-- Row 2: Price Comparison Bars -->
                             <div class="bh-card mb-3" id="vc-prices">
-                                <h6 class="fw-bold mb-3" style="color:#1e293b;">💰 Price Breakdown</h6>
-                                <table class="table table-sm mb-0" style="font-size:0.92rem;">
-                                    <tbody>
-                                        <tr>
-                                            <td class="text-muted">Predicted Resale Price</td>
-                                            <td class="fw-bold text-end">₹${predResale}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-muted">Your Expected Price</td>
-                                            <td class="fw-bold text-end">₹${userPrice}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-muted">Price Difference</td>
-                                            <td class="fw-bold text-end" style="color:${recColor}">${priceDiff}%</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <div style="font-size:0.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#94a3b8;margin-bottom:16px;">💰 Price Comparison</div>
+
+                                <div style="margin-bottom:16px;">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span style="font-size:0.84rem;color:#94a3b8;">AI Predicted Price</span>
+                                        <span style="font-size:0.95rem;font-weight:700;color:#818cf8;">₹${predResale}</span>
+                                    </div>
+                                    <div style="height:10px;border-radius:10px;background:rgba(255,255,255,0.06);overflow:hidden;">
+                                        <div id="predBar" style="height:100%;border-radius:10px;background:linear-gradient(90deg,#6366f1,#818cf8);width:0%;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);"></div>
+                                    </div>
+                                </div>
+
+                                <div style="margin-bottom:8px;">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span style="font-size:0.84rem;color:#94a3b8;">Your Expected Price</span>
+                                        <span style="font-size:0.95rem;font-weight:700;color:${recColor};">₹${userPrice}</span>
+                                    </div>
+                                    <div style="height:10px;border-radius:10px;background:rgba(255,255,255,0.06);overflow:hidden;">
+                                        <div id="userBar" style="height:100%;border-radius:10px;background:linear-gradient(90deg,${recColor}99,${recColor});width:0%;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);"></div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <!-- Fair Price Range -->
+                            <!-- Fair Price Range pill -->
                             ${result.fair_price_range ? `
-                            <div class="alert alert-warning d-flex align-items-center justify-content-center gap-2 mb-3" id="vc-range">
-                                <span style="font-size:1.2rem;">🎯</span>
-                                <div><strong>Fair Market Range:</strong>&nbsp;
-                                    <span class="fs-6 fw-bold text-dark">${result.fair_price_range}</span>
-                                </div>
+                            <div id="vc-range" style="
+                                background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(253,230,138,0.06));
+                                border: 1px solid rgba(245,158,11,0.3);
+                                border-radius: 14px;
+                                padding: 14px 20px;
+                                text-align:center;
+                                margin-bottom:12px;">
+                                <span style="font-size:1.1rem;">🎯</span>
+                                <span style="color:#94a3b8;font-size:0.9rem;font-weight:600;"> Fair Market Range: </span>
+                                <span style="font-size:1rem;font-weight:800;color:#fde68a;">${result.fair_price_range}</span>
                             </div>` : ''}
 
                             <!-- Insights -->
                             ${result.insights && result.insights.length > 0 ? `
                             <div class="bh-card" id="vc-insights">
-                                <h6 class="fw-bold mb-2" style="color:#1e293b;">📌 Insight</h6>
-                                <ul class="list-unstyled text-start mb-0">
-                                    ${result.insights.map(i => `<li class="mb-2" style="font-size:0.92rem; color:#475569;">${i}</li>`).join('')}
-                                </ul>
+                                <div style="font-size:0.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#94a3b8;margin-bottom:12px;">� AI Insights</div>
+                                ${result.insights.map((ins, idx) => `
+                                <div id="ins-${idx}" style="
+                                    display:flex;gap:10px;align-items:flex-start;
+                                    padding:10px 14px;border-radius:10px;margin-bottom:8px;
+                                    background:rgba(106,92,255,0.07);
+                                    border-left: 3px solid rgba(106,92,255,0.5);
+                                    opacity:0;transform:translateX(-12px);
+                                    transition:opacity 0.4s ease,transform 0.4s ease;">
+                                    <span style="font-size:1rem;flex-shrink:0;">👉</span>
+                                    <span style="font-size:0.88rem;color:#cbd5f5;line-height:1.5;">${ins}</span>
+                                </div>`).join('')}
                             </div>` : ''}
 
                         </div>`;
 
-                    // Animate condition bar
+                    // Animate donut gauge
                     setTimeout(() => {
-                        const bar = document.getElementById('condBar');
-                        if (bar) bar.style.width = Math.min(condScore, 100) + '%';
-                    }, 300);
+                        const arc = document.getElementById('gaugeArc');
+                        if (arc) arc.style.strokeDashoffset = dashOffset.toFixed(2);
+                    }, 200);
 
-                    // Animate cards
-                    ['vc-cond', 'vc-rec', 'vc-prices', 'vc-range', 'vc-insights'].forEach((id, i) => {
-                        setTimeout(() => {
-                            const el = document.getElementById(id);
-                            if (el) el.classList.add('visible');
-                        }, 100 + i * 120);
-                    });
+                    // Animate counter
+                    (function animateCounter(target, el) {
+                        let start = 0, duration = 1400, step = 16;
+                        const increment = target / (duration / step);
+                        const timer = setInterval(() => {
+                            start = Math.min(start + increment, target);
+                            if (el) el.textContent = start.toFixed(1) + '%';
+                            if (start >= target) clearInterval(timer);
+                        }, step);
+                    })(condRaw, document.getElementById('condCounter'));
+
+                    // Animate bh-cards (condCard + rec)
+                    setTimeout(() => { const e = document.getElementById('vc-cond'); if (e) e.classList.add('visible'); }, 100);
+                    setTimeout(() => { const e = document.getElementById('vc-rec'); if (e) e.classList.add('visible'); }, 220);
+                    setTimeout(() => { const e = document.getElementById('vc-prices'); if (e) e.classList.add('visible'); }, 350);
+
+                    // Animate price bars
+                    setTimeout(() => {
+                        const pb = document.getElementById('predBar');
+                        const ub = document.getElementById('userBar');
+                        if (pb) pb.style.width = predPct + '%';
+                        if (ub) ub.style.width = userPct + '%';
+                    }, 500);
+
+                    // Animate fair range + insights
+                    setTimeout(() => { const e = document.getElementById('vc-range'); if (e) e.classList.add('visible'); }, 480);
+                    setTimeout(() => { const e = document.getElementById('vc-insights'); if (e) e.classList.add('visible'); }, 600);
+
+                    // Stagger insight rows
+                    if (result.insights) {
+                        result.insights.forEach((_, idx) => {
+                            setTimeout(() => {
+                                const el = document.getElementById(`ins-${idx}`);
+                                if (el) { el.style.opacity = '1'; el.style.transform = 'translateX(0)'; }
+                            }, 700 + idx * 100);
+                        });
+                    }
 
                 } else {
                     throw new Error(result.error || 'Unknown error');
@@ -1200,31 +1669,33 @@
                         {
                             label: 'Forecasted Sales',
                             data: forecastData.values,
-                            borderColor: '#6366f1',
-                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                            borderWidth: 2,
-                            fill: false,
-                            tension: 0.4
+                            borderColor: '#818cf8',
+                            backgroundColor: 'rgba(129, 140, 248, 0.12)',
+                            borderWidth: 2.5,
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#818cf8',
+                            pointRadius: 3,
                         },
                         {
-                            label: 'Confidence Interval (Upper)',
+                            label: 'Upper CI',
                             data: forecastData.upper_ci,
-                            borderColor: 'rgba(99, 102, 241, 0.2)',
-                            backgroundColor: 'rgba(99, 102, 241, 0)',
+                            borderColor: 'rgba(34, 211, 238, 0.3)',
+                            backgroundColor: 'rgba(34, 211, 238, 0)',
                             borderWidth: 1,
-                            borderDash: [5, 5],
+                            borderDash: [6, 4],
                             pointRadius: 0,
                             fill: false
                         },
                         {
-                            label: 'Confidence Interval (Lower)',
+                            label: 'Lower CI',
                             data: forecastData.lower_ci,
-                            borderColor: 'rgba(99, 102, 241, 0.2)',
-                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                            borderColor: 'rgba(34, 211, 238, 0.3)',
+                            backgroundColor: 'rgba(34, 211, 238, 0.06)',
                             borderWidth: 1,
-                            borderDash: [5, 5],
+                            borderDash: [6, 4],
                             pointRadius: 0,
-                            fill: '-1' // Fill to previous dataset
+                            fill: '-1'
                         }
                     ]
                 },
@@ -1234,36 +1705,38 @@
                     plugins: {
                         legend: {
                             position: 'top',
+                            labels: { color: '#cbd5f5', font: { size: 12 } }
                         },
                         title: {
                             display: true,
-                            text: 'EV Sales Forecast'
+                            text: 'EV Sales Forecast',
+                            color: '#e2e8f0',
+                            font: { size: 15, weight: 'bold' }
                         },
                         tooltip: {
                             mode: 'index',
                             intersect: false,
+                            backgroundColor: 'rgba(15,23,42,0.92)',
+                            titleColor: '#e2e8f0',
+                            bodyColor: '#94a3b8',
+                            borderColor: 'rgba(106,92,255,0.3)',
+                            borderWidth: 1
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: false,
-                            title: {
-                                display: true,
-                                text: 'EV Units Sold'
-                            }
+                            grid: { color: 'rgba(255,255,255,0.06)' },
+                            ticks: { color: '#94a3b8' },
+                            title: { display: true, text: 'EV Units Sold', color: '#cbd5f5' }
                         },
                         x: {
-                            title: {
-                                display: true,
-                                text: 'Date'
-                            }
+                            grid: { color: 'rgba(255,255,255,0.06)' },
+                            ticks: { color: '#94a3b8', maxRotation: 45 },
+                            title: { display: true, text: 'Date', color: '#cbd5f5' }
                         }
                     },
-                    interaction: {
-                        mode: 'nearest',
-                        axis: 'x',
-                        intersect: false
-                    }
+                    interaction: { mode: 'nearest', axis: 'x', intersect: false }
                 }
             });
         }
