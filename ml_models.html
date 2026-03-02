@@ -642,52 +642,52 @@
                     <div class="col-md-6">
                         <label class="form-label">Vehicle Age (years)</label>
                         <input type="number" class="form-control form-control-custom" name="vehicle_age_years"
-                            step="0.1" placeholder="e.g. 1" required>
+                            step="0.1" placeholder="e.g. 1" value="1" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Total Charge Cycles</label>
                         <input type="number" class="form-control form-control-custom" name="total_charge_cycles"
-                            placeholder="e.g. 326" required>
+                            placeholder="e.g. 326" value="326" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Max Battery Temperature (°C)</label>
                         <input type="number" class="form-control form-control-custom" name="max_battery_temperature_c"
-                            step="0.1" placeholder="e.g. 36" required>
+                            step="0.1" placeholder="e.g. 36" value="36" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Avg Battery Temperature (°C)</label>
                         <input type="number" class="form-control form-control-custom" name="avg_battery_temperature_c"
-                            step="0.1" placeholder="e.g. 26" required>
+                            step="0.1" placeholder="e.g. 26" value="26" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Avg Charging Time (hours)</label>
                         <input type="number" class="form-control form-control-custom" name="avg_charging_time_hours"
-                            step="0.1" placeholder="e.g. 2" required>
+                            step="0.1" placeholder="e.g. 2" value="2" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Avg Depth of Discharge (%)</label>
                         <input type="number" class="form-control form-control-custom"
-                            name="avg_depth_of_discharge_percent" step="0.1" placeholder="e.g. 56" required>
+                            name="avg_depth_of_discharge_percent" step="0.1" placeholder="e.g. 56" value="56" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Fast Charging Frequency (%)</label>
                         <input type="number" class="form-control form-control-custom"
-                            name="fast_charging_frequency_percent" step="0.1" placeholder="e.g. 5" required>
+                            name="fast_charging_frequency_percent" step="0.1" placeholder="e.g. 5" value="5" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Average Voltage (V)</label>
                         <input type="number" class="form-control form-control-custom" name="avg_voltage" step="0.1"
-                            placeholder="e.g. 3" required>
+                            placeholder="e.g. 3" value="3" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Internal Resistance (mΩ)</label>
                         <input type="number" class="form-control form-control-custom" name="internal_resistance_mohm"
-                            step="0.01" placeholder="e.g. 11" required>
+                            step="0.01" placeholder="e.g. 11" value="11" required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Capacity Retention (%)</label>
                         <input type="number" class="form-control form-control-custom" name="capacity_retention_percent"
-                            step="0.1" placeholder="e.g. 91" required>
+                            step="0.1" placeholder="e.g. 91" value="91" required>
                     </div>
                     <div class="col-12 mt-4">
                         <button type="submit" class="btn-predict" style="max-width: 250px;">Run Diagnosis</button>
@@ -712,12 +712,12 @@
                     <div class="col-md-4">
                         <label class="form-label">Brand</label>
                         <input type="text" class="form-control form-control-custom" name="brand" placeholder="e.g. BYD"
-                            required>
+                            value="BYD" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Vehicle Type</label>
                         <select class="form-select form-control-custom" name="vehicle_type">
-                            <option value="Car">Car</option>
+                            <option value="Car" selected>Car</option>
                             <option value="Bike">Bike</option>
                             <option value="SUV">SUV</option>
                         </select>
@@ -725,42 +725,42 @@
                     <div class="col-md-4">
                         <label class="form-label">Battery Health (%)</label>
                         <input type="number" class="form-control form-control-custom" name="battery_health_pct"
-                            step="0.1" placeholder="e.g. 81" required>
+                            step="0.1" placeholder="e.g. 81" value="81" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Range (km)</label>
                         <input type="number" class="form-control form-control-custom" name="range_km" step="0.1"
-                            placeholder="e.g. 105" required>
+                            placeholder="e.g. 105" value="105" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Top Speed (kmph)</label>
                         <input type="number" class="form-control form-control-custom" name="top_speed_kmph" step="0.1"
-                            placeholder="e.g. 144" required>
+                            placeholder="e.g. 144" value="144" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Odometer Reading (km)</label>
                         <input type="number" class="form-control form-control-custom" name="odometer_km" step="0.1"
-                            placeholder="e.g. 140236" required>
+                            placeholder="e.g. 140236" value="140236" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Warranty Remaining (years)</label>
                         <input type="number" class="form-control form-control-custom" name="warranty_remaining_years"
-                            step="0.1" placeholder="e.g. 1" required>
+                            step="0.1" placeholder="e.g. 1" value="1" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Annual Maintenance Cost</label>
                         <input type="number" class="form-control form-control-custom" name="annual_maintenance_cost"
-                            step="0.01" placeholder="e.g. 32026" required>
+                            step="0.01" placeholder="e.g. 32026" value="32026" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Purchase Price</label>
                         <input type="number" class="form-control form-control-custom" name="Purchase_Price_L"
-                            step="0.01" placeholder="e.g. 2093043" required>
+                            step="0.01" placeholder="e.g. 2093043" value="2093043" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Purchase Year</label>
                         <input type="number" class="form-control form-control-custom" name="Purchase_Year" min="2000"
-                            max="2050" placeholder="e.g. 2023" required>
+                            max="2050" placeholder="e.g. 2023" value="2023" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Current Year</label>
@@ -770,17 +770,17 @@
                     <div class="col-md-4">
                         <label class="form-label">Initial Mileage (km)</label>
                         <input type="number" class="form-control form-control-custom" name="Initial_Mileage" step="0.1"
-                            placeholder="e.g. 202" required>
+                            placeholder="e.g. 202" value="202" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Current Mileage (km)</label>
                         <input type="number" class="form-control form-control-custom" name="Current_Mileage" step="0.1"
-                            placeholder="e.g. 166" required>
+                            placeholder="e.g. 166" value="166" required>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label">Expected Resale Price</label>
                         <input type="number" class="form-control form-control-custom" name="Resale_Value_L" step="0.01"
-                            placeholder="e.g. 1475081" required>
+                            placeholder="e.g. 1475081" value="1475081" required>
                     </div>
                     <div class="col-12 mt-4 text-center">
                         <button type="submit" class="btn-predict" style="max-width: 250px;">Calculate Value</button>
