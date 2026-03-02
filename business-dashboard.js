@@ -640,6 +640,23 @@ window.showSection = function (sectionId) {
     const cleanId = sectionId.replace('section-', '').toLowerCase();
     const targetId = 'section-' + cleanId;
 
+    // Update Header Text dynamically based on section
+    const headers = {
+        'analytics': { title: 'Business Dashboard', subtitle: 'Manage your brand presence and view analytics.' },
+        'advertising': { title: 'Advertising', subtitle: 'Create and manage your EV promotional campaigns.' },
+        'bookings': { title: 'Bookings', subtitle: 'Track and manage user test drives and pre-bookings.' },
+        'ml-models': { title: 'Our ML Models', subtitle: 'Advanced insights and predictive analytics for your EVs.' },
+        'plans': { title: 'Subscription Plans', subtitle: 'Upgrade or manage your current business plan.' },
+        'profile': { title: 'Brand Profile', subtitle: 'Manage your company details and settings.' }
+    };
+
+    if (headers[cleanId]) {
+        const titleEl = document.getElementById('pageTitle');
+        const subtitleEl = document.getElementById('pageSubtitle');
+        if (titleEl) titleEl.innerText = headers[cleanId].title;
+        if (subtitleEl) subtitleEl.innerText = headers[cleanId].subtitle;
+    }
+
     // Hide all
     const sections = ['section-analytics', 'section-advertising', 'section-plans', 'section-profile', 'section-bookings', 'section-ml-models'];
     sections.forEach(id => {
@@ -818,3 +835,147 @@ function renderSalesChart(forecastData) {
         }
     });
 }
+
+// ==========================================
+// 9. ML MODELS (Battery Health)
+// ==========================================
+// Handle Battery Health Prediction
+document.getElementById('batteryHealthForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData.entries());
+
+    // Read user inputs for display
+    const capRetention = parseFloat(data.capacity_retention_percent) || 0;
+    const chargeCycles = parseInt(data.total_charge_cycles) || 0;
+    const maxTemp = parseFloat(data.max_battery_temperature_c) || 0;
+    const fastChargePct = parseFloat(data.fast_charging_frequency_percent) || 0;
+
+    const resultDiv = document.getElementById('predictionResult');
+    resultDiv.classList.remove('d-none');
+    resultDiv.className = 'mt-4';
+    resultDiv.innerHTML = `
+        <div class="bh-card visible p-4 text-center mb-3">
+            <div class="spinner-border text-primary" role="status" style="width:3rem;height:3rem;"></div>
+            <p class="mt-3 text-muted fw-semibold">Analyzing battery health...</p>
+        </div>`;
+
+    try {
+        const response = await fetch('https://ev-4ce7.onrender.com/predict_health', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) throw new Error('API request failed');
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            const orbColor = { 'Healthy': '#10b981', 'Moderate': '#f59e0b', 'Degraded': '#ef4444' }[result.prediction] || '#6b7280';
+            const orbIcon = { 'Healthy': '🔋', 'Moderate': '⚡', 'Degraded': '🔴' }[result.prediction] || '🔋';
+            const riskMarkerLeft = { 'LOW': '10%', 'MODERATE': '48%', 'HIGH': '86%' }[result.risk_level] || '48%';
+            const riskLabel = { 'LOW': '🟢 Low Risk', 'MODERATE': '🟡 Moderate Risk', 'HIGH': '🔴 High Risk' }[result.risk_level] || result.risk_level;
+
+            // Metric bar configs: [label, value, max, color]
+            const metrics = [
+                { label: 'Capacity Retention', value: capRetention, max: 100, color: capRetention > 85 ? '#10b981' : capRetention > 70 ? '#f59e0b' : '#ef4444', unit: '%' },
+                { label: 'Max Temperature', value: maxTemp, max: 80, color: maxTemp < 40 ? '#10b981' : maxTemp < 55 ? '#f59e0b' : '#ef4444', unit: '°C' },
+                { label: 'Charge Cycles', value: Math.min(chargeCycles, 2000), max: 2000, color: chargeCycles < 500 ? '#10b981' : chargeCycles < 1000 ? '#f59e0b' : '#ef4444', unit: ` (${chargeCycles})` },
+                { label: 'Fast Charging Freq', value: fastChargePct, max: 100, color: fastChargePct < 20 ? '#10b981' : fastChargePct < 50 ? '#f59e0b' : '#ef4444', unit: '%' },
+            ];
+
+            const metricHTML = metrics.map((m, i) => `
+                <div style="margin-bottom: 14px;">
+                    <div class="d-flex justify-content-between" style="font-size:0.82rem; font-weight:600; color:#94a3b8;">
+                        <span>${m.label}</span>
+                        <span style="color:${m.color}">${m.value}${m.unit}</span>
+                    </div>
+                    <div class="bh-metric-bar">
+                        <div class="bh-metric-fill" id="bar-${i}" style="background:${m.color};"></div>
+                    </div>
+                </div>`).join('');
+
+            resultDiv.innerHTML = `
+                <div class="bh-result-wrapper">
+                    <!-- Status Orb -->
+                    <div class="text-center mb-4">
+                        <div class="bh-status-orb" style="background: ${orbColor};">
+                            <div>${orbIcon}</div>
+                            <div class="bh-status-label">${result.prediction}</div>
+                        </div>
+                        <p class="text-muted" style="font-size:0.9rem;">AI Battery Diagnosis Complete</p>
+                    </div>
+
+                    <!-- Metric Bars -->
+                    <div class="bh-card mb-3" id="bh-metrics">
+                        <h6 class="fw-bold mb-3" style="color:#cbd5f5;">📊 Key Metrics</h6>
+                        ${metricHTML}
+                    </div>
+
+                    <!-- Recommendation & Insight -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <div class="bh-card h-100" id="bh-rec">
+                                <div style="font-size:1.5rem; margin-bottom:8px;">💡</div>
+                                <h6 class="fw-bold mb-1" style="color:#cbd5f5;">Recommendation</h6>
+                                <p class="mb-0" style="font-size:0.9rem; color:#94a3b8; line-height:1.6;">${result.recommendation}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="bh-card h-100" id="bh-insight">
+                                <div style="font-size:1.5rem; margin-bottom:8px;">🔬</div>
+                                <h6 class="fw-bold mb-1" style="color:#cbd5f5;">AI Insight</h6>
+                                <p class="mb-0" style="font-size:0.9rem; color:#94a3b8; line-height:1.6;">${result.insight}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Meter -->
+                    <div class="bh-card" id="bh-risk">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="fw-bold mb-0" style="color:#cbd5f5;">⚡ Risk Level</h6>
+                            <span style="font-weight:700; font-size:1rem;">${riskLabel}</span>
+                        </div>
+                        <div style="position:relative; padding: 8px 0 24px;">
+                            <div class="bh-risk-bar"></div>
+                            <div class="bh-risk-marker" id="riskMarker" style="left: 0%;"></div>
+                        </div>
+                        <div class="d-flex justify-content-between" style="font-size:0.75rem; color:#94a3b8; font-weight:600; margin-top:-16px;">
+                            <span>Low</span><span>Moderate</span><span>High</span>
+                        </div>
+                    </div>
+                </div>`;
+
+            // Animate cards in sequence
+            const cards = ['bh-metrics', 'bh-rec', 'bh-insight', 'bh-risk'];
+            cards.forEach((id, i) => {
+                setTimeout(() => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('visible');
+                }, 150 + i * 120);
+            });
+
+            // Animate metric bars
+            metrics.forEach((m, i) => {
+                setTimeout(() => {
+                    const bar = document.getElementById(`bar-${i}`);
+                    if (bar) bar.style.width = `${Math.min((m.value / m.max) * 100, 100)}%`;
+                }, 400 + i * 80);
+            });
+
+            // Animate risk marker
+            setTimeout(() => {
+                const marker = document.getElementById('riskMarker');
+                if (marker) marker.style.left = riskMarkerLeft;
+            }, 700);
+
+        } else {
+            throw new Error(result.error || 'Unknown error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        resultDiv.className = 'mt-4 p-3 text-center alert alert-danger';
+        resultDiv.innerText = 'Error connecting to prediction server. Please ensure the Python backend is running.';
+    }
+});

@@ -199,6 +199,296 @@
             display: block;
         }
 
+        /* ===== Battery Health Styles from ml_models ===== */
+        .ml-card {
+            background-color: #131836;
+            background-image: linear-gradient(135deg, rgba(106, 92, 255, 0.12) 0%, rgba(34, 211, 238, 0.06) 100%);
+            color: #f8fafc;
+            border: 1px solid rgba(106, 92, 255, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            height: 100%;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .ml-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(106, 92, 255, 0.2);
+            border-color: rgba(106, 92, 255, 0.5);
+        }
+
+        #batteryHealthForm label.form-label {
+            color: #f8fafc !important;
+            font-weight: 500;
+        }
+
+        .btn-predict {
+            background: linear-gradient(135deg, #6a5cff, #22d3ee);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 700;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(106, 92, 255, 0.4);
+        }
+
+        .btn-predict:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(106, 92, 255, 0.6);
+        }
+
+        .ml-card .form-control-custom {
+            background: rgba(106, 92, 255, 0.08) !important;
+            border: 1px solid rgba(106, 92, 255, 0.2) !important;
+            color: white !important;
+            border-radius: 10px;
+            padding: 0.6rem 1rem;
+        }
+
+        .ml-card .form-control-custom:focus {
+            box-shadow: 0 0 0 3px rgba(106, 92, 255, 0.25) !important;
+            border-color: #6a5cff !important;
+        }
+
+        .bh-status-orb {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2.4rem;
+            font-weight: 800;
+            position: relative;
+            color: white;
+            box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .bh-status-orb::before {
+            content: '';
+            position: absolute;
+            inset: -10px;
+            border-radius: 50%;
+            opacity: 0.25;
+            animation: pulseRing 2s ease-in-out infinite;
+            background: inherit;
+        }
+
+        .bh-status-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .bh-metric-bar {
+            height: 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .bh-metric-fill {
+            height: 100%;
+            border-radius: 8px;
+            width: 0;
+            transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .bh-card {
+            background-color: #131836;
+            background-image: linear-gradient(135deg, rgba(106, 92, 255, 0.08) 0%, rgba(34, 211, 238, 0.03) 100%);
+            border-radius: 16px;
+            border: 1px solid rgba(106, 92, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            padding: 1.2rem 1.5rem;
+            color: white;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .bh-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .bh-card h6,
+        .bh-card p,
+        .bh-card li,
+        .bh-card .text-muted {
+            color: #cbd5f5 !important;
+        }
+
+        .ml-card .slider-val-display {
+            display: inline-block;
+            background: linear-gradient(135deg, #6a5cff, #22d3ee);
+            color: white;
+            font-weight: 700;
+            font-size: 0.82rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            min-width: 54px;
+            text-align: center;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .ml-card input[type=range].range-custom {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 6px;
+            background: rgba(106, 92, 255, 0.25);
+            outline: none;
+            margin: 6px 0 2px;
+        }
+
+        .ml-card input[type=range].range-custom::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6a5cff, #22d3ee);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(106, 92, 255, 0.4);
+            transition: transform 0.15s;
+        }
+
+        .ml-card input[type=range].range-custom::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+        }
+
+        .ml-card .field-tooltip {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background: rgba(106, 92, 255, 0.3);
+            border-radius: 50%;
+            font-size: 0.65rem;
+            text-align: center;
+            line-height: 16px;
+            cursor: pointer;
+            margin-left: 5px;
+            color: #cbd5f5;
+            font-weight: 700;
+            position: relative;
+            top: -1px;
+            border: 1px solid rgba(106, 92, 255, 0.4);
+        }
+
+        .ml-card .field-tooltip:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            left: 120%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.78rem;
+            white-space: nowrap;
+            max-width: 220px;
+            white-space: normal;
+            width: 200px;
+            z-index: 9999;
+            border: 1px solid rgba(106, 92, 255, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            line-height: 1.4;
+            font-weight: 400;
+        }
+
+        .form-control-custom.is-valid {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
+        }
+
+        .form-control-custom.is-invalid {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+        }
+
+        .field-error {
+            font-size: 0.76rem;
+            color: #f87171;
+            margin-top: 3px;
+            display: none;
+        }
+
+        .field-error.show {
+            display: block;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-result-action {
+            padding: 0.5rem 1.2rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(106, 92, 255, 0.4);
+            background: rgba(106, 92, 255, 0.12);
+            color: #cbd5f5;
+        }
+
+        .btn-result-action:hover {
+            background: rgba(106, 92, 255, 0.28);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        @keyframes pulseRing {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .bh-risk-bar {
+            height: 14px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #10b981 0%, #f59e0b 50%, #ef4444 100%);
+            position: relative;
+            margin-top: 10px;
+        }
+
+        .bh-risk-marker {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #334155;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: left 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             body {
@@ -292,8 +582,8 @@
         <!-- HEADER -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h2 class="fw-bold mb-0">Business Dashboard</h2>
-                <p class="text-muted">Manage your brand presence and view analytics.</p>
+                <h2 class="fw-bold mb-0" id="pageTitle">Business Dashboard</h2>
+                <p class="text-muted" id="pageSubtitle">Manage your brand presence and view analytics.</p>
             </div>
             <div class="bg-white px-3 py-2 rounded-pill shadow-sm">
                 <span class="fw-bold text-primary" id="brandNameDisplay">Select Brand...</span>
@@ -758,6 +1048,171 @@
 
         <!-- ML MODELS SECTION -->
         <div id="section-ml-models" style="display: none;">
+
+            <!-- ML Disclaimer -->
+            <div class="alert d-flex align-items-center mb-4 shadow-sm" role="alert"
+                style="background: #1e293b; border: 1px solid rgba(245, 158, 11, 0.4); color: #fde68a; border-radius: 12px; padding: 1rem; animation: slideDown 0.5s ease-out;">
+                <div style="font-size: 1.5rem; margin-right: 15px;">⚠️</div>
+                <div>
+                    <strong>AI Disclaimer:</strong> The predictions provided by our Machine Learning models are
+                    estimates
+                    based on learned data patterns. These models can occasionally make mistakes or display variances
+                    from
+                    real-world conditions. Please use these results as guidance and not as absolute financial or
+                    technical
+                    guarantees.
+                </div>
+            </div>
+
+            <!-- Battery Health Model -->
+            <div class="ml-card mb-5">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div>
+                        <h3 class="fw-bold mb-1">Battery Health Analysis</h3>
+                        <p class="text-muted mb-0" style="color: #cbd5e1 !important;">Enter technical parameters for
+                            precise health estimation</p>
+                    </div>
+                </div>
+
+                <form id="batteryHealthForm">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Vehicle Age (years) <span class="field-tooltip"
+                                    data-tip="How many years since the vehicle was first registered.">?</span></label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="range" class="range-custom flex-grow-1" min="0" max="15" step="0.5"
+                                    value="1" oninput="syncInput(this,'bh_age_num')">
+                                <span class="slider-val-display" id="bh_age_disp">1</span>
+                            </div>
+                            <input type="number" class="form-control form-control-custom mt-1" id="bh_age_num"
+                                name="vehicle_age_years" step="0.1" value="1" required
+                                oninput="syncSlider(this,'bh_age_num',0,15,'bh_age_disp')">
+                            <div class="field-error" id="err_age">Must be between 0 and 15 years.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Total Charge Cycles <span class="field-tooltip"
+                                    data-tip="Number of full charge-discharge cycles completed.">?</span></label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="range" class="range-custom flex-grow-1" min="0" max="2000" step="10"
+                                    value="326" oninput="syncInput(this,'bh_cycles_num')">
+                                <span class="slider-val-display" id="bh_cycles_disp">326</span>
+                            </div>
+                            <input type="number" class="form-control form-control-custom mt-1" id="bh_cycles_num"
+                                name="total_charge_cycles" value="326" required
+                                oninput="syncSlider(this,'bh_cycles_num',0,2000,'bh_cycles_disp')">
+                            <div class="field-error" id="err_cycles">Must be between 0 and 2000.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Max Battery Temperature (°C) <span class="field-tooltip"
+                                    data-tip="Peak temperature recorded, higher values accelerate degradation.">?</span></label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="range" class="range-custom flex-grow-1" min="0" max="80" step="0.5"
+                                    value="36" oninput="syncInput(this,'bh_maxtemp_num')">
+                                <span class="slider-val-display" id="bh_maxtemp_disp">36</span>
+                            </div>
+                            <input type="number" class="form-control form-control-custom mt-1" id="bh_maxtemp_num"
+                                name="max_battery_temperature_c" step="0.1" value="36" required
+                                oninput="syncSlider(this,'bh_maxtemp_num',0,80,'bh_maxtemp_disp')">
+                            <div class="field-error" id="err_maxtemp">Must be between 0 and 80°C.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Avg Battery Temperature (°C) <span class="field-tooltip"
+                                    data-tip="Typical operating temperature during normal use.">?</span></label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="range" class="range-custom flex-grow-1" min="0" max="60" step="0.5"
+                                    value="26" oninput="syncInput(this,'bh_avgtemp_num')">
+                                <span class="slider-val-display" id="bh_avgtemp_disp">26</span>
+                            </div>
+                            <input type="number" class="form-control form-control-custom mt-1" id="bh_avgtemp_num"
+                                name="avg_battery_temperature_c" step="0.1" value="26" required
+                                oninput="syncSlider(this,'bh_avgtemp_num',0,60,'bh_avgtemp_disp')">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Avg Charging Time (hours) <span class="field-tooltip"
+                                    data-tip="Average time taken to charge from 0-100%.">?</span></label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="range" class="range-custom flex-grow-1" min="0.5" max="24" step="0.5"
+                                    value="2" oninput="syncInput(this,'bh_chgtime_num')">
+                                <span class="slider-val-display" id="bh_chgtime_disp">2</span>
+                            </div>
+                            <input type="number" class="form-control form-control-custom mt-1" id="bh_chgtime_num"
+                                name="avg_charging_time_hours" step="0.1" value="2" required
+                                oninput="syncSlider(this,'bh_chgtime_num',0.5,24,'bh_chgtime_disp')">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Avg Depth of Discharge (%) <span class="field-tooltip"
+                                    data-tip="How far the battery is typically drained before recharging — lower is better.">?</span></label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="range" class="range-custom flex-grow-1" min="0" max="100" step="1"
+                                    value="56" oninput="syncInput(this,'bh_dod_num')">
+                                <span class="slider-val-display" id="bh_dod_disp">56%</span>
+                            </div>
+                            <input type="number" class="form-control form-control-custom mt-1" id="bh_dod_num"
+                                name="avg_depth_of_discharge_percent" step="0.1" value="56" required
+                                oninput="syncSlider(this,'bh_dod_num',0,100,'bh_dod_disp','%')">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Fast Charging Frequency (%) <span class="field-tooltip"
+                                    data-tip="% of sessions using DC fast charging — higher values degrade the battery faster.">?</span></label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="range" class="range-custom flex-grow-1" min="0" max="100" step="1"
+                                    value="5" oninput="syncInput(this,'bh_fastchg_num')">
+                                <span class="slider-val-display" id="bh_fastchg_disp">5%</span>
+                            </div>
+                            <input type="number" class="form-control form-control-custom mt-1" id="bh_fastchg_num"
+                                name="fast_charging_frequency_percent" step="0.1" value="5" required
+                                oninput="syncSlider(this,'bh_fastchg_num',0,100,'bh_fastchg_disp','%')">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Average Voltage (V) <span class="field-tooltip"
+                                    data-tip="Mean cell voltage during operation (nominal ~3.6V for Li-ion).">?</span></label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="range" class="range-custom flex-grow-1" min="2" max="5" step="0.1"
+                                    value="3" oninput="syncInput(this,'bh_volt_num')">
+                                <span class="slider-val-display" id="bh_volt_disp">3V</span>
+                            </div>
+                            <input type="number" class="form-control form-control-custom mt-1" id="bh_volt_num"
+                                name="avg_voltage" step="0.1" value="3" required
+                                oninput="syncSlider(this,'bh_volt_num',2,5,'bh_volt_disp','V')">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Internal Resistance (mΩ) <span class="field-tooltip"
+                                    data-tip="Higher resistance = reduced power delivery & capacity. Rising values signal ageing.">?</span></label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="range" class="range-custom flex-grow-1" min="1" max="100" step="0.5"
+                                    value="11" oninput="syncInput(this,'bh_resist_num')">
+                                <span class="slider-val-display" id="bh_resist_disp">11</span>
+                            </div>
+                            <input type="number" class="form-control form-control-custom mt-1" id="bh_resist_num"
+                                name="internal_resistance_mohm" step="0.01" value="11" required
+                                oninput="syncSlider(this,'bh_resist_num',1,100,'bh_resist_disp')">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Capacity Retention (%) <span class="field-tooltip"
+                                    data-tip="Current capacity vs original — above 80% is generally considered healthy.">?</span></label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="range" class="range-custom flex-grow-1" min="0" max="100" step="0.5"
+                                    value="91" oninput="syncInput(this,'bh_cap_num')">
+                                <span class="slider-val-display" id="bh_cap_disp">91%</span>
+                            </div>
+                            <input type="number" class="form-control form-control-custom mt-1" id="bh_cap_num"
+                                name="capacity_retention_percent" step="0.1" value="91" required
+                                oninput="syncSlider(this,'bh_cap_num',0,100,'bh_cap_disp','%')">
+                        </div>
+                        <div class="col-12 mt-4 d-flex align-items-center gap-3">
+                            <button type="submit" class="btn-predict" style="max-width: 220px;">🔬 Run
+                                Diagnosis</button>
+                            <button type="button" class="btn-result-action" onclick="resetBatteryForm()">↺
+                                Reset</button>
+                        </div>
+                    </div>
+                    <!-- Result Area -->
+                    <div id="predictionResult" class="mt-4 d-none"></div>
+                </form>
+            </div>
+
+
+
             <div class="card-custom mb-4"
                 style="background: #1e293b; color: #f8fafc; border: 1px solid rgba(106, 92, 255, 0.2);">
                 <div class="d-flex align-items-center justify-content-between mb-3">
@@ -765,21 +1220,6 @@
                         <h3 class="fw-bold mb-1">EV Sales Forecast</h3>
                         <p class="text-muted mb-0" style="color: #cbd5e1 !important;">Historical data and future
                             predictions</p>
-                    </div>
-                </div>
-
-                <!-- ML Disclaimer -->
-                <div class="alert d-flex align-items-center mb-4 shadow-sm" role="alert"
-                    style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: #fde68a; border-radius: 12px; padding: 1rem; animation: slideDown 0.5s ease-out;">
-                    <div style="font-size: 1.5rem; margin-right: 15px;">⚠️</div>
-                    <div>
-                        <strong>AI Disclaimer:</strong> The predictions provided by our Machine Learning models are
-                        estimates
-                        based on learned data patterns. These models can occasionally make mistakes or display variances
-                        from
-                        real-world conditions. Please use these results as guidance and not as absolute financial or
-                        technical
-                        guarantees.
                     </div>
                 </div>
 
@@ -854,6 +1294,82 @@
     <script type="module" src="business-dashboard.js"></script>
 
     <script>
+        // Sync slider -> number input + badge display
+        function syncInput(rangeEl, numId, unit) {
+            const numEl = document.getElementById(numId);
+            if (numEl) numEl.value = rangeEl.value;
+            const disp = rangeEl.parentElement.querySelector('.slider-val-display');
+            if (disp) disp.textContent = rangeEl.value + (unit || '');
+            if (numEl) {
+                numEl.classList.remove('is-invalid');
+                numEl.classList.add('is-valid');
+            }
+        }
+
+        // Sync number input -> closest range slider + badge
+        function syncSlider(numEl, numId, min, max, dispId, unit) {
+            unit = unit || '';
+            let v = parseFloat(numEl.value);
+            const disp = document.getElementById(dispId);
+            const rangeEl = numEl.closest('.col-md-6, .col-md-4, .col-12')
+                ?.querySelector('input[type="range"]');
+            if (!isNaN(v)) {
+                v = Math.min(Math.max(v, min), max);
+                if (rangeEl) rangeEl.value = v;
+                if (disp) disp.textContent = v + unit;
+                numEl.classList.remove('is-invalid');
+                numEl.classList.add('is-valid');
+            } else {
+                numEl.classList.add('is-invalid');
+                numEl.classList.remove('is-valid');
+            }
+        }
+
+        // Reset Battery Health form
+        function resetBatteryForm() {
+            document.getElementById('batteryHealthForm').reset();
+            const defaults = {
+                bh_age_disp: '1', bh_cycles_disp: '326', bh_maxtemp_disp: '36',
+                bh_avgtemp_disp: '26', bh_chgtime_disp: '2', bh_dod_disp: '56%',
+                bh_fastchg_disp: '5%', bh_volt_disp: '3V', bh_resist_disp: '11', bh_cap_disp: '91%'
+            };
+            Object.entries(defaults).forEach(([id, val]) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val;
+            });
+            document.querySelectorAll('#batteryHealthForm input[type="range"]').forEach(r => {
+                const numId = r.getAttribute('oninput').match(/'([^']+)'\)/)?.[1];
+                const numEl = document.getElementById(numId);
+                if (numEl) r.value = numEl.defaultValue;
+            });
+            const res = document.getElementById('predictionResult');
+            if (res) { res.innerHTML = ''; res.classList.add('d-none'); }
+            document.querySelectorAll('#batteryHealthForm .form-control-custom').forEach(el => {
+                el.classList.remove('is-valid', 'is-invalid');
+            });
+        }
+
+
+
+        // Live validation on all form inputs
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.form-control-custom[required]').forEach(input => {
+                input.addEventListener('blur', () => {
+                    if (input.value && input.checkValidity()) {
+                        input.classList.add('is-valid');
+                        input.classList.remove('is-invalid');
+                    } else if (!input.value && input.hasAttribute('required')) {
+                        input.classList.add('is-invalid');
+                        input.classList.remove('is-valid');
+                    }
+                });
+                input.addEventListener('input', () => {
+                    if (input.value) {
+                        input.classList.remove('is-invalid');
+                    }
+                });
+            });
+        });
 
         // Plan Selection
         let selectedPlan = null;
