@@ -719,8 +719,8 @@ window.updateDurationHint = function () {
         hint.innerText = "Enter years (e.g. 5)";
         if (input.value > 10) input.value = 5;
     } else {
-        hint.innerText = "Enter months (e.g. 12)";
-        if (input.value < 12) input.value = 12;
+        hint.innerText = "Enter months (e.g. 36)";
+        if (input.value < 12) input.value = 36;
     }
 };
 
@@ -728,7 +728,7 @@ window.loadForecast = async function () {
     const steps = document.getElementById('forecastSteps').value;
     const granularity = document.getElementById('forecastGranularity').value;
     const errorDiv = document.getElementById('salesError');
-    if(errorDiv) errorDiv.classList.add('d-none');
+    if (errorDiv) errorDiv.classList.add('d-none');
 
     try {
         const response = await fetch(`https://ev-4ce7.onrender.com/predict_sales?steps=${steps}&granularity=${granularity}`);
@@ -743,7 +743,7 @@ window.loadForecast = async function () {
         }
     } catch (error) {
         console.error('Error:', error);
-        if(errorDiv) {
+        if (errorDiv) {
             errorDiv.innerText = 'Error loading forecast: ' + error.message;
             errorDiv.classList.remove('d-none');
         }

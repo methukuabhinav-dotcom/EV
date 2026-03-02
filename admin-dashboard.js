@@ -1008,8 +1008,8 @@ window.updateDurationHint = function () {
     hint.innerText = "Enter years (e.g. 5)";
     if (input.value > 10) input.value = 5;
   } else {
-    hint.innerText = "Enter months (e.g. 12)";
-    if (input.value < 12) input.value = 12;
+    hint.innerText = "Enter months (e.g. 36)";
+    if (input.value < 12) input.value = 36;
   }
 };
 
