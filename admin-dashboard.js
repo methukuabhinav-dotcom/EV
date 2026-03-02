@@ -279,44 +279,88 @@ window.switchTab = function (tab) {
   const evTab = document.getElementById("tab-ev");
   const userTab = document.getElementById("tab-users");
   const bookingsTab = document.getElementById("tab-bookings");
+  const mainTabs = document.getElementById("mainDashboardTabs");
+  const titleEl = document.getElementById("mainDashboardTitle");
+  const descEl = document.getElementById("mainDashboardDesc");
 
   // Hide all sections first
-  const sections = ["ev-insights", "user-analytics", "ad-manager", "vehicles-booked", "user-revenue", "business-revenue"];
+  const sections = ["ev-insights", "user-analytics", "ad-manager", "vehicles-booked", "user-revenue", "business-revenue", "ml-models"];
   sections.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = "none";
   });
 
   // Deactivate all tabs
-  [evTab, userTab, document.getElementById("tab-ads"), bookingsTab].forEach(t => {
+  [evTab, userTab, document.getElementById("tab-ads"), bookingsTab, document.getElementById("tab-ml-models")].forEach(t => {
     if (t) t.classList.remove("active");
   });
 
-  // Sidebar links active state
+  // Sidebar links active state (Update styling on active choice)
   document.querySelectorAll('.nav-link-custom').forEach(l => l.classList.remove('active'));
+
+  // Reset standard Admin Dashboard headers by default
+  if (mainTabs) mainTabs.style.display = 'flex';
+  if (titleEl) titleEl.innerText = "Admin Dashboard";
+  if (descEl) descEl.innerText = "Comprehensive EV market insights and user analytics.";
 
   if (tab === 'ev') {
     document.getElementById("ev-insights").style.display = "block";
     evTab.classList.add("active");
+    // Ensure "Admin Dashboard" sidebar link is active when in these original tabs
+    const adminLink = document.querySelector('a[href="admin-dashboard.html"]');
+    if (adminLink) adminLink.classList.add('active');
     updateDashboard(); // Refresh EV data
   } else if (tab === 'users') {
     document.getElementById("user-analytics").style.display = "block";
     userTab.classList.add("active");
+    const adminLink = document.querySelector('a[href="admin-dashboard.html"]');
+    if (adminLink) adminLink.classList.add('active');
     updateUserAnalytics();
   } else if (tab === 'ads') {
     document.getElementById("ad-manager").style.display = "block";
     document.getElementById("tab-ads").classList.add("active");
+    const adminLink = document.querySelector('a[href="admin-dashboard.html"]');
+    if (adminLink) adminLink.classList.add('active');
     updateAdManager();
   } else if (tab === 'bookings') {
     document.getElementById("vehicles-booked").style.display = "block";
     bookingsTab.classList.add("active");
+    const adminLink = document.querySelector('a[href="admin-dashboard.html"]');
+    if (adminLink) adminLink.classList.add('active');
     loadBookedVehicles();
   } else if (tab === 'user-revenue') {
     document.getElementById("user-revenue").style.display = "block";
+
+    // UI Override for User Revenue
+    if (mainTabs) mainTabs.style.display = 'none';
+    if (titleEl) titleEl.innerText = "User Revenue";
+    if (descEl) descEl.innerText = "Tracking and analytics for end-user financials.";
+    const sidebarLink = document.querySelector('a[onclick="switchTab(\'user-revenue\')"]');
+    if (sidebarLink) sidebarLink.classList.add('active');
+
     updateUserRevenue();
   } else if (tab === 'business-revenue') {
     document.getElementById("business-revenue").style.display = "block";
+
+    // UI Override for Business Revenue
+    if (mainTabs) mainTabs.style.display = 'none';
+    if (titleEl) titleEl.innerText = "Business Revenue";
+    if (descEl) descEl.innerText = "Financial tracking for business accounts and ad promotions.";
+    const sidebarLink = document.querySelector('a[onclick="switchTab(\'business-revenue\')"]');
+    if (sidebarLink) sidebarLink.classList.add('active');
+
     updateBusinessRevenue();
+  } else if (tab === 'ml-models') {
+    document.getElementById("ml-models").style.display = "block";
+
+    // UI Override for ML Models
+    if (mainTabs) mainTabs.style.display = 'none';
+    if (titleEl) titleEl.innerText = "Our ML Models";
+    if (descEl) descEl.innerText = "Direct access to AI/ML forecasting models.";
+    const sidebarLink = document.querySelector('a[onclick="switchTab(\'ml-models\')"]');
+    if (sidebarLink) sidebarLink.classList.add('active');
+
+    window.loadForecast();
   }
 }
 
@@ -950,3 +994,119 @@ window.updateBusinessRevenue = async function () {
   }
 }
 
+// ==========================================
+// 8. ML MODELS (Sales Forecast)
+// ==========================================
+let salesChart = null;
+
+window.updateDurationHint = function () {
+  const gran = document.getElementById('forecastGranularity').value;
+  const input = document.getElementById('forecastSteps');
+  const hint = document.getElementById('durationHint');
+
+  if (gran === 'yearly') {
+    hint.innerText = "Enter years (e.g. 5)";
+    if (input.value > 10) input.value = 5;
+  } else {
+    hint.innerText = "Enter months (e.g. 12)";
+    if (input.value < 12) input.value = 12;
+  }
+};
+
+window.loadForecast = async function () {
+  const steps = document.getElementById('forecastSteps').value;
+  const granularity = document.getElementById('forecastGranularity').value;
+  const errorDiv = document.getElementById('salesError');
+  if (errorDiv) errorDiv.classList.add('d-none');
+
+  try {
+    const response = await fetch(`https://ev-4ce7.onrender.com/predict_sales?steps=${steps}&granularity=${granularity}`);
+    if (!response.ok) throw new Error('Failed to fetch forecast');
+
+    const result = await response.json();
+
+    if (result.status === 'success') {
+      renderSalesChart(result.forecast);
+    } else {
+      throw new Error(result.error);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    if (errorDiv) {
+      errorDiv.innerText = 'Error loading forecast: ' + error.message;
+      errorDiv.classList.remove('d-none');
+    }
+  }
+};
+
+function renderSalesChart(forecastData) {
+  const ctx = document.getElementById('salesChart').getContext('2d');
+
+  if (salesChart) {
+    salesChart.destroy();
+  }
+
+  salesChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: forecastData.dates,
+      datasets: [
+        {
+          label: 'Forecasted Sales',
+          data: forecastData.values,
+          borderColor: '#6366f1',
+          backgroundColor: 'rgba(99, 102, 241, 0.12)',
+          borderWidth: 2.5,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#6366f1',
+          pointRadius: 3,
+        },
+        {
+          label: 'Upper CI',
+          data: forecastData.upper_ci,
+          borderColor: 'rgba(34, 211, 238, 0.3)',
+          backgroundColor: 'rgba(34, 211, 238, 0)',
+          borderWidth: 1,
+          borderDash: [6, 4],
+          pointRadius: 0,
+          fill: false
+        },
+        {
+          label: 'Lower CI',
+          data: forecastData.lower_ci,
+          borderColor: 'rgba(34, 211, 238, 0.3)',
+          backgroundColor: 'rgba(34, 211, 238, 0.06)',
+          borderWidth: 1,
+          borderDash: [6, 4],
+          pointRadius: 0,
+          fill: '-1'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { color: '#cbd5f5', font: { size: 12 } }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          grid: { color: 'rgba(0,0,0,0.06)' },
+          ticks: { color: '#94a3b8' },
+          title: { display: true, text: 'EV Units Sold', color: '#94a3b8' }
+        },
+        x: {
+          grid: { color: 'rgba(0,0,0,0.06)' },
+          ticks: { color: '#94a3b8', maxRotation: 45 },
+          title: { display: true, text: 'Date', color: '#94a3b8' }
+        }
+      },
+      interaction: { mode: 'nearest', axis: 'x', intersect: false }
+    }
+  });
+}

@@ -270,12 +270,16 @@
             <button class="nav-link-custom" onclick="showSection('bookings')">
                 <span>🛒</span> Bookings
             </button>
+            <button class="nav-link-custom" onclick="showSection('ml-models')">
+                <span>🤖</span> Our ML Models
+            </button>
             <button class="nav-link-custom" onclick="showSection('plans')">
                 <span>💳</span> Plans
             </button>
             <button class="nav-link-custom" onclick="showSection('profile')">
                 <span>👤</span> Profile
             </button>
+
             <a href="index.html" class="nav-link-custom mt-auto">
                 <span>🚪</span> Back to Home
             </a>
@@ -749,6 +753,66 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- ML MODELS SECTION -->
+        <div id="section-ml-models" style="display: none;">
+            <div class="card-custom mb-4"
+                style="background: #1e293b; color: #f8fafc; border: 1px solid rgba(106, 92, 255, 0.2);">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div>
+                        <h3 class="fw-bold mb-1">EV Sales Forecast</h3>
+                        <p class="text-muted mb-0" style="color: #cbd5e1 !important;">Historical data and future
+                            predictions</p>
+                    </div>
+                </div>
+
+                <!-- ML Disclaimer -->
+                <div class="alert d-flex align-items-center mb-4 shadow-sm" role="alert"
+                    style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: #fde68a; border-radius: 12px; padding: 1rem; animation: slideDown 0.5s ease-out;">
+                    <div style="font-size: 1.5rem; margin-right: 15px;">⚠️</div>
+                    <div>
+                        <strong>AI Disclaimer:</strong> The predictions provided by our Machine Learning models are
+                        estimates
+                        based on learned data patterns. These models can occasionally make mistakes or display variances
+                        from
+                        real-world conditions. Please use these results as guidance and not as absolute financial or
+                        technical
+                        guarantees.
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Granularity</label>
+                        <select class="form-select" id="forecastGranularity" onchange="window.updateDurationHint()"
+                            style="background: rgba(106, 92, 255, 0.08); border: 1px solid rgba(106, 92, 255, 0.2); color: white;">
+                            <option value="monthly" selected style="background: #1e293b; color: white;">Monthly</option>
+                            <option value="yearly" style="background: #1e293b; color: white;">Yearly</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Duration</label>
+                        <div class="input-group">
+                            <input type="number" id="forecastSteps" class="form-control" value="12" min="1" max="60"
+                                style="background: rgba(106, 92, 255, 0.08); border: 1px solid rgba(106, 92, 255, 0.2); color: white;">
+                        </div>
+                        <small class="text-muted" id="durationHint" style="color: #94a3b8 !important;">Enter months
+                            (e.g. 12)</small>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label d-none d-md-block">&nbsp;</label>
+                        <button class="btn btn-primary w-100" onclick="window.loadForecast()"
+                            style="background: #6a5cff; border: none;">Update Forecast</button>
+                    </div>
+                </div>
+
+                <div style="height: 400px; position: relative;">
+                    <canvas id="salesChart"></canvas>
+                </div>
+
+                <div id="salesError" class="alert alert-danger mt-3 d-none"></div>
             </div>
         </div>
     </main>

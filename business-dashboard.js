@@ -641,7 +641,7 @@ window.showSection = function (sectionId) {
     const targetId = 'section-' + cleanId;
 
     // Hide all
-    const sections = ['section-analytics', 'section-advertising', 'section-plans', 'section-profile', 'section-bookings'];
+    const sections = ['section-analytics', 'section-advertising', 'section-plans', 'section-profile', 'section-bookings', 'section-ml-models'];
     sections.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
@@ -661,6 +661,7 @@ window.showSection = function (sectionId) {
     if (cleanId === 'bookings') loadBrandBookings();
     if (cleanId === 'ads' || cleanId === 'advertising') checkAdStatus(); // ensure ad status is fresh
     if (['analytics', 'advertising', 'plans', 'profile'].includes(cleanId)) checkAdStatus();
+    if (cleanId === 'ml-models') window.loadForecast();
 
     // Update Sidebar Active State
     document.querySelectorAll('.nav-link-custom').forEach(el => {
@@ -702,4 +703,118 @@ window.startRazorpayPayment = function (amount, brandEmail, onSuccess) {
         alert("Payment Failed: " + response.error.description);
     });
     rzp1.open();
+}
+
+// ==========================================
+// 8. ML MODELS (Sales Forecast)
+// ==========================================
+let salesChart = null;
+
+window.updateDurationHint = function () {
+    const gran = document.getElementById('forecastGranularity').value;
+    const input = document.getElementById('forecastSteps');
+    const hint = document.getElementById('durationHint');
+
+    if (gran === 'yearly') {
+        hint.innerText = "Enter years (e.g. 5)";
+        if (input.value > 10) input.value = 5;
+    } else {
+        hint.innerText = "Enter months (e.g. 12)";
+        if (input.value < 12) input.value = 12;
+    }
+};
+
+window.loadForecast = async function () {
+    const steps = document.getElementById('forecastSteps').value;
+    const granularity = document.getElementById('forecastGranularity').value;
+    const errorDiv = document.getElementById('salesError');
+    if(errorDiv) errorDiv.classList.add('d-none');
+
+    try {
+        const response = await fetch(`https://ev-4ce7.onrender.com/predict_sales?steps=${steps}&granularity=${granularity}`);
+        if (!response.ok) throw new Error('Failed to fetch forecast');
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            renderSalesChart(result.forecast);
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        if(errorDiv) {
+            errorDiv.innerText = 'Error loading forecast: ' + error.message;
+            errorDiv.classList.remove('d-none');
+        }
+    }
+};
+
+function renderSalesChart(forecastData) {
+    const ctx = document.getElementById('salesChart').getContext('2d');
+
+    if (salesChart) {
+        salesChart.destroy();
+    }
+
+    salesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: forecastData.dates,
+            datasets: [
+                {
+                    label: 'Forecasted Sales',
+                    data: forecastData.values,
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.12)',
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#6366f1',
+                    pointRadius: 3,
+                },
+                {
+                    label: 'Upper CI',
+                    data: forecastData.upper_ci,
+                    borderColor: 'rgba(34, 211, 238, 0.3)',
+                    backgroundColor: 'rgba(34, 211, 238, 0)',
+                    borderWidth: 1,
+                    borderDash: [6, 4],
+                    pointRadius: 0,
+                    fill: false
+                },
+                {
+                    label: 'Lower CI',
+                    data: forecastData.lower_ci,
+                    borderColor: 'rgba(34, 211, 238, 0.3)',
+                    backgroundColor: 'rgba(34, 211, 238, 0.06)',
+                    borderWidth: 1,
+                    borderDash: [6, 4],
+                    pointRadius: 0,
+                    fill: '-1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { font: { size: 12 } }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    title: { display: true, text: 'EV Units Sold' }
+                },
+                x: {
+                    ticks: { maxRotation: 45 },
+                    title: { display: true, text: 'Date' }
+                }
+            },
+            interaction: { mode: 'nearest', axis: 'x', intersect: false }
+        }
+    });
 }

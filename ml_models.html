@@ -823,23 +823,6 @@
             </div>
         </div>
 
-        <!-- Sales Forecast Card -->
-        <div class="row g-4 mb-5">
-            <div class="col-12">
-                <div class="ml-card">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="ml-icon-wrapper mb-0 me-3">
-                            📈
-                        </div>
-                        <div>
-                            <h3 class="mb-1">EV Sales Forecasting</h3>
-                            <p class="mb-0 text-muted">Predict future EV sales trends using historical data.</p>
-                        </div>
-                    </div>
-                    <button class="btn-predict" onclick="showForm('sales')">View Forecast</button>
-                </div>
-            </div>
-        </div>
 
         <!-- Battery Health Form Section -->
         <div id="batteryFormSection" class="form-section d-none">
@@ -1093,45 +1076,6 @@
             </form>
         </div>
 
-        <!-- Sales Forecast Section -->
-        <div id="salesFormSection" class="form-section d-none">
-            <div class="form-header">
-                <div>
-                    <h3 class="fw-bold mb-1">EV Sales Forecast</h3>
-                    <p class="text-muted mb-0">Historical data and future predictions</p>
-                </div>
-                <button class="btn-close-form" onclick="closeForms()">✕</button>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <label class="form-label">Duration</label>
-                    <div class="input-group">
-                        <input type="number" id="forecastSteps" class="form-control form-control-custom" value="12"
-                            min="1" max="60">
-                    </div>
-                    <small class="text-muted" id="durationHint">Enter months (e.g. 12)</small>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Granularity</label>
-                    <select class="form-select form-control-custom" id="forecastGranularity"
-                        onchange="updateDurationHint()">
-                        <option value="monthly" selected>Monthly</option>
-                        <option value="yearly">Yearly</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label d-none d-md-block">&nbsp;</label>
-                    <button class="btn btn-primary w-100" onclick="loadForecast()">Update Forecast</button>
-                </div>
-            </div>
-
-            <div style="height: 400px; position: relative;">
-                <canvas id="salesChart"></canvas>
-            </div>
-
-            <div id="salesError" class="alert alert-danger mt-3 d-none"></div>
-        </div>
 
 
     </main>
@@ -1627,119 +1571,7 @@
             }
         });
 
-        // Handle Sales Forecast
-        let salesChart = null;
 
-        window.loadForecast = async function () {
-            const steps = document.getElementById('forecastSteps').value;
-            const granularity = document.getElementById('forecastGranularity').value;
-            const errorDiv = document.getElementById('salesError');
-            errorDiv.classList.add('d-none');
-
-            try {
-                const response = await fetch(`https://ev-4ce7.onrender.com/predict_sales?steps=${steps}&granularity=${granularity}`);
-                if (!response.ok) throw new Error('Failed to fetch forecast');
-
-                const result = await response.json();
-
-                if (result.status === 'success') {
-                    renderSalesChart(result.forecast);
-                } else {
-                    throw new Error(result.error);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                errorDiv.innerText = 'Error loading forecast: ' + error.message;
-                errorDiv.classList.remove('d-none');
-            }
-        };
-
-        function renderSalesChart(forecastData) {
-            const ctx = document.getElementById('salesChart').getContext('2d');
-
-            if (salesChart) {
-                salesChart.destroy();
-            }
-
-            salesChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: forecastData.dates,
-                    datasets: [
-                        {
-                            label: 'Forecasted Sales',
-                            data: forecastData.values,
-                            borderColor: '#818cf8',
-                            backgroundColor: 'rgba(129, 140, 248, 0.12)',
-                            borderWidth: 2.5,
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: '#818cf8',
-                            pointRadius: 3,
-                        },
-                        {
-                            label: 'Upper CI',
-                            data: forecastData.upper_ci,
-                            borderColor: 'rgba(34, 211, 238, 0.3)',
-                            backgroundColor: 'rgba(34, 211, 238, 0)',
-                            borderWidth: 1,
-                            borderDash: [6, 4],
-                            pointRadius: 0,
-                            fill: false
-                        },
-                        {
-                            label: 'Lower CI',
-                            data: forecastData.lower_ci,
-                            borderColor: 'rgba(34, 211, 238, 0.3)',
-                            backgroundColor: 'rgba(34, 211, 238, 0.06)',
-                            borderWidth: 1,
-                            borderDash: [6, 4],
-                            pointRadius: 0,
-                            fill: '-1'
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                            labels: { color: '#cbd5f5', font: { size: 12 } }
-                        },
-                        title: {
-                            display: true,
-                            text: 'EV Sales Forecast',
-                            color: '#e2e8f0',
-                            font: { size: 15, weight: 'bold' }
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                            backgroundColor: 'rgba(15,23,42,0.92)',
-                            titleColor: '#e2e8f0',
-                            bodyColor: '#94a3b8',
-                            borderColor: 'rgba(106,92,255,0.3)',
-                            borderWidth: 1
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            grid: { color: 'rgba(255,255,255,0.06)' },
-                            ticks: { color: '#94a3b8' },
-                            title: { display: true, text: 'EV Units Sold', color: '#cbd5f5' }
-                        },
-                        x: {
-                            grid: { color: 'rgba(255,255,255,0.06)' },
-                            ticks: { color: '#94a3b8', maxRotation: 45 },
-                            title: { display: true, text: 'Date', color: '#cbd5f5' }
-                        }
-                    },
-                    interaction: { mode: 'nearest', axis: 'x', intersect: false }
-                }
-            });
-        }
 
     </script>
 
