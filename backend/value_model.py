@@ -4,260 +4,275 @@ import pickle
 import traceback
 import numpy as np
 import pandas as pd
-import xgboost
+import warnings
+
+warnings.filterwarnings("ignore")
+
 
 class ValueModel:
-    def __init__(self, model_path):
-        self.model_path = model_path
-        self.model = None
-        self.feature_names = None
-        self.load_model()
+    """
+    Dual GradientBoosting model for EV resale value analysis.
 
-    def load_model(self):
-        if os.path.exists(self.model_path):
+    Loaded from pkl bundles that contain:
+        - 'model'    : trained GradientBoostingRegressor
+        - 'features' : ordered feature list
+        - 'le_brand' : fitted LabelEncoder for 'brand'
+        - 'le_type'  : fitted LabelEncoder for 'vehicle_type'
+
+    condition_model.pkl → predicts value_for_money_score × 100  (0–100 %)
+    price_model.pkl     → predicts Resale_Value_L
+    """
+
+    def __init__(self, condition_model_path: str, price_model_path: str):
+        self.condition_model_path = condition_model_path
+        self.price_model_path     = price_model_path
+
+        self.cond_model   = None
+        self.price_model  = None
+        self.cond_features  = []
+        self.price_features = []
+        self.le_brand     = None
+        self.le_type      = None
+
+        # public flag kept for legacy compat check in main.py
+        self.model = True
+
+        self._load_models()
+
+    # ------------------------------------------------------------------ #
+    #  Load                                                               #
+    # ------------------------------------------------------------------ #
+    def _load_models(self):
+        for attr_m, attr_f, path, label in [
+            ('cond_model',  'cond_features',  self.condition_model_path, "Condition"),
+            ('price_model', 'price_features', self.price_model_path,     "Price"),
+        ]:
+            if not os.path.exists(path):
+                print(f"[WARNING] {label} model not found: {path}")
+                continue
             try:
-                with open(self.model_path, 'rb') as f:
-                    self.model = pickle.load(f)
-                
-                if hasattr(self.model, 'feature_names_in_'):
-                    self.feature_names = self.model.feature_names_in_
+                with open(path, "rb") as f:
+                    bundle = pickle.load(f)
+
+                if isinstance(bundle, dict):
+                    setattr(self, attr_m, bundle.get("model"))
+                    setattr(self, attr_f, bundle.get("features", []))
+                    # Share encoders (both bundles carry the same encoders)
+                    if self.le_brand is None:
+                        self.le_brand = bundle.get("le_brand")
+                        self.le_type  = bundle.get("le_type")
+                    print(f"[OK] {label} model loaded — features: {bundle.get('features', [])}")
                 else:
-                    print("Warning: Model does not have feature_names_in_ attribute.")
-                
-                print(f"Value Model loaded successfully from {self.model_path}")
+                    # Legacy: old numpy-array pkl files (feature-name lists)
+                    # Fall back to formula-based approach
+                    print(f"[INFO] {label} pkl is a legacy feature array; using formula fallback.")
+                    setattr(self, attr_m, None)
+                    setattr(self, attr_f, list(bundle) if hasattr(bundle, '__iter__') else [])
+
             except Exception as e:
                 traceback.print_exc()
-                print(f"Error loading Value Model: {e}")
-        else:
-            print(f"Value Model file not found at {self.model_path}")
+                print(f"[ERROR] {label} model: {e}")
 
-    def preprocess(self, data):
-        """
-        Preprocess input data to match model features.
-        """
+    # ------------------------------------------------------------------ #
+    #  Feature builder                                                    #
+    # ------------------------------------------------------------------ #
+    def _build_features(self, data: dict) -> pd.DataFrame:
+        brand        = str(data.get("brand", ""))
+        vehicle_type = str(data.get("vehicle_type", "Car"))
+        purchase_year = int(data.get("Purchase_Year", 2020))
+        current_year  = int(data.get("Current_Year", 2025))
+        odometer      = float(data.get("odometer_km", 0))
+        initial_mil   = float(data.get("Initial_Mileage", 0))
+        current_mil   = float(data.get("Current_Mileage", 0))
+
+        vehicle_age   = max(current_year - purchase_year, 0)
+        usage_per_yr  = odometer / vehicle_age if vehicle_age > 0 else odometer
+        mileage_drop  = initial_mil - current_mil
+
+        # Encode brand and vehicle_type
         try:
-            # Extract raw inputs
-            # Categorical
-            brand = data.get('brand', '')
-            model_name = data.get('model', '')
-            vehicle_type = data.get('vehicle_type', 'Car')
-            
-            # Numerical
-            initial_capacity = float(data.get('initial_battery_capacity_kwh', 0))
-            current_capacity = float(data.get('current_battery_capacity_kwh', 0))
-            battery_health = float(data.get('battery_health_pct', 0))
-            range_km = float(data.get('range_km', 0))
-            top_speed = float(data.get('top_speed_kmph', 0))
-            odometer = float(data.get('odometer_km', 0))
-            warranty = float(data.get('warranty_remaining_years', 0))
-            maintenance_cost = float(data.get('annual_maintenance_cost', 0))
-            purchase_year = int(data.get('Purchase_Year', 2020))
-            current_year = int(data.get('Current_Year', 2025))
-            purchase_price = float(data.get('Purchase_Price_L', 0))
-            initial_mileage = float(data.get('Initial_Mileage', 0))
-            current_mileage = float(data.get('Current_Mileage', 0))
-            initial_perf = float(data.get('Initial_Perf', 0))
-            current_perf = float(data.get('Current_Perf', 0))
-            resale_value = float(data.get('Resale_Value_L', 0))
+            brand_enc = self.le_brand.transform([brand])[0]
+        except Exception:
+            brand_enc = 0
 
-            # Derived Features
-            vehicle_age = current_year - purchase_year
-            
-            if initial_capacity > 0:
-                battery_loss_pct = ((initial_capacity - current_capacity) / initial_capacity) * 100
-            else:
-                battery_loss_pct = 0
-            
-            performance_drop = initial_perf - current_perf
-            
-            if current_capacity > 0:
-                battery_efficiency = range_km / current_capacity
-            else:
-                battery_efficiency = 0
+        try:
+            type_enc = self.le_type.transform([vehicle_type])[0]
+        except Exception:
+            type_enc = 0
 
-            # Create a dictionary with all base numerical features
-            input_dict = {
-                'initial_battery_capacity_kwh': initial_capacity,
-                'current_battery_capacity_kwh': current_capacity,
-                'battery_health_pct': battery_health,
-                'range_km': range_km,
-                'top_speed_kmph': top_speed,
-                'odometer_km': odometer,
-                'warranty_remaining_years': warranty,
-                'annual_maintenance_cost': maintenance_cost,
-                'Purchase_Year': purchase_year,
-                'Current_Year': current_year,
-                'Purchase_Price_L': purchase_price,
-                'Initial_Mileage': initial_mileage,
-                'Current_Mileage': current_mileage,
-                'Initial_Perf': initial_perf,
-                'Current_Perf': current_perf,
-                'Resale_Value_L': resale_value,
-                # Derived
-                'vehicle_age': vehicle_age,
-                'battery_loss_pct': battery_loss_pct,
-                'performance_drop': performance_drop,
-                'battery_efficiency': battery_efficiency
-            }
+        row = {
+            "brand_enc"                : brand_enc,
+            "type_enc"                 : type_enc,
+            "battery_health_pct"       : float(data.get("battery_health_pct", 0)),
+            "range_km"                 : float(data.get("range_km", 0)),
+            "top_speed_kmph"           : float(data.get("top_speed_kmph", 0)),
+            "odometer_km"              : odometer,
+            "warranty_remaining_years" : float(data.get("warranty_remaining_years", 0)),
+            "annual_maintenance_cost"  : float(data.get("annual_maintenance_cost", 0)),
+            "Purchase_Year"            : purchase_year,
+            "Current_Year"             : current_year,
+            "Purchase_Price_L"         : float(data.get("Purchase_Price_L", 0)),
+            "Initial_Mileage"          : initial_mil,
+            "Current_Mileage"          : current_mil,
+            "vehicle_age"              : vehicle_age,
+            "usage_per_year"           : usage_per_yr,
+            "mileage_drop"             : mileage_drop,
+        }
+        return pd.DataFrame([row])
 
-            # Handle One-Hot Encoding
-            # We need to construct the DataFrame with exact columns as self.feature_names
-            if self.feature_names is None:
-                 raise ValueError("Model feature names not available.")
+    # ------------------------------------------------------------------ #
+    #  Condition Score (0-100 %)                                          #
+    # ------------------------------------------------------------------ #
+    def _formula_condition(self, data: dict) -> float:
+        """Fallback formula when pkl is legacy numpy array."""
+        battery  = float(data.get("battery_health_pct", 0))
+        odometer = float(data.get("odometer_km", 0))
+        warranty = float(data.get("warranty_remaining_years", 0))
+        maint    = float(data.get("annual_maintenance_cost", 0))
+        age      = max(int(data.get("Current_Year", 2025)) - int(data.get("Purchase_Year", 2020)), 0)
+        init_mil = float(data.get("Initial_Mileage", 0))
+        curr_mil = float(data.get("Current_Mileage", 0))
+        mileage_drop = max(init_mil - curr_mil, 0)
+        range_km = float(data.get("range_km", 0))
+        top_speed= float(data.get("top_speed_kmph", 0))
 
-            # Initialize all features to 0.0 with explicit float64 dtype
-            # This is required for XGBoost to accept the DataFrame without dtype errors
-            final_input = pd.DataFrame(
-                np.zeros((1, len(self.feature_names)), dtype=np.float64),
-                columns=self.feature_names
-            )
+        score = (
+              0.35 * (battery / 100)
+            + 0.10 * min(range_km / 500, 1.0)
+            + 0.05 * min(top_speed / 200, 1.0)
+            - 0.20 * min(odometer / 300_000, 1.0)
+            + 0.10 * min(warranty / 10, 1.0)
+            - 0.05 * min(maint / 100_000, 1.0)
+            - 0.10 * min(age / 20, 1.0)
+            - 0.05 * min(mileage_drop / 100, 1.0)
+        ) * 100 + 23.61
+        return round(float(np.clip(score, 0, 100)), 2)
 
-            # Fill numerical features
-            for col in input_dict:
-                if col in final_input.columns:
-                    final_input[col] = float(input_dict[col])
+    def compute_condition_score(self, data: dict) -> float:
+        if self.cond_model is not None:
+            X = self._build_features(data)
+            score = float(self.cond_model.predict(X)[0])
+            return round(float(np.clip(score, 0, 100)), 2)
+        return self._formula_condition(data)
 
-            # Set One-Hot Encoded features
-            # Format: 'brand_BrandName', 'model_ModelName', 'vehicle_type_Type'
-            brand_col = f"brand_{brand}"
-            if brand_col in final_input.columns:
-                final_input.loc[0, brand_col] = 1
-            
-            model_col = f"model_{model_name}"
-            if model_col in final_input.columns:
-                final_input.loc[0, model_col] = 1
-                
-            type_col = f"vehicle_type_{vehicle_type}"
-            if type_col in final_input.columns:
-                final_input.loc[0, type_col] = 1
-            
-            return final_input
+    # ------------------------------------------------------------------ #
+    #  Predicted Resale Price                                             #
+    # ------------------------------------------------------------------ #
+    def _formula_price(self, data: dict, condition_score: float) -> float:
+        """Fallback depreciation formula when pkl is legacy numpy array."""
+        purchase_price = float(data.get("Purchase_Price_L", 0))
+        vehicle_age    = max(int(data.get("Current_Year", 2025)) - int(data.get("Purchase_Year", 2020)), 0)
+        odometer       = float(data.get("odometer_km", 0))
+        warranty       = float(data.get("warranty_remaining_years", 0))
 
-        except Exception as e:
-            traceback.print_exc()
-            raise ValueError(f"Preprocessing error: {str(e)}")
+        odometer_factor  = min(odometer / 200_000, 1.0) * 0.04
+        condition_factor = ((100 - condition_score) / 100) * 0.03
+        ann_depr         = 0.12 + odometer_factor + condition_factor
+        retained         = max((1 - ann_depr) ** vehicle_age, 0)
+        warranty_factor  = 1 + min(warranty / 10, 1) * 0.03
+        return round(float(purchase_price * retained * warranty_factor * 0.687), 1)
 
-    def predict(self, data):
-        if self.model is None:
-            raise ValueError("Value Model is not loaded.")
-        
-        processed_data = self.preprocess(data)
-        prediction = self.model.predict(processed_data)[0]
-        return float(prediction)
+    def predict_resale_price(self, data: dict, condition_score: float = None) -> float:
+        if self.price_model is not None:
+            X = self._build_features(data)
+            return round(float(self.price_model.predict(X)[0]), 1)
+        if condition_score is None:
+            condition_score = self.compute_condition_score(data)
+        return self._formula_price(data, condition_score)
 
-    def analyze(self, data):
-        """
-        Predict score and generate insights based on specific logic.
-        """
+    # ------------------------------------------------------------------ #
+    #  Legacy compat                                                      #
+    # ------------------------------------------------------------------ #
+    def predict(self, data: dict) -> float:
+        return self.predict_resale_price(data)
+
+    # ------------------------------------------------------------------ #
+    #  Public: analyze                                                    #
+    # ------------------------------------------------------------------ #
+    def analyze(self, data: dict) -> dict:
         import random
-        
-        score = self.predict(data)
-        
-        # Raw inputs for logic
-        battery_health_pct = float(data.get('battery_health_pct', 0))
-        odometer_km = float(data.get('odometer_km', 0))
-        warranty_remaining_years = float(data.get('warranty_remaining_years', 0))
-        purchase_year = int(data.get('Purchase_Year', 2020))
-        current_year = int(data.get('Current_Year', 2025))
-        resale_value = float(data.get('Resale_Value_L', 0))
-        purchase_price = float(data.get('Purchase_Price_L', 0))
-        
-        age = current_year - purchase_year
-        recommendation = ""
-        insights = []
-        price_range = None
 
-        if resale_value > purchase_price:
-            recommendation = "Overpriced"
-            low_price = purchase_price * 0.50
-            high_price = purchase_price * 0.70
-            price_range = f"₹{round(low_price):,} - ₹{round(high_price):,}"
-            insights.append(f"⚠️ The resale value exceeds the purchase price, indicating the vehicle is overpriced.")
-            insights.append("Consider negotiation or look for better deals.")
+        condition_score  = self.compute_condition_score(data)
+        predicted_resale = self.predict_resale_price(data, condition_score)
+        user_price       = float(data.get("Resale_Value_L", 0))
+
+        battery_health   = float(data.get("battery_health_pct", 0))
+        odometer         = float(data.get("odometer_km", 0))
+        warranty         = float(data.get("warranty_remaining_years", 0))
+        purchase_year    = int(data.get("Purchase_Year", 2020))
+        current_year     = int(data.get("Current_Year", 2025))
+        age              = max(current_year - purchase_year, 0)
+
+        # Price difference % (positive → user price is higher → overpriced)
+        if predicted_resale > 0:
+            price_diff_pct = ((user_price - predicted_resale) / predicted_resale) * 100.0
         else:
-            if score > 1.0:
-                recommendation = "Excellent Price"
-            elif score >= 0.9:
-                recommendation = "Fair Price"
-            else:
-                recommendation = "Overpriced"
+            price_diff_pct = 0.0
 
-            # Insight Generation
-            if recommendation == "Excellent Price":
-                reasons = []
-                if battery_health_pct >= 90:
-                    reasons.append(f"battery health at {battery_health_pct}%")
-                if warranty_remaining_years >= 5:
-                    reasons.append(f"{int(warranty_remaining_years)} years warranty remaining")
-                if odometer_km < 40000:
-                    reasons.append(f"only {int(odometer_km):,} km driven")
-                if age <= 2:
-                    reasons.append(f"a relatively new {purchase_year} model")
-            
-                if reasons:
-                    chosen = random.sample(reasons, min(len(reasons), 3))
-    
-                    if len(chosen) > 1:
-                        reason_text = ", ".join(chosen[:-1]) + " and " + chosen[-1]
-                    else:
-                        reason_text = chosen[0]
-    
-                    insights.append(f"✅ The vehicle delivers exceptional value with {reason_text}.")
-                else:
-                    insights.append("✅ The vehicle is priced significantly below market value, offering a great deal.")
+        # Recommendation thresholds
+        if price_diff_pct > 10.0:
+            recommendation = "Overpriced"
+        elif price_diff_pct >= -10.0:
+            recommendation = "Fair Price"
+        else:
+            recommendation = "Excellent Price"
 
-            elif recommendation == "Fair Price":
-                reasons = [
-                    f"battery health at {battery_health_pct}%",
-                    f"{int(odometer_km):,} km usage",
-                    f"{int(warranty_remaining_years)} years warranty left",
-                    f"{age} years vehicle age"
-                ]
-                # Ensure we don't sample more than available, though list is fixed size 4
-                chosen = random.sample(reasons, min(len(reasons), 3))
+        # Insights
+        insights = []
+        if recommendation == "Overpriced":
+            reasons = []
+            if battery_health < 85:
+                reasons.append("battery degradation")
+            if odometer > 100_000:
+                reasons.append("high accumulated mileage")
+            if warranty <= 1:
+                reasons.append("limited remaining warranty")
+            if age >= 3:
+                reasons.append("age-related depreciation")
+            if user_price > predicted_resale:
+                reasons.append("pricing exceeding expected market value")
+            if not reasons:
+                reasons = ["overall market depreciation factors"]
+            chosen      = random.sample(reasons, min(len(reasons), 2))
+            reason_text = " and ".join(chosen)
+            insights.append(f"⚠️ The vehicle appears overpriced mainly due to {reason_text}.")
 
-                if len(chosen) > 1:
-                    reason_text = ", ".join(chosen[:-1]) + " and " + chosen[-1]
-                else:
-                    reason_text = chosen[0]
+        elif recommendation == "Fair Price":
+            parts = [
+                f"battery health at {battery_health}%",
+                f"{int(odometer):,} km usage",
+                f"{int(warranty)} yr warranty remaining",
+                f"{age} yr vehicle age",
+            ]
+            chosen      = random.sample(parts, min(len(parts), 2))
+            insights.append(f"👍 Pricing is reasonable considering {' and '.join(chosen)}.")
 
-                insights.append(f"👍 The pricing is reasonable considering {reason_text}.")
-            else:  # Overpriced (score-based)
-                reasons = []
-    
-                if battery_health_pct < 80:
-                    reasons.append("battery wear over time")
-                if odometer_km > 80000:
-                    reasons.append("higher accumulated mileage")
-                if warranty_remaining_years <= 1:
-                    reasons.append("limited remaining warranty")
-                if age >= 6:
-                    reasons.append("age-related depreciation")
-    
-                if not reasons:
-                    reasons = ["overall market depreciation factors"]
-    
-                # Select up to 3 reasons
-                chosen = random.sample(reasons, min(len(reasons), 3))
-    
-                # Make sentence read naturally
-                if len(chosen) > 1:
-                    reason_text = ", ".join(chosen[:-1]) + " and " + chosen[-1]
-                else:
-                    reason_text = chosen[0]
-    
-                insights.append(f"The vehicle appears overpriced mainly due to {reason_text}.")
+        else:  # Excellent Price
+            parts = []
+            if battery_health >= 90:
+                parts.append(f"battery health of {battery_health}%")
+            if warranty >= 3:
+                parts.append(f"{int(warranty)} years warranty remaining")
+            if odometer < 60_000:
+                parts.append(f"only {int(odometer):,} km driven")
+            if not parts:
+                parts = ["competitive market pricing"]
+            chosen = random.sample(parts, min(len(parts), 2))
+            insights.append(f"✅ Great value — {' and '.join(chosen)}.")
 
-                # Suggested Market Price (60–80% of resale)
-                low_price = resale_value * 0.60
-                high_price = resale_value * 0.80
-            
-                price_range = f"₹{round(low_price):,} - ₹{round(high_price):,}"
-                insights.append("Consider negotiation or look for better deals.")
+        # Fair price range (±10 % of predicted)
+        low_price   = predicted_resale * 0.90
+        high_price  = predicted_resale * 1.10
+        price_range = f"₹{round(low_price):,} - ₹{round(high_price):,}"
 
         return {
-            'score': score,
-            'recommendation': recommendation,
-            'insights': insights,
-            'fair_price_range': price_range
+            "condition_score":  condition_score,
+            "predicted_resale": predicted_resale,
+            "user_price":       user_price,
+            "price_diff_pct":   round(price_diff_pct, 2),
+            "recommendation":   recommendation,
+            "insights":         insights,
+            "fair_price_range": price_range,
+            # legacy compat
+            "score":            condition_score,
         }

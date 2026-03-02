@@ -2,21 +2,16 @@
 <html>
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EV Analytics | Home</title>
+  <title>EV Analytics | Smart EV Intelligence Platform</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
+  <!-- NAVBAR -->
   <nav class="navbar">
     <div class="logo">⚡<span>EV ANALYTICS</span></div>
-    <button class="hamburger" id="hamburger-btn" aria-label="Toggle navigation">
-      <span></span><span></span><span></span>
-    </button>
-    <ul class="nav-links" id="nav-links">
-
+    <ul class="nav-links">
       <li><a class="active" href="index.html">Home</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="pricing.html">Pricing</a></li>
@@ -25,67 +20,227 @@
       <li><a href="ml_models.html">ML Models</a></li>
     </ul>
     <div id="nav-auth-container">
-      <a href="login.html"><button class="btn">Login</button></a>
+      <a href="login.html"><button class="btn btn-primary">Login</button></a>
     </div>
   </nav>
 
   <script type="module" src="nav.js"></script>
 
-  <section class="section">
-    <h1>Powering the <span style="color:#6a5cff">Future</span> of EVs</h1>
-    <p style="margin-top:30px; color:white; max-width:750px;">
-      Smart analytics platform for electric vehicle charging,
-      performance monitoring, and sustainable mobility.
-    </p>
+  <!-- HERO SECTION -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-badge">🚀 Next Generation EV Analytics</div>
+      <h1 class="hero-title">Powering the <span class="gradient-text">Future</span> of Electric Vehicles</h1>
+      <p class="hero-subtitle">
+        Intelligent analytics platform for real-time EV charging optimization,
+        predictive performance monitoring, and sustainable mobility insights.
+      </p>
 
-    <div class="hero-cards">
-      <div class="card">
-        <h2>⚡EV Benefits</h2>
-        <p>Lower costs & higher efficiency</p>
+      <div class="hero-cta">
+        <a href="vehicle-selection.html" class="cta-btn-primary">Get Started Free</a>
+        <a href="about.html" class="cta-btn-secondary">Learn More</a>
       </div>
-      <div class="card">
-        <h2>📊 Industry Relevance</h2>
-        <p>Market trends & growth data</p>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-card fade-in-1">
+        <div class="stat-number" data-target="10000">10,000+</div>
+        <div class="stat-label">EVs Analyzed</div>
       </div>
-      <div class="card">
-        <h2>🌱 Sustainability</h2>
-        <p>Zero emissions & clean energy</p>
+      <div class="stat-card fade-in-2">
+        <div class="stat-number" data-target="500000">500K+</div>
+        <div class="stat-label">Data Points</div>
+      </div>
+      <div class="stat-card fade-in-3">
+        <div class="stat-number" data-target="95">95%</div>
+        <div class="stat-label">Accuracy Rate</div>
+      </div>
+      <div class="stat-card fade-in-4">
+        <div class="stat-number" data-target="150">150+</div>
+        <div class="stat-label">EV Models</div>
       </div>
     </div>
   </section>
 
-  <!-- WHY EV ANALYTICS -->
+  <!-- FEATURES SECTION -->
+  <section class="features-section">
+    <div class="section-header">
+      <h2>Core Features</h2>
+      <p>Everything you need to make informed EV decisions</p>
+    </div>
 
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Real-Time Charging Analytics</h3>
+        <p>Monitor charging patterns, optimize battery health, and predict charging times with advanced ML models for
+          maximum efficiency.</p>
+        <a href="#" class="feature-link">Explore →</a>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Market Intelligence</h3>
+        <p>Get comprehensive industry trends, competitive analysis, sales forecasts, and market adoption rates for EVs
+          across regions.</p>
+        <a href="#" class="feature-link">Explore →</a>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🤖</div>
+        <h3>AI-Powered Predictions</h3>
+        <p>Leverage machine learning models to predict vehicle performance, resale values, maintenance needs, and total
+          cost of ownership.</p>
+        <a href="#" class="feature-link">Explore →</a>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🌍</div>
+        <h3>Sustainability Impact</h3>
+        <p>Calculate CO₂ savings, environmental impact, and your contribution to reducing carbon emissions with detailed
+          reports.</p>
+        <a href="#" class="feature-link">Explore →</a>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Secure Data Analysis</h3>
+        <p>Enterprise-grade security with encrypted data transmission, privacy protection, and compliance with
+          international standards.</p>
+        <a href="#" class="feature-link">Explore →</a>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3>Multi-Platform Access</h3>
+        <p>Access your analytics anytime, anywhere. Seamless experience across web, mobile, and desktop with real-time
+          sync.</p>
+        <a href="#" class="feature-link">Explore →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY CHOOSE US SECTION -->
   <section class="why-section">
-    <h1>Why Choose EV Analytics?</h1>
-    <p class="why-subtitle">
-      Your comprehensive platform for the electric vehicle revolution.
-    </p>
+    <div class="section-header">
+      <h2>Why Choose EV Analytics?</h2>
+      <p>Trusted by EV enthusiasts, dealers, and fleet managers worldwide</p>
+    </div>
 
     <div class="why-cards">
       <div class="why-card">
         <div class="why-icon">⚡</div>
-        <h3>EV Benefits</h3>
+        <h3>Cost Efficiency</h3>
         <p>
-          Experience reduced operating costs, minimal maintenance, and superior performance compared to traditional
-          vehicles.
+          Discover real savings with detailed TCO analysis, maintenance cost predictions, and optimal charging
+          strategies that reduce operational expenses by up to 40%.
         </p>
       </div>
 
       <div class="why-card active">
         <div class="why-icon">📈</div>
-        <h3>Industry Relevance</h3>
+        <h3>Industry Intelligence</h3>
         <p>
-          Stay ahead of the curve with real-time insights into market adoption, sales trends, and competitor analysis.
+          Stay ahead with real-time market analytics, competitive benchmarking, sales trend forecasting, and emerging
+          technology insights powered by AI.
         </p>
       </div>
 
       <div class="why-card">
         <div class="why-icon">🌱</div>
-        <h3>Sustainability Impact</h3>
+        <h3>Environmental Impact</h3>
         <p>
-          Visualize your contribution to a greener planet with our CO₂ savings tracker and environmental impact reports.
+          Track your carbon footprint reduction, environmental contributions, and sustainability metrics. Make a real
+          difference with data-driven eco insights.
         </p>
+      </div>
+
+      <div class="why-card">
+        <div class="why-icon">🎯</div>
+        <h3>Personalized Recommendations</h3>
+        <p>
+          Get AI-powered vehicle suggestions based on your driving patterns, budget, lifestyle, and environmental
+          preferences for the perfect EV match.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATFORM BENEFITS SECTION -->
+  <section class="benefits-section">
+    <div class="section-header light">
+      <h2>Platform Capabilities</h2>
+      <p>Comprehensive tools for every aspect of EV analysis</p>
+    </div>
+
+    <div class="benefits-container">
+      <div class="benefit-item">
+        <div class="benefit-number">01</div>
+        <h3>Vehicle Comparison</h3>
+        <p>Compare up to 150+ EV models side-by-side with detailed specifications, pricing, performance metrics, and
+          user reviews.</p>
+      </div>
+
+      <div class="benefit-item">
+        <div class="benefit-number">02</div>
+        <h3>Charging Network Finder</h3>
+        <p>Locate nearby charging stations, check availability in real-time, and plan optimal routes for long-distance
+          EV journeys.</p>
+      </div>
+
+      <div class="benefit-item">
+        <div class="benefit-number">03</div>
+        <h3>Predictive Analytics</h3>
+        <p>Forecast battery degradation, maintenance schedules, resale value, and optimal replacement timing with 95%+
+          accuracy.</p>
+      </div>
+
+      <div class="benefit-item">
+        <div class="benefit-number">04</div>
+        <h3>Performance Dashboards</h3>
+        <p>Real-time monitoring of vehicle health, charging patterns, energy consumption, efficiency metrics, and
+          historical trends.</p>
+      </div>
+
+      <div class="benefit-item">
+        <div class="benefit-number">05</div>
+        <h3>Cost Analysis Tools</h3>
+        <p>Detailed breakdown of ownership costs, fuel savings, tax incentives, insurance comparison, and ROI
+          calculations.</p>
+      </div>
+
+      <div class="benefit-item">
+        <div class="benefit-number">06</div>
+        <h3>Community Insights</h3>
+        <p>Access real-world user experiences, troubleshooting guides, charging tips, and best practices from the global
+          EV community.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS SECTION -->
+  <section class="stats-section">
+    <div class="stats-content">
+      <h2>Trusted by Millions</h2>
+      <p>Join the growing community of smart EV decision-makers</p>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-value">25M+</div>
+          <div class="stat-text">Data Records Processed</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">180+</div>
+          <div class="stat-text">EV Models Covered</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">95%</div>
+          <div class="stat-text">Prediction Accuracy</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">24/7</div>
+          <div class="stat-text">Platform Uptime</div>
+        </div>
       </div>
     </div>
   </section>
@@ -93,61 +248,141 @@
   <!-- CTA SECTION -->
   <section class="cta-section">
     <div class="cta-box">
-      <h2>Ready to Switch to Electric?</h2>
+      <h2>Ready to Find Your Perfect EV?</h2>
       <p>
-        Join the revolution. Analyze the data, understand the savings,
-        and make an informed decision today.
+        Join thousands of informed EV buyers and fleet managers.
+        Start your journey to sustainable mobility with our intelligent analytics platform.
       </p>
       <a href="vehicle-selection.html" class="cta-btn">Get Started Free</a>
     </div>
   </section>
 
-  <!-- FOOTER (WITHOUT STATION FINDER) -->
+  <!-- FAQ SECTION -->
+  <section class="faq-section">
+    <div class="section-header">
+      <h2>Frequently Asked Questions</h2>
+      <p>Get answers to common EV analytics questions</p>
+    </div>
+
+    <div class="faq-container">
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>What data sources does EV Analytics use?</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+          We aggregate data from manufacturer specifications, real-world user reports, charging networks, market
+          databases, and machine learning predictions to provide comprehensive insights.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>How accurate are the price and performance predictions?</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+          Our AI models achieve 95%+ accuracy through continuous training on 25M+ data points and real-world validation.
+          Predictions are updated monthly with latest market data.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>Can I track my vehicle's performance over time?</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+          Yes! Create a personal dashboard to monitor charging patterns, battery health, efficiency metrics, and receive
+          maintenance alerts powered by predictive analytics.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>Is my data secure and private?</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+          Absolutely. We use enterprise-grade encryption, comply with GDPR and privacy regulations, and never share
+          personal data with third parties without explicit consent.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          <span>What pricing plans are available?</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="faq-answer">
+          We offer Free, Premium, and Enterprise plans. The Free plan includes basic comparisons, Premium adds advanced
+          analytics and tracking, and Enterprise provides API access for businesses.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-row">
-
-      <!-- Left -->
       <div class="footer-left">
         <h3>⚡ <span>EV</span> ANALYTICS</h3>
         <p>
-          Empowering the EV ecosystem with data-driven insights and smart
-          mobility solutions.
+          Revolutionizing the EV ecosystem with intelligent data analytics,
+          predictive insights, and sustainable mobility solutions for a greener future.
         </p>
       </div>
 
-      <!-- Platform -->
       <div class="footer-col">
         <h4>Platform</h4>
         <a href="index.html">Home</a>
-        <a href="#">Insights</a>
-        <a href="/stations.html">Stations</a>
+        <a href="vehicle-selection.html">Vehicle Selector</a>
+        <a href="stations.html">Charging Stations</a>
+        <a href="ml_models.html">ML Models</a>
       </div>
 
-      <!-- Company -->
       <div class="footer-col">
         <h4>Company</h4>
         <a href="about.html">About Us</a>
         <a href="contact.html">Contact</a>
         <a href="user-dashboard.html" id="footer-dashboard-link">Dashboard</a>
+        <a href="pricing.html">Pricing</a>
       </div>
 
-      <!-- Social -->
       <div class="footer-col">
-        <h4>Social</h4>
-        <a href="#">Twitter</a>
-        <a href="#">LinkedIn</a>
-        <a href="#">Instagram</a>
+        <h4>Resources</h4>
+        <a href="#">Blog</a>
+        <a href="#">Documentation</a>
+        <a href="#">API Docs</a>
+        <a href="#">Support</a>
       </div>
 
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookies</a>
+        <a href="#">Licenses</a>
+      </div>
     </div>
 
     <div class="footer-bottom">
-      © 2025 EV Analytics. All rights reserved.
+      <p>&copy; 2025 EV Analytics Platform. All rights reserved. | Built with ⚡ for sustainable mobility</p>
     </div>
   </footer>
 
   <!-- DYNAMIC AD POPUP COMPONENT -->
   <script type="module" src="ad-component.js"></script>
+
+  <!-- FAQ Interaction Script -->
+  <script>
+    document.querySelectorAll('.faq-question').forEach(button => {
+      button.addEventListener('click', () => {
+        const faqItem = button.parentElement;
+        faqItem.classList.toggle('active');
+      });
+    });
+  </script>
 </body>
 
 </html>

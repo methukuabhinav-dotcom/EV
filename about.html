@@ -2,21 +2,16 @@
 <html>
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About | EV Analytics</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
+  <!-- NAVBAR -->
   <nav class="navbar">
     <div class="logo">⚡ <span>EV ANALYTICS</span></div>
-    <button class="hamburger" id="hamburger-btn" aria-label="Toggle navigation">
-      <span></span><span></span><span></span>
-    </button>
-    <ul class="nav-links" id="nav-links">
-
+    <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
       <li><a class="active" href="about.html">About</a></li>
       <li><a href="pricing.html">Pricing</a></li>
@@ -25,66 +20,123 @@
       <li><a href="ml_models.html">ML Models</a></li>
     </ul>
     <div id="nav-auth-container">
-      <a href="login.html"><button class="btn">Login</button></a>
+      <a href="login.html"><button class="btn btn-primary">Login</button></a>
     </div>
   </nav>
 
   <script type="module" src="nav.js"></script>
 
-  <section class="section">
-    <h1>Driving the <span style="color:#6a5cff">Electric Revolution</span></h1>
-    <p style="margin-top:20px;color:#bdbdbd;max-width:700px;">
-      EV Analytics bridges the gap between EV data and actionable insights.
-      We empower governments, businesses, and individuals to adopt
-      electric mobility efficiently.
-    </p>
+  <!-- HERO SECTION -->
+  <section class="about-hero">
+    <div class="about-hero-content">
+      <h1>Driving the <span class="gradient-text">Electric Revolution</span></h1>
+      <p class="about-subtitle">
+        EV Analytics bridges the gap between EV data and actionable insights.
+        We empower governments, businesses, and individuals to adopt electric mobility efficiently.
+      </p>
 
-    <div class="hero-cards" style="margin-top:40px;">
-      <div class="card">
-        <h2>12+</h2>
-        <p>Countries</p>
-      </div>
-      <div class="card">
-        <h2>50+</h2>
-        <p>Cities</p>
-      </div>
-      <div class="card">
-        <h2>1M+</h2>
-        <p>Data Points</p>
+      <div class="about-stats">
+        <div class="about-stat-card">
+          <div class="stat-value">12+</div>
+          <p>Countries</p>
+        </div>
+        <div class="about-stat-card">
+          <div class="stat-value">50+</div>
+          <p>Cities</p>
+        </div>
+        <div class="about-stat-card">
+          <div class="stat-value">1M+</div>
+          <p>Data Points</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- How We Process Data -->
-  <section class="process">
-    <h2>How We Process Data</h2>
+  <!-- MISSION SECTION -->
+  <section class="mission-section">
+    <div class="section-header">
+      <h2>Our Mission</h2>
+      <p>Democratizing EV data for smarter decisions</p>
+    </div>
+
+    <div class="mission-content">
+      <div class="mission-card">
+        <div class="mission-icon">🎯</div>
+        <h3>Empower Users</h3>
+        <p>Give individuals and businesses the data they need to make informed decisions about electric vehicles.</p>
+      </div>
+
+      <div class="mission-card">
+        <div class="mission-icon">🌍</div>
+        <h3>Accelerate Adoption</h3>
+        <p>Support the global transition to sustainable mobility through comprehensive analytics and insights.</p>
+      </div>
+
+      <div class="mission-card">
+        <div class="mission-icon">📊</div>
+        <h3>Unlock Insights</h3>
+        <p>Transform raw EV data into actionable intelligence that drives innovation and growth.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW WE PROCESS DATA -->
+  <section class="process-section">
+    <div class="section-header">
+      <h2>How We Process Data</h2>
+      <p>Our comprehensive data pipeline ensures accuracy and reliability</p>
+    </div>
 
     <div class="process-cards">
       <div class="process-card">
-        <div class="icon">🗄️</div>
-        <h3>1. Aggregation</h3>
-        <p>
-          Collecting real-time data from EV manufacturers,
-          charging networks, and user inputs.
-        </p>
+        <div class="process-number">01</div>
+        <div class="process-icon">🗄️</div>
+        <h3>Data Aggregation</h3>
+        <p>Collecting real-time data from EV manufacturers, charging networks, market databases, and user inputs across
+          the globe.</p>
       </div>
 
       <div class="process-card">
-        <div class="icon">🧠</div>
-        <h3>2. Analysis</h3>
-        <p>
-          Using advanced models to predict trends,
-          battery health degradation, and demand hotspots.
-        </p>
+        <div class="process-number">02</div>
+        <div class="process-icon">🧠</div>
+        <h3>Advanced Analysis</h3>
+        <p>Using machine learning models to predict trends, battery degradation, demand hotspots, and market
+          opportunities.</p>
       </div>
 
       <div class="process-card">
-        <div class="icon">📊</div>
-        <h3>3. Visualization</h3>
-        <p>
-          Presenting insights through interactive dashboards
-          that empower decision-making.
+        <div class="process-number">03</div>
+        <div class="process-icon">📊</div>
+        <h3>Smart Visualization</h3>
+        <p>Presenting insights through interactive dashboards and reports that empower data-driven decision-making.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALUES SECTION -->
+  <section class="values-section">
+    <div class="section-header">
+      <h2>Our Core Values</h2>
+      <p>What drives us forward</p>
+    </div>
+
+    <div class="values-grid">
+      <div class="value-item">
+        <h3>Transparency</h3>
+        <p>We believe in open data and clear communication about how our analytics work and what insights mean.</p>
+      </div>
+      <div class="value-item">
+        <h3>Innovation</h3>
+        <p>Continuously pushing the boundaries of EV analytics with cutting-edge AI and machine learning technologies.
         </p>
+      </div>
+      <div class="value-item">
+        <h3>Sustainability</h3>
+        <p>Committed to reducing carbon emissions and promoting sustainable mobility solutions globally.</p>
+      </div>
+      <div class="value-item">
+        <h3>Reliability</h3>
+        <p>Providing accurate, timely data that our users can trust for critical business and personal decisions.</p>
       </div>
     </div>
   </section>
@@ -153,17 +205,67 @@
   </section>
 
 
-  <footer>
-    <div class="container">
-      <div class="footer-bottom">
-        <p>&copy; 2025 EV Analytics. All rights reserved.</p>
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-row">
+      <div class="footer-left">
+        <h3>⚡ <span>EV</span> ANALYTICS</h3>
+        <p>
+          Revolutionizing the EV ecosystem with intelligent data analytics,
+          predictive insights, and sustainable mobility solutions.
+        </p>
       </div>
+
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <a href="index.html">Home</a>
+        <a href="vehicle-selection.html">Vehicle Selector</a>
+        <a href="stations.html">Charging Stations</a>
+        <a href="ml_models.html">ML Models</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="about.html">About Us</a>
+        <a href="contact.html">Contact</a>
+        <a href="user-dashboard.html" id="footer-dashboard-link">Dashboard</a>
+        <a href="pricing.html">Pricing</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <a href="#">Blog</a>
+        <a href="#">Documentation</a>
+        <a href="#">API Docs</a>
+        <a href="#">Support</a>
+      </div>
+
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookies</a>
+        <a href="#">Licenses</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2025 EV Analytics Platform. All rights reserved. | Built with ⚡ for sustainable mobility</p>
     </div>
   </footer>
 
   <script src="about.js"></script>
   <!-- DYNAMIC AD POPUP COMPONENT -->
   <script type="module" src="ad-component.js"></script>
+
+  <script>
+    document.querySelectorAll('.faq-question').forEach(button => {
+      button.addEventListener('click', () => {
+        const faqItem = button.parentElement;
+        faqItem.classList.toggle('active');
+      });
+    });
+  </script>
 </body>
 
 </html>

@@ -11,9 +11,11 @@ CORS(app)  # Enable CORS for all routes
 # Load Resources
 model, label_encoder = load_model_and_encoder()
 
-# Load Value Model
-VALUE_MODEL_PATH = os.path.join(os.path.dirname(__file__), 'value_for_money.pkl')
-value_model = ValueModel(VALUE_MODEL_PATH)
+# Load Value Model (dual: condition_model.pkl + price_model.pkl)
+BACKEND_DIR = os.path.dirname(__file__)
+CONDITION_MODEL_PATH = os.path.join(BACKEND_DIR, 'condition_model.pkl')
+PRICE_MODEL_PATH = os.path.join(BACKEND_DIR, 'price_model.pkl')
+value_model = ValueModel(CONDITION_MODEL_PATH, PRICE_MODEL_PATH)
 
 # Load Sales Model
 SALES_MODEL_PATH = os.path.join(os.path.dirname(__file__), 'sarima_monthly_ev_sales.pkl')
@@ -82,10 +84,16 @@ def predict_value():
         
         return jsonify({
             'status': 'success',
-            'value_score': result['score'],
-            'recommendation': result['recommendation'],
-            'insights': result['insights'],
-            'fair_price_range': result['fair_price_range']
+            # New dual-model fields
+            'condition_score':  result.get('condition_score'),
+            'predicted_resale': result.get('predicted_resale'),
+            'user_price':       result.get('user_price'),
+            'price_diff_pct':   result.get('price_diff_pct'),
+            'recommendation':   result['recommendation'],
+            'insights':         result['insights'],
+            'fair_price_range': result['fair_price_range'],
+            # Legacy compat
+            'value_score':      result.get('condition_score'),
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -112,9 +120,11 @@ def predict_sales():
 @app.route('/health', methods=['GET'])
 def health_check():
     return jsonify({
-        'status': 'online', 
+        'status': 'online',
         'health_model_loaded': model is not None,
-        'value_model_loaded': value_model.model is not None
+        'value_model_loaded': value_model.model is not None,
+        'condition_model_features': value_model.condition_features,
+        'price_model_features': value_model.price_features,
     })
 
 if __name__ == "__main__":
