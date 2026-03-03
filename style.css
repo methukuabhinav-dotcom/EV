@@ -1059,96 +1059,340 @@ body {
   margin: 0;
 }
 
+/* ================= HAMBURGER MENU ================= */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  height: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1100;
+  order: 3;
+}
+
+.hamburger span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background: #cbd5f5;
+  border-radius: 3px;
+  transition: all 0.35s ease;
+  transform-origin: center;
+}
+
+.hamburger.active span:nth-child(1) {
+  transform: translateY(8.5px) rotate(45deg);
+  background: #6a5cff;
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamburger.active span:nth-child(3) {
+  transform: translateY(-8.5px) rotate(-45deg);
+  background: #6a5cff;
+}
+
 /* ================= RESPONSIVE ================= */
 @media (max-width: 1024px) {
+  .navbar {
+    padding: 18px 40px;
+  }
+
   .hero-section {
     grid-template-columns: 1fr;
     padding: 100px 60px;
+    gap: 60px;
+    text-align: center;
+  }
+
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-cta {
+    justify-content: center;
   }
 
   .hero-title {
     font-size: 44px;
   }
 
+  .hero-subtitle {
+    max-width: 100%;
+  }
+
+  .hero-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .logo {
     font-size: 24px;
   }
 
-  .nav-links {
+  .navbar .nav-links {
     gap: 30px;
   }
 
-  .nav-links a {
+  .navbar .nav-links a {
     font-size: 14px;
+  }
+
+  .why-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .footer-row {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 40px;
+  }
+
+  .features-section,
+  .benefits-section,
+  .faq-section,
+  .why-section,
+  .stats-section {
+    padding: 80px 40px;
   }
 }
 
 @media (max-width: 768px) {
   .navbar {
-    padding: 15px 30px;
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .nav-links {
-    gap: 20px;
+    padding: 16px 24px;
     flex-wrap: wrap;
-    justify-content: center;
+    position: relative;
   }
 
+  .hamburger {
+    display: flex;
+  }
+
+  #nav-auth-container {
+    order: 2;
+  }
+
+  .navbar .nav-links {
+    order: 4;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.4s ease;
+    padding: 0;
+    background: rgba(15, 23, 42, 0.98);
+    border-top: 1px solid rgba(106, 92, 255, 0.15);
+    margin-top: 0;
+  }
+
+  .navbar .nav-links.open {
+    max-height: 400px;
+    padding: 12px 0 16px;
+  }
+
+  .navbar .nav-links li {
+    width: 100%;
+  }
+
+  .navbar .nav-links a {
+    display: block;
+    padding: 12px 0;
+    font-size: 15px;
+    border-bottom: 1px solid rgba(106, 92, 255, 0.08);
+  }
+
+  .navbar .nav-links a::after {
+    display: none;
+  }
+
+  /* --- Hero --- */
   .hero-section {
-    padding: 80px 30px;
+    padding: 80px 24px 60px;
     grid-template-columns: 1fr;
+    gap: 40px;
+    min-height: auto;
   }
 
   .hero-title {
-    font-size: 36px;
+    font-size: 34px;
   }
 
   .hero-subtitle {
     font-size: 16px;
   }
 
+  .hero-cta {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .cta-btn-primary,
+  .cta-btn-secondary {
+    width: 100%;
+    text-align: center;
+  }
+
+  .hero-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  /* --- Sections --- */
   .features-section,
   .benefits-section,
   .faq-section {
-    padding: 80px 30px;
+    padding: 70px 24px;
   }
 
   .why-section,
-  .stats-section,
+  .stats-section {
+    padding: 70px 24px;
+  }
+
   .cta-section {
-    padding: 80px 30px;
+    padding: 60px 24px;
   }
 
   .footer {
-    padding: 50px 30px 20px;
+    padding: 50px 24px 20px;
   }
 
   .footer-row {
-    gap: 40px;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
   }
 
+  .footer-left {
+    grid-column: 1 / -1;
+    max-width: 100%;
+  }
+
+  /* --- Section headers --- */
   .section-header h2 {
-    font-size: 36px;
+    font-size: 32px;
   }
 
+  .section-header p {
+    font-size: 16px;
+  }
+
+  /* --- Why cards --- */
+  .why-cards {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .why-card {
+    padding: 28px;
+  }
+
+  /* --- CTA box --- */
   .cta-box {
-    padding: 50px 30px;
+    padding: 50px 28px;
   }
 
   .cta-box h2 {
     font-size: 28px;
   }
 
+  .cta-box p {
+    font-size: 16px;
+  }
+
+  /* --- Feature / benefit / stat cards --- */
   .feature-card,
-  .stat-card,
-  .why-card,
   .benefit-item {
-    padding: 30px;
+    padding: 28px;
+  }
+
+  .stat-card {
+    padding: 20px;
+  }
+
+  .stat-number {
+    font-size: 26px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stat-value {
+    font-size: 34px;
   }
 }
+
+@media (max-width: 480px) {
+
+  /* --- Navbar --- */
+  .navbar {
+    padding: 14px 16px;
+  }
+
+  .logo {
+    font-size: 20px;
+  }
+
+  /* --- Hero --- */
+  .hero-title {
+    font-size: 28px;
+  }
+
+  .hero-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* --- Why / Stats --- */
+  .why-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* --- Footer --- */
+  .footer-row {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-left {
+    grid-column: auto;
+  }
+
+  /* --- Features grid: single column --- */
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-header h2 {
+    font-size: 26px;
+  }
+
+  .cta-box h2 {
+    font-size: 24px;
+  }
+
+  .cta-box {
+    padding: 36px 20px;
+  }
+
+  .why-card,
+  .feature-card,
+  .benefit-item {
+    padding: 24px;
+  }
+}
+
 
 /* ================= ABOUT PAGE STYLES ================= */
 .about-hero {
