@@ -6,6 +6,149 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>About | EV Analytics</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Process Section ── */
+    .process-section {
+      padding: 3rem 2rem;
+    }
+
+    .process-cards {
+      display: flex;
+      gap: 1.25rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+    }
+
+    .process-card {
+      flex: 1 1 240px;
+      max-width: 320px;
+      background: rgba(106, 92, 255, 0.07);
+      border: 1px solid rgba(106, 92, 255, 0.22);
+      border-radius: 16px;
+      padding: 1.5rem 1.25rem;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .process-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(106, 92, 255, 0.18);
+    }
+
+    .process-number {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: rgba(106, 92, 255, 0.5);
+      letter-spacing: 1px;
+      margin-bottom: 0.4rem;
+    }
+
+    .process-icon {
+      font-size: 2rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .process-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: white;
+    }
+
+    .process-card p {
+      font-size: 0.85rem;
+      color: #cbd5f5;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* ── Mission Section ── */
+    .mission-section {
+      padding: 3rem 2rem;
+    }
+
+    .mission-content {
+      display: flex;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    .mission-card {
+      flex: 1 1 220px;
+      max-width: 300px;
+      background: rgba(106, 92, 255, 0.07);
+      border: 1px solid rgba(106, 92, 255, 0.22);
+      border-radius: 16px;
+      padding: 1.5rem 1.25rem;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .mission-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(106, 92, 255, 0.18);
+    }
+
+    .mission-icon {
+      font-size: 2rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .mission-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 0.4rem;
+    }
+
+    .mission-card p {
+      font-size: 0.85rem;
+      color: #cbd5f5;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* ── Values Section ── */
+    .values-section {
+      padding: 3rem 2rem;
+    }
+
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin-top: 2rem;
+    }
+
+    .value-item {
+      background: rgba(106, 92, 255, 0.07);
+      border: 1px solid rgba(106, 92, 255, 0.22);
+      border-radius: 14px;
+      padding: 1.25rem;
+      transition: transform 0.3s ease;
+    }
+
+    .value-item:hover {
+      transform: translateY(-4px);
+    }
+
+    .value-item h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #a78bfa;
+      margin-bottom: 0.35rem;
+    }
+
+    .value-item p {
+      font-size: 0.83rem;
+      color: #cbd5f5;
+      line-height: 1.5;
+      margin: 0;
+    }
+  </style>
 </head>
 
 <body>
