@@ -585,7 +585,26 @@
             }
         }
 
+        .bh-risk-bar {
+            height: 14px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #10b981 0%, #f59e0b 50%, #ef4444 100%);
+            position: relative;
+            margin-top: 10px;
+        }
 
+        .bh-risk-marker {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #334155;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: left 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
 
         /* ===== MOBILE TOP-BAR ===== */
         .mobile-topbar {
@@ -737,14 +756,8 @@
             <span>⚡ Volt Analytics</span>
         </div>
         <div class="nav-links">
-            <a href="user-dashboard.html" class="nav-link-custom">
-                <span>📊</span> Dashboard
-            </a>
-            <a href="ml_models.html" class="nav-link-custom active">
-                <span>🤖</span> ML Models
-            </a>
-            <a href="index.html" class="nav-link-custom">
-                <span>🏠</span> Home
+            <a href="service-dashboard.html" class="nav-link-custom active">
+                <span>🤖</span> Service Dashboard
             </a>
             <button class="nav-link-custom logout-btn-nav mt-auto" onclick="logout()">
                 <span>🚪</span> Logout
@@ -758,8 +771,8 @@
             <div class="col">
                 <h2 class="fw-bold mb-0"
                     style="background: linear-gradient(135deg, #fff, #6a5cff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                    Our AI</h2>
-                <p style="color: #cbd5f5;">Explore our predictive analytics powered by machine learning.</p>
+                    Service Dashboard</h2>
+                <p style="color: #cbd5f5;">Exclusive battery health diagnostics for service personnel.</p>
             </div>
         </div>
 
@@ -770,142 +783,174 @@
             <div>
                 <strong>AI Disclaimer:</strong> The predictions provided by our Machine Learning models are estimates
                 based on learned data patterns. These models can occasionally make mistakes or display variances from
-                real-world conditions. Please use these results as guidance and not as absolute financial or technical
+                real-world conditions. Please use these results as guidance and not as absolute technical
                 guarantees.
             </div>
         </div>
 
         <!-- Prediction Cards Row -->
-
-
-        <div class="row g-4 mb-5">
-            <!-- Value for Money Card -->
-            <div class="col-md-12">
+        <!-- <div class="row g-4 mb-5"> -->
+        <!-- Battery Health Card -->
+        <!-- <div class="col-md-12">
                 <div class="ml-card">
                     <span
-                        style="position:absolute; top:1.25rem; right:1.25rem; background: linear-gradient(135deg, rgba(106,92,255,0.18), rgba(106,92,255,0.08)); border: 1px solid rgba(106,92,255,0.45); color: #a78bfa; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">👤
-                        For Users</span>
+                        style="position:absolute; top:1.25rem; right:1.25rem; background: linear-gradient(135deg, rgba(34,211,238,0.18), rgba(34,211,238,0.08)); border: 1px solid rgba(34,211,238,0.4); color: #22d3ee; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">🔧
+                        For Service Persons</span>
                     <div class="ml-icon-wrapper">
-                        💎
+                        🔋
                     </div>
-                    <h3>Value for Money Prediction</h3>
-                    <p>Get an accurate valuation of your EV based on market trends, depreciation curves, and vehicle
-                        condition. Perfect for resale or purchase decisions.</p>
-                    <button class="btn-predict" onclick="showForm('value')">Check Value</button>
+                    <h3>Battery Health Prediction</h3>
+                    <p>Analyze an EV battery's current state and predict its remaining lifespan using our advanced AI
+                        algorithm considering charge cycles, voltage, and temperature.</p>
                 </div>
             </div>
-        </div>
+        </div> -->
 
 
-
-
-        <!-- Value For Money Form Section -->
-        <div id="valueFormSection" class="form-section d-none">
+        <!-- Battery Health Form Section -->
+        <div id="batteryFormSection" class="form-section">
             <div class="form-header">
                 <div>
-                    <h3 class="fw-bold mb-1">Value Estimation</h3>
-                    <p class="text-muted mb-0">Calculate the fair market value of your EV</p>
+                    <h3 class="fw-bold mb-1">Battery Health Analysis</h3>
+                    <p class="text-muted mb-0">Enter technical parameters for precise health estimation</p>
                 </div>
-                <button class="btn-close-form" onclick="closeForms()">✕</button>
             </div>
-            <form id="valueForm">
+            <form id="batteryHealthForm">
                 <div class="row g-4">
-                    <div class="col-md-4">
-                        <label class="form-label">Brand <span class="field-tooltip"
-                                data-tip="Manufacturer name, e.g. BYD, Tata, Ather.">?</span></label>
-                        <input type="text" class="form-control form-control-custom" name="brand" placeholder="e.g. BYD"
-                            value="BYD" required>
+                    <div class="col-md-6">
+                        <label class="form-label">Vehicle Age (years) <span class="field-tooltip"
+                                data-tip="How many years since the vehicle was first registered.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="0" max="15" step="0.5" value="1"
+                                oninput="syncInput(this,'bh_age_num')">
+                            <span class="slider-val-display" id="bh_age_disp">1</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_age_num"
+                            name="vehicle_age_years" step="0.1" value="1" required
+                            oninput="syncSlider(this,'bh_age_num',0,15,'bh_age_disp')">
+                        <div class="field-error" id="err_age">Must be between 0 and 15 years.</div>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Vehicle Type <span class="field-tooltip"
-                                data-tip="Select the vehicle category that best describes your EV.">?</span></label>
-                        <select class="form-select form-control-custom" name="vehicle_type">
-                            <option value="Car" selected>Car</option>
-                            <option value="Bike">Bike</option>
-                            <option value="SUV">SUV</option>
-                        </select>
+                    <div class="col-md-6">
+                        <label class="form-label">Total Charge Cycles <span class="field-tooltip"
+                                data-tip="Number of full charge-discharge cycles completed.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="0" max="2000" step="10"
+                                value="326" oninput="syncInput(this,'bh_cycles_num')">
+                            <span class="slider-val-display" id="bh_cycles_disp">326</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_cycles_num"
+                            name="total_charge_cycles" value="326" required
+                            oninput="syncSlider(this,'bh_cycles_num',0,2000,'bh_cycles_disp')">
+                        <div class="field-error" id="err_cycles">Must be between 0 and 2000.</div>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Battery Health (%) <span class="field-tooltip"
-                                data-tip="Current battery capacity as a percentage of original rated capacity.">?</span></label>
-                        <input type="number" class="form-control form-control-custom" name="battery_health_pct"
-                            step="0.1" placeholder="e.g. 81" value="81" min="0" max="100" required>
+                    <div class="col-md-6">
+                        <label class="form-label">Max Battery Temperature (°C) <span class="field-tooltip"
+                                data-tip="Peak temperature recorded, higher values accelerate degradation.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="0" max="80" step="0.5" value="36"
+                                oninput="syncInput(this,'bh_maxtemp_num')">
+                            <span class="slider-val-display" id="bh_maxtemp_disp">36</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_maxtemp_num"
+                            name="max_battery_temperature_c" step="0.1" value="36" required
+                            oninput="syncSlider(this,'bh_maxtemp_num',0,80,'bh_maxtemp_disp')">
+                        <div class="field-error" id="err_maxtemp">Must be between 0 and 80°C.</div>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Range (km) <span class="field-tooltip"
-                                data-tip="Current single-charge driving range in km.">?</span></label>
-                        <input type="number" class="form-control form-control-custom" name="range_km" step="0.1"
-                            placeholder="e.g. 105" value="105" required>
+                    <div class="col-md-6">
+                        <label class="form-label">Avg Battery Temperature (°C) <span class="field-tooltip"
+                                data-tip="Typical operating temperature during normal use.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="0" max="60" step="0.5" value="26"
+                                oninput="syncInput(this,'bh_avgtemp_num')">
+                            <span class="slider-val-display" id="bh_avgtemp_disp">26</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_avgtemp_num"
+                            name="avg_battery_temperature_c" step="0.1" value="26" required
+                            oninput="syncSlider(this,'bh_avgtemp_num',0,60,'bh_avgtemp_disp')">
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Top Speed (kmph) <span class="field-tooltip"
-                                data-tip="Maximum rated speed of the vehicle.">?</span></label>
-                        <input type="number" class="form-control form-control-custom" name="top_speed_kmph" step="0.1"
-                            placeholder="e.g. 144" value="144" required>
+                    <div class="col-md-6">
+                        <label class="form-label">Avg Charging Time (hours) <span class="field-tooltip"
+                                data-tip="Average time taken to charge from 0-100%.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="0.5" max="24" step="0.5" value="2"
+                                oninput="syncInput(this,'bh_chgtime_num')">
+                            <span class="slider-val-display" id="bh_chgtime_disp">2</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_chgtime_num"
+                            name="avg_charging_time_hours" step="0.1" value="2" required
+                            oninput="syncSlider(this,'bh_chgtime_num',0.5,24,'bh_chgtime_disp')">
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Odometer Reading (km) <span class="field-tooltip"
-                                data-tip="Total km driven since vehicle was new.">?</span></label>
-                        <input type="number" class="form-control form-control-custom" name="odometer_km" step="0.1"
-                            placeholder="e.g. 140236" value="140236" required>
+                    <div class="col-md-6">
+                        <label class="form-label">Avg Depth of Discharge (%) <span class="field-tooltip"
+                                data-tip="How far the battery is typically drained before recharging — lower is better.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="0" max="100" step="1" value="56"
+                                oninput="syncInput(this,'bh_dod_num')">
+                            <span class="slider-val-display" id="bh_dod_disp">56%</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_dod_num"
+                            name="avg_depth_of_discharge_percent" step="0.1" value="56" required
+                            oninput="syncSlider(this,'bh_dod_num',0,100,'bh_dod_disp','%')">
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Warranty Remaining (years) <span class="field-tooltip"
-                                data-tip="Years left on manufacturer battery warranty.">?</span></label>
-                        <input type="number" class="form-control form-control-custom" name="warranty_remaining_years"
-                            step="0.1" placeholder="e.g. 1" value="1" required>
+                    <div class="col-md-6">
+                        <label class="form-label">Fast Charging Frequency (%) <span class="field-tooltip"
+                                data-tip="% of sessions using DC fast charging — higher values degrade the battery faster.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="0" max="100" step="1" value="5"
+                                oninput="syncInput(this,'bh_fastchg_num')">
+                            <span class="slider-val-display" id="bh_fastchg_disp">5%</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_fastchg_num"
+                            name="fast_charging_frequency_percent" step="0.1" value="5" required
+                            oninput="syncSlider(this,'bh_fastchg_num',0,100,'bh_fastchg_disp','%')">
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Annual Maintenance Cost (₹) <span class="field-tooltip"
-                                data-tip="Yearly cost for servicing and repairs.">?</span></label>
-                        <input type="number" class="form-control form-control-custom" name="annual_maintenance_cost"
-                            step="1" placeholder="e.g. 32026" value="32026" required>
+                    <div class="col-md-6">
+                        <label class="form-label">Average Voltage (V) <span class="field-tooltip"
+                                data-tip="Mean cell voltage during operation (nominal ~3.6V for Li-ion).">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="2" max="5" step="0.1" value="3"
+                                oninput="syncInput(this,'bh_volt_num')">
+                            <span class="slider-val-display" id="bh_volt_disp">3V</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_volt_num"
+                            name="avg_voltage" step="0.1" value="3" required
+                            oninput="syncSlider(this,'bh_volt_num',2,5,'bh_volt_disp','V')">
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Purchase Price (₹) <span class="field-tooltip"
-                                data-tip="Original on-road price when the vehicle was purchased.">?</span></label>
-                        <input type="number" class="form-control form-control-custom" name="Purchase_Price_L" step="1"
-                            placeholder="e.g. 2093043" value="2093043" required>
+                    <div class="col-md-6">
+                        <label class="form-label">Internal Resistance (mΩ) <span class="field-tooltip"
+                                data-tip="Higher resistance = reduced power delivery & capacity. Rising values signal ageing.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="1" max="100" step="0.5" value="11"
+                                oninput="syncInput(this,'bh_resist_num')">
+                            <span class="slider-val-display" id="bh_resist_disp">11</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_resist_num"
+                            name="internal_resistance_mohm" step="0.01" value="11" required
+                            oninput="syncSlider(this,'bh_resist_num',1,100,'bh_resist_disp')">
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Purchase Year <span class="field-tooltip"
-                                data-tip="Year when the vehicle was first purchased.">?</span></label>
-                        <input type="number" class="form-control form-control-custom" name="Purchase_Year" min="2000"
-                            max="2050" placeholder="e.g. 2023" value="2023" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Current Year <span class="field-tooltip"
-                                data-tip="The current calendar year for depreciation calculation.">?</span></label>
-                        <input type="number" class="form-control form-control-custom" name="Current_Year" value="2026"
-                            placeholder="e.g. 2026" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Initial Mileage (km) <span class="field-tooltip"
-                                data-tip="Odometer reading when you first took ownership.">?</span></label>
-                        <input type="number" class="form-control form-control-custom" name="Initial_Mileage" step="0.1"
-                            placeholder="e.g. 202" value="202" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Current Mileage (km) <span class="field-tooltip"
-                                data-tip="Odometer reading at the time of this valuation.">?</span></label>
-                        <input type="number" class="form-control form-control-custom" name="Current_Mileage" step="0.1"
-                            placeholder="e.g. 166" value="166" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Expected Resale Price (₹) <span class="field-tooltip"
-                                data-tip="The price you expect to sell or buy the vehicle for. The model will tell you if it is fair.">?</span></label>
-                        <input type="number" class="form-control form-control-custom" name="Resale_Value_L" step="1"
-                            placeholder="e.g. 1475081" value="1475081" required>
+                    <div class="col-md-6">
+                        <label class="form-label">Capacity Retention (%) <span class="field-tooltip"
+                                data-tip="Current capacity vs original — above 80% is generally considered healthy.">?</span></label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="range" class="range-custom flex-grow-1" min="0" max="100" step="0.5" value="91"
+                                oninput="syncInput(this,'bh_cap_num')">
+                            <span class="slider-val-display" id="bh_cap_disp">91%</span>
+                        </div>
+                        <input type="number" class="form-control form-control-custom mt-1" id="bh_cap_num"
+                            name="capacity_retention_percent" step="0.1" value="91" required
+                            oninput="syncSlider(this,'bh_cap_num',0,100,'bh_cap_disp','%')">
                     </div>
                     <div class="col-12 mt-4 d-flex align-items-center gap-3">
-                        <button type="submit" class="btn-predict" style="max-width: 220px;">💰 Calculate Value</button>
-                        <button type="button" class="btn-result-action" onclick="resetValueForm()">↺ Reset</button>
+                        <button type="submit" class="btn-predict" style="max-width: 220px;">🔬 Run Diagnosis</button>
+                        <button type="button" class="btn-result-action" onclick="resetBatteryForm()">↺ Reset</button>
                     </div>
                 </div>
-                <!-- Value Result Area -->
-                <div id="valueResult" class="mt-4 d-none"></div>
+                <!-- Result Area -->
+                <div id="predictionResult" class="mt-4 d-none"></div>
             </form>
         </div>
+
+
 
 
 
@@ -944,17 +989,35 @@
             }
         }
 
-
-
-        // Reset Value form
-        function resetValueForm() {
-            document.getElementById('valueForm').reset();
-            const res = document.getElementById('valueResult');
+        // Reset Battery Health form
+        function resetBatteryForm() {
+            document.getElementById('batteryHealthForm').reset();
+            // Reset all slider displays
+            const defaults = {
+                bh_age_disp: '1', bh_cycles_disp: '326', bh_maxtemp_disp: '36',
+                bh_avgtemp_disp: '26', bh_chgtime_disp: '2', bh_dod_disp: '56%',
+                bh_fastchg_disp: '5%', bh_volt_disp: '3V', bh_resist_disp: '11', bh_cap_disp: '91%'
+            };
+            Object.entries(defaults).forEach(([id, val]) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = val;
+            });
+            // Reset range sliders to match default numbers
+            document.querySelectorAll('#batteryHealthForm input[type="range"]').forEach(r => {
+                const numId = r.getAttribute('oninput').match(/'([^']+)'\)/)?.[1];
+                const numEl = document.getElementById(numId);
+                if (numEl) r.value = numEl.defaultValue;
+            });
+            // Hide result
+            const res = document.getElementById('predictionResult');
             if (res) { res.innerHTML = ''; res.classList.add('d-none'); }
-            document.querySelectorAll('#valueForm .form-control-custom').forEach(el => {
+            // Clear validation states
+            document.querySelectorAll('#batteryHealthForm .form-control-custom').forEach(el => {
                 el.classList.remove('is-valid', 'is-invalid');
             });
         }
+
+
 
         // Live validation on all form inputs
         document.addEventListener('DOMContentLoaded', () => {
@@ -978,76 +1041,48 @@
     </script>
 
     <script type="module">
-        import { protectRoute } from "./guard.js";
         import { handleLogout } from "./auth.js";
 
-        // Protect Route
-        protectRoute('user', ['Premium Plan']).then(user => {
-            console.log("Access Granted:", user.fullName);
-        });
+        // Service Role Check
+        const userRole = sessionStorage.getItem('userRole');
+        const userEmail = sessionStorage.getItem('userEmail');
+
+        if (userRole !== 'service' || userEmail !== 'service@gmail.com') {
+            console.warn("Unauthorized: Not a service user.");
+            alert("Unauthorized access attempt. Incorrect Role.");
+            window.location.href = "login.html";
+        } else {
+            console.log("Access Granted: Service Personnel");
+        }
 
         window.logout = handleLogout;
 
-        window.updateDurationHint = function () {
-            const gran = document.getElementById('forecastGranularity').value;
-            const input = document.getElementById('forecastSteps');
-            const hint = document.getElementById('durationHint');
-
-            if (gran === 'yearly') {
-                hint.innerText = "Enter years (e.g. 5)";
-                if (input.value > 10) input.value = 5; // Reset to reasonable default for years
-            } else {
-                hint.innerText = "Enter months (e.g. 12)";
-                if (input.value < 12) input.value = 12; // Reset to reasonable default for months
-            }
-        };
-
-        // Toggle Forms
-        window.showForm = function (type) {
-            // Hide all forms first
-            document.getElementById('valueFormSection').classList.add('d-none');
-
-            // Show selected form
-            if (type === 'value') {
-                document.getElementById('valueFormSection').classList.remove('d-none');
-                document.getElementById('valueFormSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } else if (type === 'sales') {
-                document.getElementById('salesFormSection').classList.remove('d-none');
-                document.getElementById('salesFormSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-                // Load forecast if not already loaded or just specific call
-                loadForecast();
-            }
-        };
-
-        window.closeForms = function () {
-            document.getElementById('valueFormSection').classList.add('d-none');
-            document.getElementById('salesFormSection').classList.add('d-none');
-            // Scroll back to top or cards
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
 
 
-
-        // Gauge Chart Instance
-        let valueGaugeChart = null;
-
-        document.getElementById('valueForm').addEventListener('submit', async function (e) {
+        // Handle Battery Health Prediction
+        document.getElementById('batteryHealthForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
             const formData = new FormData(e.target);
             const data = Object.fromEntries(formData.entries());
 
-            const resultDiv = document.getElementById('valueResult');
+            // Read user inputs for display
+            const capRetention = parseFloat(data.capacity_retention_percent) || 0;
+            const chargeCycles = parseInt(data.total_charge_cycles) || 0;
+            const maxTemp = parseFloat(data.max_battery_temperature_c) || 0;
+            const fastChargePct = parseFloat(data.fast_charging_frequency_percent) || 0;
+
+            const resultDiv = document.getElementById('predictionResult');
             resultDiv.classList.remove('d-none');
             resultDiv.className = 'mt-4';
             resultDiv.innerHTML = `
                 <div class="bh-card visible p-4 text-center mb-3">
                     <div class="spinner-border text-primary" role="status" style="width:3rem;height:3rem;"></div>
-                    <p class="mt-3 text-muted fw-semibold">Analysing vehicle value...</p>
+                    <p class="mt-3 text-muted fw-semibold">Analyzing battery health...</p>
                 </div>`;
 
             try {
-                const response = await fetch('https://ev-4ce7.onrender.com/predict_value', {
+                const response = await fetch('https://ev-4ce7.onrender.com/predict_health', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data),
@@ -1057,157 +1092,136 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    const condRaw = result.condition_score ?? 0;
-                    const condScore = condRaw.toFixed(2);
-                    const predResaleRaw = result.predicted_resale ?? 0;
-                    const userPriceRaw = result.user_price ?? 0;
-                    const predResale = predResaleRaw.toLocaleString('en-IN', { maximumFractionDigits: 1 });
-                    const userPrice = userPriceRaw.toLocaleString('en-IN', { maximumFractionDigits: 1 });
-                    const priceDiff = (result.price_diff_pct ?? 0).toFixed(2);
-                    const rec = result.recommendation || '';
-                    const recColor = rec === 'Overpriced' ? '#ef4444' : rec === 'Fair Price' ? '#f59e0b' : '#10b981';
-                    const recBg = rec === 'Overpriced' ? 'rgba(239,68,68,0.12)' : rec === 'Fair Price' ? 'rgba(245,158,11,0.12)' : 'rgba(16,185,129,0.12)';
-                    const recIcon = rec === 'Overpriced' ? '⚠️' : rec === 'Fair Price' ? '👍' : '✅';
-                    const condColor = condRaw >= 70 ? '#10b981' : condRaw >= 45 ? '#f59e0b' : '#ef4444';
+                    const orbColor = { 'Healthy': '#10b981', 'Moderate': '#f59e0b', 'Degraded': '#ef4444' }[result.prediction] || '#6b7280';
+                    const orbIcon = { 'Healthy': '🔋', 'Moderate': '⚡', 'Degraded': '🔴' }[result.prediction] || '🔋';
+                    const riskMarkerLeft = { 'LOW': '10%', 'MODERATE': '48%', 'HIGH': '86%' }[result.risk_level] || '48%';
+                    const riskLabel = { 'LOW': '🟢 Low Risk', 'MODERATE': '🟡 Moderate Risk', 'HIGH': '🔴 High Risk' }[result.risk_level] || result.risk_level;
 
-                    // SVG donut gauge params
-                    const radius = 54, circ = 2 * Math.PI * radius;
-                    const dashOffset = circ - (condRaw / 100) * circ;
+                    // Metric bar configs: [label, value, max, color]
+                    const metrics = [
+                        { label: 'Capacity Retention', value: capRetention, max: 100, color: capRetention > 85 ? '#10b981' : capRetention > 70 ? '#f59e0b' : '#ef4444', unit: '%' },
+                        { label: 'Max Temperature', value: maxTemp, max: 80, color: maxTemp < 40 ? '#10b981' : maxTemp < 55 ? '#f59e0b' : '#ef4444', unit: '°C' },
+                        { label: 'Charge Cycles', value: Math.min(chargeCycles, 2000), max: 2000, color: chargeCycles < 500 ? '#10b981' : chargeCycles < 1000 ? '#f59e0b' : '#ef4444', unit: ` (${chargeCycles})` },
+                        { label: 'Fast Charging Freq', value: fastChargePct, max: 100, color: fastChargePct < 20 ? '#10b981' : fastChargePct < 50 ? '#f59e0b' : '#ef4444', unit: '%' },
+                    ];
 
-                    // Price bar: which is bigger?
-                    const maxPrice = Math.max(predResaleRaw, userPriceRaw);
-                    const predPct = maxPrice > 0 ? (predResaleRaw / maxPrice * 100).toFixed(1) : 0;
-                    const userPct = maxPrice > 0 ? (userPriceRaw / maxPrice * 100).toFixed(1) : 0;
+                    const metricHTML = metrics.map((m, i) => `
+                        <div style="margin-bottom: 14px;">
+                            <div class="d-flex justify-content-between" style="font-size:0.82rem; font-weight:600; color:#94a3b8;">
+                                <span>${m.label}</span>
+                                <span style="color:${m.color}">${m.value}${m.unit}</span>
+                            </div>
+                            <div class="bh-metric-bar">
+                                <div class="bh-metric-fill" id="bar-${i}" style="background:${m.color};"></div>
+                            </div>
+                        </div>`).join('');
 
                     resultDiv.innerHTML = `
                         <div class="bh-result-wrapper">
+                            <!-- Status Orb -->
+                            <div class="text-center mb-4">
+                                <div style="
+                                    width: 140px; height: 140px; border-radius: 50%;
+                                    background: ${orbColor};
+                                    margin: 0 auto 16px;
+                                    display: flex; align-items: center; justify-content: center;
+                                    flex-direction: column;
+                                    box-shadow: 0 0 60px ${orbColor}66, 0 0 120px ${orbColor}33, 0 10px 30px rgba(0,0,0,0.4);
+                                    border: 4px solid rgba(255,255,255,0.15);
+                                    animation: pulseRing 2.5s ease-in-out infinite;
+                                ">
+                                    <div style="font-size: 0.95rem; font-weight: 800; color: white; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 2px 6px rgba(0,0,0,0.5);">${result.prediction}</div>
+                                </div>
+                                <p class="text-muted" style="font-size:0.9rem; margin-top:0;">AI Battery Diagnosis Complete</p>
+                            </div>
 
-                            <!-- Row 1: Donut Gauge + Price Comparison -->
+                            <!-- Metric Bars -->
+                            <div class="bh-card mb-3" id="bh-metrics">
+                                <h6 class="fw-bold mb-3" style="color:#cbd5f5;">📊 Key Metrics</h6>
+                                ${metricHTML}
+                            </div>
+
+                            <!-- Recommendation & Insight -->
                             <div class="row g-3 mb-3">
-                                <div class="col-md-5">
-                                    <div class="bh-card h-100 text-center" id="vc-cond">
-                                        <div style="font-size:0.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#94a3b8;margin-bottom:12px;">🔧 Vehicle Condition Score</div>
-                                        <div style="position:relative;display:inline-block;width:140px;height:140px;margin-bottom:10px;">
-                                            <svg width="140" height="140" viewBox="0 0 140 140">
-                                                <circle cx="70" cy="70" r="${radius}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="14"/>
-                                                <circle id="gaugeArc" cx="70" cy="70" r="${radius}" fill="none"
-                                                    stroke="${condColor}" stroke-width="14"
-                                                    stroke-linecap="round"
-                                                    stroke-dasharray="${circ.toFixed(2)}"
-                                                    stroke-dashoffset="${circ.toFixed(2)}"
-                                                    transform="rotate(-90 70 70)"
-                                                    style="transition: stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1);"
-                                                />
-                                            </svg>
-                                            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                                                <div id="condCounter" style="font-size:1.9rem;font-weight:800;color:${condColor};line-height:1;">0%</div>
-                                                <div style="font-size:0.65rem;color:#64748b;font-weight:600;">SCORE</div>
-                                            </div>
-                                        </div>
+                                <div class="col-md-6">
+                                    <div class="bh-card h-100" id="bh-rec">
+                                        <div style="font-size:1.5rem; margin-bottom:8px;">💡</div>
+                                        <h6 class="fw-bold mb-1" style="color:#cbd5f5;">Recommendation</h6>
+                                        <p class="mb-0" style="font-size:0.9rem; color:#94a3b8; line-height:1.6;">${result.recommendation}</p>
                                     </div>
                                 </div>
-                                <div class="col-md-7">
-                                    <div class="bh-card h-100" id="vc-prices">
-                                        <div style="font-size:0.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#94a3b8;margin-bottom:16px;">💰 Price Comparison</div>
-
-                                        <div style="margin-bottom:16px;">
-                                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                                <span style="font-size:0.84rem;color:#94a3b8;">AI Predicted Price</span>
-                                                <span style="font-size:0.95rem;font-weight:700;color:#818cf8;">₹${predResale}</span>
-                                            </div>
-                                            <div style="height:10px;border-radius:10px;background:rgba(255,255,255,0.06);overflow:hidden;">
-                                                <div id="predBar" style="height:100%;border-radius:10px;background:linear-gradient(90deg,#6366f1,#818cf8);width:0%;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);"></div>
-                                            </div>
-                                        </div>
-
-                                        <div style="margin-bottom:8px;">
-                                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                                <span style="font-size:0.84rem;color:#94a3b8;">Your Expected Price</span>
-                                                <span style="font-size:0.95rem;font-weight:700;color:${recColor};">₹${userPrice}</span>
-                                            </div>
-                                            <div style="height:10px;border-radius:10px;background:rgba(255,255,255,0.06);overflow:hidden;">
-                                                <div id="userBar" style="height:100%;border-radius:10px;background:linear-gradient(90deg,${recColor}99,${recColor});width:0%;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);"></div>
-                                            </div>
-                                        </div>
+                                <div class="col-md-6">
+                                    <div class="bh-card h-100" id="bh-insight">
+                                        <div style="font-size:1.5rem; margin-bottom:8px;">🔬</div>
+                                        <h6 class="fw-bold mb-1" style="color:#cbd5f5;">AI Insight</h6>
+                                        <p class="mb-0" style="font-size:0.9rem; color:#94a3b8; line-height:1.6;">${result.insight}</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Row 2: Recommendation (Full Width) -->
-                            <div class="bh-card mb-3 d-flex flex-column align-items-center justify-content-center text-center" id="vc-rec"
-                                 style="border-color:${recColor}40; background:${recBg}; padding: 2rem;">
-                                <div style="font-size:0.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#94a3b8;margin-bottom:14px;">📌 Recommendation</div>
-                                <div style="font-size:3.5rem;margin-bottom:10px;">${recIcon}</div>
-                                <div style="font-size:1.8rem;font-weight:800;color:${recColor};
-                                    text-shadow: 0 0 20px ${recColor}60;
-                                    animation: pulseRing 2s ease-in-out infinite;">${rec}</div>
-
+                            <!-- Risk Meter -->
+                            <div class="bh-card" id="bh-risk">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="fw-bold mb-0" style="color:#cbd5f5;">⚡ Risk Level</h6>
+                                    <span style="font-weight:700; font-size:1rem;">${riskLabel}</span>
+                                </div>
+                                <div style="position:relative; padding: 8px 0 24px;">
+                                    <div class="bh-risk-bar" style="background: linear-gradient(90deg, #10b981 0%, #f59e0b 50%, #ef4444 100%); height: 14px; border-radius: 10px; margin-top: 10px;"></div>
+                                    <div class="bh-risk-marker" id="riskMarker" style="position: absolute; top: 50%; width: 22px; height: 22px; background: white; border: 3px solid #334155; border-radius: 50%; transform: translateY(-50%); box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: left 1.2s cubic-bezier(0.4, 0, 0.2, 1); left: 0%;"></div>
+                                </div>
+                                <div class="d-flex justify-content-between" style="font-size:0.75rem; color:#94a3b8; font-weight:600; margin-top:-16px;">
+                                    <span>Low</span><span>Moderate</span><span>High</span>
+                                </div>
                             </div>
-
-
-
-                            <!-- Insights -->
-                            ${result.insights && result.insights.length > 0 ? `
-                            <div class="bh-card" id="vc-insights">
-                                <div style="font-size:0.8rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#94a3b8;margin-bottom:12px;">♦ AI Insights</div>
-                                ${result.insights.map((ins, idx) => `
-                                <div id="ins-${idx}" style="
-                                    display:flex;gap:10px;align-items:flex-start;
-                                    padding:10px 14px;border-radius:10px;margin-bottom:8px;
-                                    background:rgba(106,92,255,0.07);
-                                    border-left: 3px solid rgba(106,92,255,0.5);
-                                    opacity:0;transform:translateX(-12px);
-                                    transition:opacity 0.4s ease,transform 0.4s ease;">
-                                    <span style="font-size:1rem;flex-shrink:0;">👉</span>
-                                    <span style="font-size:0.88rem;color:#cbd5f5;line-height:1.5;">${ins}</span>
-                                </div>`).join('')}
-                            </div>` : ''}
-
                         </div>`;
 
-                    // Animate donut gauge
+                    // SVG Battery Animation
                     setTimeout(() => {
-                        const arc = document.getElementById('gaugeArc');
-                        if (arc) arc.style.strokeDashoffset = dashOffset.toFixed(2);
+                        const lvl = document.getElementById('batterySVGLevel');
+                        const pctTxt = document.getElementById('batterySVGPct');
+                        // Use capacity retention for the fill width (max 77 map to 100%)
+                        const targetWidth = Math.min((capRetention / 100) * 77, 77);
+                        if (lvl) lvl.style.width = targetWidth + 'px';
+
+                        // Count up
+                        let start = 0;
+                        const duration = 1500;
+                        const stepTime = 20;
+                        const steps = duration / stepTime;
+                        const inc = capRetention / steps;
+                        const timer = setInterval(() => {
+                            start += inc;
+                            if (start >= capRetention) {
+                                start = capRetention;
+                                clearInterval(timer);
+                            }
+                            if (pctTxt) pctTxt.innerText = Math.round(start) + '%';
+                        }, stepTime);
+
                     }, 200);
 
-                    // Animate counter
-                    (function animateCounter(target, el) {
-                        let start = 0, duration = 1400, step = 16;
-                        const increment = target / (duration / step);
-                        const timer = setInterval(() => {
-                            start = Math.min(start + increment, target);
-                            if (el) el.textContent = start.toFixed(1) + '%';
-                            if (start >= target) clearInterval(timer);
-                        }, step);
-                    })(condRaw, document.getElementById('condCounter'));
+                    // Animate cards in sequence
+                    const cards = ['bh-metrics', 'bh-rec', 'bh-insight', 'bh-risk'];
+                    cards.forEach((id, i) => {
+                        setTimeout(() => {
+                            const el = document.getElementById(id);
+                            if (el) el.classList.add('visible');
+                        }, 150 + i * 120);
+                    });
 
-                    // Animate bh-cards (condCard + rec)
-                    setTimeout(() => { const e = document.getElementById('vc-cond'); if (e) e.classList.add('visible'); }, 100);
-                    setTimeout(() => { const e = document.getElementById('vc-rec'); if (e) e.classList.add('visible'); }, 220);
-                    setTimeout(() => { const e = document.getElementById('vc-prices'); if (e) e.classList.add('visible'); }, 350);
+                    // Animate metric bars
+                    metrics.forEach((m, i) => {
+                        setTimeout(() => {
+                            const bar = document.getElementById(`bar-${i}`);
+                            if (bar) bar.style.width = `${Math.min((m.value / m.max) * 100, 100)}%`;
+                        }, 400 + i * 80);
+                    });
 
-                    // Animate price bars
+                    // Animate risk marker
                     setTimeout(() => {
-                        const pb = document.getElementById('predBar');
-                        const ub = document.getElementById('userBar');
-                        if (pb) pb.style.width = predPct + '%';
-                        if (ub) ub.style.width = userPct + '%';
-                    }, 500);
-
-                    // Animate fair range + insights
-                    setTimeout(() => { const e = document.getElementById('vc-range'); if (e) e.classList.add('visible'); }, 480);
-                    setTimeout(() => { const e = document.getElementById('vc-insights'); if (e) e.classList.add('visible'); }, 600);
-
-                    // Stagger insight rows
-                    if (result.insights) {
-                        result.insights.forEach((_, idx) => {
-                            setTimeout(() => {
-                                const el = document.getElementById(`ins-${idx}`);
-                                if (el) { el.style.opacity = '1'; el.style.transform = 'translateX(0)'; }
-                            }, 700 + idx * 100);
-                        });
-                    }
+                        const marker = document.getElementById('riskMarker');
+                        if (marker) marker.style.left = riskMarkerLeft;
+                    }, 700);
 
                 } else {
                     throw new Error(result.error || 'Unknown error');
@@ -1218,6 +1232,8 @@
                 resultDiv.innerText = 'Error connecting to prediction server. Please ensure the Python backend is running.';
             }
         });
+
+
 
 
 

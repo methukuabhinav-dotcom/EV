@@ -355,7 +355,7 @@ window.switchTab = function (tab) {
 
     // UI Override for ML Models
     if (mainTabs) mainTabs.style.display = 'none';
-    if (titleEl) titleEl.innerText = "Our ML Models";
+    if (titleEl) titleEl.innerText = "Our AI";
     if (descEl) descEl.innerText = "Direct access to AI/ML forecasting models.";
     const sidebarLink = document.querySelector('a[onclick="switchTab(\'ml-models\')"]');
     if (sidebarLink) sidebarLink.classList.add('active');
@@ -1046,39 +1046,71 @@ function renderSalesChart(forecastData) {
     salesChart.destroy();
   }
 
+  const dates = forecastData.dates;
+  const values = forecastData.values;
+
+  // Find the cutoff index: last date <= Jan 2026
+  const CUTOFF = '2026-01';
+  let cutoffIdx = dates.length - 1;
+  for (let i = 0; i < dates.length; i++) {
+    const d = dates[i].substring(0, 7); // "YYYY-MM"
+    if (d > CUTOFF) {
+      cutoffIdx = i;
+      break;
+    }
+  }
+
+  // Historical: solid, fill. Predicted: dashed, no fill. Both share the cutoff point to connect.
+  const historicalData = values.map((v, i) => i <= cutoffIdx ? v : null);
+  const predictedData = values.map((v, i) => i >= cutoffIdx ? v : null);
+
   salesChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: forecastData.dates,
+      labels: dates,
       datasets: [
         {
-          label: 'Forecasted Sales',
-          data: forecastData.values,
+          label: 'Historical Data',
+          data: historicalData,
           borderColor: '#6366f1',
           backgroundColor: 'rgba(99, 102, 241, 0.12)',
           borderWidth: 2.5,
           fill: true,
           tension: 0.4,
           pointBackgroundColor: '#6366f1',
-          pointRadius: 3,
+          pointRadius: 2.5,
+          spanGaps: false,
+        },
+        {
+          label: 'Predicted Data',
+          data: predictedData,
+          borderColor: '#22d3ee',
+          backgroundColor: 'rgba(34, 211, 238, 0.06)',
+          borderWidth: 2.5,
+          borderDash: [7, 5],
+          fill: false,
+          tension: 0.4,
+          pointBackgroundColor: '#22d3ee',
+          pointRadius: 2.5,
+          spanGaps: false,
         },
         {
           label: 'Upper CI',
           data: forecastData.upper_ci,
-          borderColor: 'rgba(34, 211, 238, 0.3)',
+          borderColor: 'rgba(34, 211, 238, 0.25)',
           backgroundColor: 'rgba(34, 211, 238, 0)',
           borderWidth: 1,
-          borderDash: [6, 4],
+          borderDash: [4, 4],
           pointRadius: 0,
           fill: false
         },
         {
           label: 'Lower CI',
           data: forecastData.lower_ci,
-          borderColor: 'rgba(34, 211, 238, 0.3)',
+          borderColor: 'rgba(34, 211, 238, 0.25)',
           backgroundColor: 'rgba(34, 211, 238, 0.06)',
           borderWidth: 1,
-          borderDash: [6, 4],
+          borderDash: [4, 4],
           pointRadius: 0,
           fill: '-1'
         }

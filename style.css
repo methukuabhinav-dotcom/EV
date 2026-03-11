@@ -1891,3 +1891,296 @@ body {
     height: 350px;
   }
 }
+
+/* ================= HOME SPLIT HERO ================= */
+
+.home-split-layout {
+  display: flex;
+  height: calc(100vh - 84px);
+  min-height: 600px;
+  width: 100%;
+  background: #0f172a;
+  /* Right side dark theme */
+  overflow: hidden;
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+/* --- Left Side --- */
+.split-left {
+  flex: 5;
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  border-radius: 0 40px 40px 0;
+  /* Match design curvature */
+  margin: 15px 0 15px 15px;
+  /* Margin to create floating border effect */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px;
+  color: white;
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Optional darker overlay to make white text pop */
+.split-left::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.6) 100%);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.split-logo {
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.split-logo-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.split-left-text {
+  z-index: 2;
+  margin-bottom: 20px;
+}
+
+.split-left-text h2 {
+  font-size: 2.8rem;
+  line-height: 1.2;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* --- Right Side --- */
+.split-right {
+  flex: 7;
+  display: flex;
+  flex-direction: column;
+  padding: 30px 60px;
+  background: #0f172a;
+}
+
+/* Specific dark nav for split */
+.split-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0 20px 0;
+}
+
+.split-nav-links {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+  margin: 0;
+  padding: 0;
+}
+
+.split-nav-links a {
+  text-decoration: none;
+  color: #6b7280;
+  font-size: 15px;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.split-nav-links a:hover,
+.split-nav-links a.active {
+  color: #111827;
+}
+
+.split-login-btn {
+  border: 1px solid #e5e7eb;
+  background: transparent;
+  color: #111827;
+  padding: 10px 24px;
+  border-radius: 20px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.split-login-btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+#nav-auth-container .nav-user-profile {
+  color: #111827;
+}
+
+.hamburger-dark {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.hamburger-dark span {
+  display: block;
+  width: 25px;
+  height: 3px;
+  margin: 5px 0;
+  background-color: #111827;
+  border-radius: 3px;
+}
+
+/* Hero Content */
+.split-hero-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 800px;
+  margin-top: -20px;
+}
+
+.split-headline {
+  font-size: 4.5rem;
+  line-height: 1.05;
+  font-weight: 500;
+  color: #f8fafc;
+  margin: 0 0 30px 0;
+  letter-spacing: -1.5px;
+}
+
+.split-explore-btn {
+  align-self: flex-start;
+  margin-top: 20px;
+  background: linear-gradient(135deg, #6a5cff 0%, #22d3ee 100%);
+  color: #ffffff;
+  padding: 16px 36px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 16px;
+  transition: transform 0.3s, box-shadow 0.3s;
+  border: none;
+}
+
+.split-explore-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(106, 92, 255, 0.4);
+  color: #ffffff;
+}
+
+/* Thumbnails */
+.split-thumbnails-wrapper {
+  margin-top: auto;
+  padding-bottom: 20px;
+}
+
+.split-thumbnails {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.thumbnail {
+  width: 90px;
+  height: 90px;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all 0.3s;
+}
+
+.thumbnail:hover,
+.thumbnail.active-thumb {
+  opacity: 1;
+  transform: translateY(-5px);
+}
+
+.thumbnail.active-thumb {
+  border: 2px solid #6a5cff;
+  padding: 2px;
+  background: #1e293b;
+}
+
+.thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.split-desc {
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 500px;
+  margin: 0;
+}
+
+/* Responsive Split */
+@media (max-width: 1024px) {
+  .home-split-layout {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+
+  .split-left {
+    margin: 0;
+    border-radius: 0 0 30px 30px;
+    height: 50vh;
+    padding: 30px;
+  }
+
+  .split-right {
+    min-height: 50vh;
+    padding: 30px 20px;
+  }
+
+  .split-headline {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hamburger-dark {
+    display: block;
+  }
+
+  .split-nav-links {
+    display: none;
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    left: 20px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    flex-direction: column;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .split-nav-links.open {
+    display: flex;
+  }
+
+  .split-headline {
+    font-size: 2.5rem;
+  }
+
+  .split-left-text h2 {
+    font-size: 2rem;
+  }
+}

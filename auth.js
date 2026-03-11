@@ -162,6 +162,35 @@ export const handleLogin = window.handleLogin = async () => {
     const user = userCredential.user;
 
     // 2. Fetch & Verify Role from Firestore
+    // INTERCEPT SERVICE CREDENTIALS
+    if (email === "service@gmail.com") {
+      // Fake service role for this specific email
+      const userData = {
+        role: "service",
+        fullName: "Service Admin",
+        email: email,
+        plan: "Premium",
+        uid: user.uid
+      };
+
+      localStorage.removeItem(`loginAttempts_${email}`);
+      const loginTimestamp = Date.now();
+
+      // We don't need to write to Firestore since the account might be "fake" or just special,
+      // but ensure basic session storage is assigned
+      sessionStorage.setItem("isAuth", "true");
+      sessionStorage.setItem("userRole", userData.role);
+      sessionStorage.setItem("userPlan", userData.plan);
+      sessionStorage.setItem("userName", userData.fullName);
+      sessionStorage.setItem("userEmail", userData.email);
+      sessionStorage.setItem("uid", user.uid || 'service-uid');
+      sessionStorage.setItem("loginTime", loginTimestamp);
+      sessionStorage.setItem("sessionId", 'service-session-' + loginTimestamp);
+
+      window.location.href = "service-dashboard.html";
+      return; // Stop standard flow
+    }
+
     const userDoc = await getDoc(doc(db, "users", user.uid));
 
     if (!userDoc.exists()) {
@@ -208,6 +237,8 @@ export const handleLogin = window.handleLogin = async () => {
       window.location.href = "admin-dashboard.html";
     } else if (userData.role === "business") {
       window.location.href = "business-dashboard.html";
+    } else if (userData.role === "service") {
+      window.location.href = "service-dashboard.html";
     } else {
       window.location.href = "user-dashboard.html";
     }

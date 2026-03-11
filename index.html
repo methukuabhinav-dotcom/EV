@@ -31,41 +31,66 @@
 
   <script type="module" src="nav.js"></script>
 
-  <!-- HERO SECTION -->
-  <section class="hero-section">
-    <div class="hero-content">
-      <div class="hero-badge">🚀 Next Generation EV Analytics</div>
-      <h1 class="hero-title">Powering the <span class="gradient-text">Future</span> of Electric Vehicles</h1>
-      <p class="hero-subtitle">
-        Intelligent analytics platform for real-time EV charging optimization,
-        predictive performance monitoring, and sustainable mobility insights.
-      </p>
-
-      <div class="hero-cta">
-        <a href="vehicle-selection.html" class="cta-btn-primary">Get Started Free</a>
-        <a href="about.html" class="cta-btn-secondary">Learn More</a>
+  <!-- SPLIT LAYOUT HERO -->
+  <main class="home-split-layout">
+    <!-- LEFT SIDE (Image) -->
+    <div class="split-left"
+      style="background-image: url('https://images.unsplash.com/photo-1619682817481-e994891cd1f5?q=80&w=1200&auto=format&fit=crop');">
+      <div class="split-logo">
+        <svg xmlns="http://www.w3.org/O/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round" class="split-logo-icon">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+        </svg>
+        <span>EV ANALYTICS</span>
+      </div>
+      <div class="split-left-text">
+        <h2>Redefining the road ahead with<br>electric performance</h2>
       </div>
     </div>
 
-    <div class="hero-stats">
-      <div class="stat-card fade-in-1">
-        <div class="stat-number" data-target="10000">10,000+</div>
-        <div class="stat-label">EVs Analyzed</div>
-      </div>
-      <div class="stat-card fade-in-2">
-        <div class="stat-number" data-target="500000">500K+</div>
-        <div class="stat-label">Data Points</div>
-      </div>
-      <div class="stat-card fade-in-3">
-        <div class="stat-number" data-target="95">95%</div>
-        <div class="stat-label">Accuracy Rate</div>
-      </div>
-      <div class="stat-card fade-in-4">
-        <div class="stat-number" data-target="150">150+</div>
-        <div class="stat-label">EV Models</div>
+    <!-- RIGHT SIDE (Content & Nav) -->
+    <div class="split-right">
+
+      <!-- RIGHT HERO CONTENT -->
+      <div class="split-hero-content">
+        <h1 class="split-headline">Powering the future<br>of EV analytics</h1>
+        <p class="split-desc">
+          Intelligent analytics platform for real-time EV charging optimization, predictive performance monitoring,
+          and sustainable mobility insights.
+        </p>
+        <a href="vehicle-selection.html" class="split-explore-btn">Get Started Free</a>
+
+        <!-- THUMBNAILS AT BOTTOM -->
+        <div class="split-thumbnails-wrapper">
+          <div class="split-thumbnails">
+            <div class="thumbnail active-thumb">
+              <img src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=200&auto=format&fit=crop"
+                alt="EV Detail 1">
+            </div>
+            <div class="thumbnail">
+              <img src="https://images.unsplash.com/photo-1620891549027-942fdc95d3f5?q=80&w=200&auto=format&fit=crop"
+                alt="EV Detail 2">
+            </div>
+            <div class="thumbnail">
+              <img src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=200&auto=format&fit=crop"
+                alt="EV Detail 3">
+            </div>
+            <div class="thumbnail">
+              <img src="https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=200&auto=format&fit=crop"
+                alt="EV Detail 4">
+            </div>
+          </div>
+          <p class="split-desc">
+            Intelligent analytics platform for real-time EV charging optimization, predictive performance monitoring,
+            and sustainable mobility insights.
+          </p>
+        </div>
       </div>
     </div>
-  </section>
+  </main>
+
+  <script type="module" src="nav.js"></script>
 
   <!-- FEATURES SECTION -->
   <section class="features-section">
